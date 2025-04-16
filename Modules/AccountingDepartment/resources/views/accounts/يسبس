@@ -1,0 +1,212 @@
+<html dir="rtl" lang="ar">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Chart of Accounts
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+ </head>
+ <body class="bg-gray-100">
+  <div class="container mx-auto p-4">
+   <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">
+    شجرة دليل الحسابات
+   </h1>
+   <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="p-6">
+     <div class="flex justify-between items-center cursor-pointer" onclick="toggleDropdown('accounts-dropdown')">
+      <h2 class="text-xl font-semibold text-gray-700">
+       <i class="fas fa-tree mr-2">
+       </i>
+       شجرة الحسابات
+      </h2>
+      <i class="fas fa-chevron-down text-gray-500">
+      </i>
+     </div>
+     <ul class="list-none pl-6 mt-2 hidden" id="accounts-dropdown">
+      <!-- الأصول -->
+      <li class="border-b py-4">
+       <div class="flex justify-between items-center cursor-pointer" onclick="toggleDropdown('dropdown-1')">
+        <div class="flex items-center">
+         <img alt="Icon representing Assets" class="mr-3" height="40" src="https://storage.googleapis.com/a1aa/image/Aa9qb8WWjuYvCBlly4pfPnhk568l_HfQb2aKLcvL_2s.jpg" width="40"/>
+         <span class="text-lg font-semibold text-gray-700">
+          1 - الأصول
+         </span>
+        </div>
+        <i class="fas fa-chevron-down text-gray-500">
+        </i>
+       </div>
+       <ul class="list-none pl-6 mt-2 hidden" id="dropdown-1">
+        <li class="border-b py-2 text-gray-600 flex items-center cursor-pointer" onclick="toggleDropdown('dropdown-11')">
+         <img alt="Icon representing Current Assets" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/rkJahYyXQYEOnP5qlcmdEzs0-pV8cqHB_IYFeSoMD44.jpg" width="30"/>
+         11 - الأصول المتداولة
+         <i class="fas fa-chevron-down text-gray-500 ml-2">
+         </i>
+        </li>
+        <ul class="list-none pl-6 mt-2 hidden" id="dropdown-11">
+         <li class="border-b py-2 text-gray-600 flex items-center cursor-pointer" onclick="toggleDropdown('dropdown-111')">
+          <img alt="Icon representing Cash and Equivalents" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/gsev8KxxAxGXxDx8ucsRXN5BraxsBLDN75hDxjLxlx0.jpg" width="30"/>
+          111 - النقدية وما في حكمها
+          <i class="fas fa-chevron-down text-gray-500 ml-2">
+          </i>
+         </li>
+         <ul class="list-none pl-6 mt-2 hidden" id="dropdown-111">
+          <li class="border-b py-2 text-gray-600 flex items-center cursor-pointer" onclick="toggleDropdown('dropdown-11101')">
+           <img alt="Icon representing Cash and Bank Deposits" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/AKfhWGnYR6tS1mZPDDswml9yKxOFcmdNUlSB8lxuHIA.jpg" width="30"/>
+           11101 - نقدية وودائع في البنوك
+           <i class="fas fa-chevron-down text-gray-500 ml-2">
+           </i>
+          </li>
+          <ul class="list-none pl-6 mt-2 hidden" id="dropdown-11101">
+           <li class="border-b py-2 text-gray-600 flex items-center">
+            <img alt="Icon representing Current Account at Al Rajhi Bank" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/1.jpg" width="30"/>
+            11101001 - حسابات جارية - مصرف الراجحي
+           </li>
+           <li class="border-b py-2 text-gray-600 flex items-center">
+            <img alt="Icon representing Current Account at Bank Albilad" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/2.jpg" width="30"/>
+            11101002 - حسابات جارية - بنك البلاد
+           </li>
+           <li class="border-b py-2 text-gray-600 flex items-center">
+            <img alt="Icon representing Current Account at Alinma Bank" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/3.jpg" width="30"/>
+            11101003 - حسابات جارية - مصرف الإنماء
+           </li>
+           <li class="border-b py-2 text-gray-600 flex items-center">
+            <img alt="Icon representing Current Account at National Commercial Bank" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/4.jpg" width="30"/>
+            11101004 - حسابات جارية - البنك الأهلي التجاري
+           </li>
+          </ul>
+          <li class="border-b py-2 text-gray-600 flex items-center">
+           <img alt="Icon representing Deposits and Retained Guarantees" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/18Pd0tVnGxgiW7cUoz6nesfGecpXX8SfTbb5xv-nN4c.jpg" width="30"/>
+           11102 - حساب الودائع والتأمينات المحتجزة
+          </li>
+          <li class="border-b py-2 text-gray-600 flex items-center">
+           <img alt="Icon representing Cash in Safes" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/Q6aiOqgF9NXbEVlzsdqEgFT1LS967edUz2yI5Lt3I68.jpg" width="30"/>
+           11103 - النقدية في الصناديق
+          </li>
+          <li class="border-b py-2 text-gray-600 flex items-center">
+           <img alt="Icon representing Cash in Transit (Checks Under Collection)" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/nAmurvzi3tMK9_5qRk8OR5eNlPhRbaohT6ooIgGDkWw.jpg" width="30"/>
+           11104 - النقدية في الطريق " شيكات تحت التحصيل "
+          </li>
+         </ul>
+         <li class="border-b py-2 text-gray-600 flex items-center">
+          <img alt="Icon representing Loan and Financing Portfolios" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/15elp4yJeAXTRN0RTPdjIFfrQK-TBXmOo4T3bVcr1Sg.jpg" width="30"/>
+          112 - المحافظ الإقراضية والتمويلة
+         </li>
+         <li class="border-b py-2 text-gray-600 flex items-center">
+          <img alt="Icon representing Investments (Current)" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/JZmR-wd_f0I5uj1e7CcjlH1C-HuApgK4_mIAco_5Ewg.jpg" width="30"/>
+          113 - الإستثمارات ( المتداولة )
+         </li>
+         <li class="border-b py-2 text-gray-600 flex items-center">
+          <img alt="Icon representing Receivables" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/arIR6TCX-Vj5WZSlDoGgOuT1HOMy289L0IPRCy5PPyY.jpg" width="30"/>
+          114 - الذمم المدينة
+         </li>
+         <li class="border-b py-2 text-gray-600 flex items-center">
+          <img alt="Icon representing Prepaid Expenses" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/0CiDMYeF4b8QLYAbNWG7xdxBkICxJyKFqmGrudVOPW0.jpg" width="30"/>
+          115 - مصروفات مدفوعة مقدماً
+         </li>
+         <li class="border-b py-2 text-gray-600 flex items-center">
+          <img alt="Icon representing Accrued Revenues and Donations" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/FPyyJDygd80nPsFxD9yS6_N0haqHIAtbBoqYViChj5E.jpg" width="30"/>
+          116 - إيرادات وتبرعات مستحقة
+         </li>
+         <li class="border-b py-2 text-gray-600 flex items-center">
+          <img alt="Icon representing Inventory" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/DJbc3ifMVfpUk6qEuTWdvVFYwTMzaWW53VtkYH2HQD8.jpg" width="30"/>
+          117 - المخزون
+         </li>
+         <li class="border-b py-2 text-gray-600 flex items-center">
+          <img alt="Icon representing Current Accounts of Branches (Related Parties)" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/qeo1Quh6qXxToTB2qgY_8rRM14TxtPO0p6XUPqBIvvo.jpg" width="30"/>
+          118 - الحسابات الجارية للفروع " أطراف ذات علاقة "
+         </li>
+        </ul>
+        <li class="border-b py-2 text-gray-600 flex items-center">
+         <img alt="Icon representing Non-Current Assets" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/ckxxHc9CJByUIyXDT8bSGY6UaoWu7nngDfEXcfLawOg.jpg" width="30"/>
+         12 - الأصول غير المتداولة
+        </li>
+        <li class="border-b py-2 text-gray-600 flex items-center">
+         <img alt="Icon representing Endowment Assets" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/NqLH0v3-FtwP_888fsNDAioARZ8P1exkGkebQzpBRAs.jpg" width="30"/>
+         13 - أصول الأوقاف
+        </li>
+       </ul>
+      </li>
+      <!-- الإلتزامات وصافي الأصول -->
+      <li class="border-b py-4">
+       <div class="flex justify-between items-center cursor-pointer" onclick="toggleDropdown('dropdown-2')">
+        <div class="flex items-center">
+         <img alt="Icon representing Liabilities and Net Assets" class="mr-3" height="40" src="https://storage.googleapis.com/a1aa/image/BpcuIoCdQ7-lTs5uTWsdnhnR0hQG6Aqad29vS2P6yck.jpg" width="40"/>
+         <span class="text-lg font-semibold text-gray-700">
+          2 - الإلتزامات وصافي الأصول
+         </span>
+        </div>
+        <i class="fas fa-chevron-down text-gray-500">
+        </i>
+       </div>
+       <ul class="list-none pl-6 mt-2 hidden" id="dropdown-2">
+        <li class="border-b py-2 text-gray-600 flex items-center">
+         <img alt="Icon representing Current Liabilities" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/LbYiGWMP_69YUwRGf0oAhU6OoiXfVGTORP7eyKob5tA.jpg" width="30"/>
+         21 - الإلتزامات المتداولة
+        </li>
+        <li class="border-b py-2 text-gray-600 flex items-center">
+         <img alt="Icon representing Non-Current Liabilities" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/6TLv77a09pp5eNHFNdaHwz5_lNDv7KBHqgVPFk9ijJ8.jpg" width="30"/>
+         22 - الإلتزامات غير متداولة
+        </li>
+        <li class="border-b py-2 text-gray-600 flex items-center">
+         <img alt="Icon representing Net Assets" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/KxWbJYsPyE4pbXRwxW3aluPM-Tc-nlKDWW3decVAFRo.jpg" width="30"/>
+         23 - صافي الأصول
+        </li>
+       </ul>
+      </li>
+      <!-- الإيرادات والتبرعات -->
+      <li class="border-b py-4">
+       <div class="flex justify-between items-center cursor-pointer" onclick="toggleDropdown('dropdown-3')">
+        <div class="flex items-center">
+         <img alt="Icon representing Revenues and Donations" class="mr-3" height="40" src="https://storage.googleapis.com/a1aa/image/aSDbfCjqvHbqNiygV6hB8wgIrngD6lgwjOL__9Jznv4.jpg" width="40"/>
+         <span class="text-lg font-semibold text-gray-700">
+          3 - الإيرادات والتبرعات
+         </span>
+        </div>
+        <i class="fas fa-chevron-down text-gray-500">
+        </i>
+       </div>
+       <ul class="list-none pl-6 mt-2 hidden" id="dropdown-3">
+        <li class="border-b py-2 text-gray-600 flex items-center">
+         <img alt="Icon representing Donations and Revenues" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/inonWcn44W7U4m5YCMBikG1Rw8D2XL1YN-2TQ4gQww0.jpg" width="30"/>
+         31 - التبرعات والايرادات
+        </li>
+       </ul>
+      </li>
+      <!-- المصروفات -->
+      <li class="border-b py-4">
+       <div class="flex justify-between items-center cursor-pointer" onclick="toggleDropdown('dropdown-4')">
+        <div class="flex items-center">
+         <img alt="Icon representing Expenses" class="mr-3" height="40" src="https://storage.googleapis.com/a1aa/image/iSUU-wDSGFRaGdPHyF-eyOI-_7ns-AUZgpgMVRLAAvs.jpg" width="40"/>
+         <span class="text-lg font-semibold text-gray-700">
+          4 - المصروفات
+         </span>
+        </div>
+        <i class="fas fa-chevron-down text-gray-500">
+        </i>
+       </div>
+       <ul class="list-none pl-6 mt-2 hidden" id="dropdown-4">
+        <li class="border-b py-2 text-gray-600 flex items-center">
+         <img alt="Icon representing General and Administrative Expenses" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/SNhrOwGDIkXbvfl5gLXRvhIOY2TiPjo-yWj-L-fZnn4.jpg" width="30"/>
+         41 - المصاريف العمومية والإدارية
+        </li>
+        <li class="border-b py-2 text-gray-600 flex items-center">
+         <img alt="Icon representing Program and Activity Expenses" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/OST98PaBUPqb9MKhCGGLLyzcZb-DgpkloiqQKp7t_U4.jpg" width="30"/>
+         42 - مصاريف البرامج والأنشطة
+        </li>
+        <li class="border-b py-2 text-gray-600 flex items-center">
+         <img alt="Icon representing Endowment Returns and Distributions Expenses" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/p88WP5v7eRvCqVUypcoBhkDeFpoYEu9t-VseneTS7BQ.jpg" width="30"/>
+         43 - مصاريف وتوزيعات عوائد الأوقاف
+        </li>
+        <li class="border-b py-2 text-gray-600 flex items-center">
+         <img alt="Icon representing Fundraising Expenses" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/4-XO4jj51nCloGxFyf2B-cN3cV7pHYxUxIyAsbExlfQ.jpg" width="30"/>
+         44 - مصاريف جمع الأموال
+        </li>
+        <li class="border-b py-2 text-gray-600 flex items-center">
+         <img alt="Icon representing Investment Expenses" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/uJSGJEjQrM62xbeVQMT0BSSmfvEU_zUzQzaQt_0abjk.jpg" width="30"/>
+         45 - مصاريف الاستثمار
+        </li>
+        <li class="border-b py-2 text-gray-600 flex items-center">
+         <img alt="Icon representing Governance Expenses" class="mr-2" height="30" src="https://storage.googleapis.com/a1aa/image

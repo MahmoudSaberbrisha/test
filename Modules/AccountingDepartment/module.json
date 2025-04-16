@@ -1,0 +1,11 @@
+{
+    "name": "AccountingDepartment",
+    "alias": "accountingdepartment",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\AccountingDepartment\\Providers\\AccountingDepartmentServiceProvider"
+    ],
+    "files": []
+}

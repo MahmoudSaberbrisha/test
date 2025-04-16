@@ -1,0 +1,2 @@
+<a class="remove-from-cart modal-effect" href="javascript:void(0);" title="{{__('Delete')}}" data-effect="effect-scale" onclick="$('#modal-danger form').attr('action', '{{route(auth()->getDefaultDriver().'.extra-services.destroy', $id)}}'); $('#modal-danger form').attr('method', 'post');" data-toggle="modal" data-target="#modal-danger"><i class="fa fa-trash"></i></a>
+<a class="btn-edit" href="javascript:void(0);" data-placement="top" onclick='Livewire.dispatch("openModal", {id: "{{ $id }}"} );' title="{{__('Edit')}}"><i class="fa fa-edit"></i></a>

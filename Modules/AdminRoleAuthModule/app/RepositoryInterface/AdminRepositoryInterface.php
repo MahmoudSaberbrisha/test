@@ -1,0 +1,22 @@
+<?php
+
+namespace Modules\AdminRoleAuthModule\RepositoryInterface;
+
+interface AdminRepositoryInterface {
+
+    public function getAll();
+
+    public function create(array $request);
+
+    public function findById(int $id);
+
+    public function update(int $id, array $request);
+
+    public function delete(int $id);
+
+    public function active(int $id, string $value);
+
+    public function updateAccount(array $request);
+
+    public function updatePassword(array $request);
+}

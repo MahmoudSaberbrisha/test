@@ -1,0 +1,11 @@
+{
+    "name": "AdminRoleAuthModule",
+    "alias": "adminroleauthmodule",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\AdminRoleAuthModule\\Providers\\AdminRoleAuthModuleServiceProvider"
+    ],
+    "files": []
+}

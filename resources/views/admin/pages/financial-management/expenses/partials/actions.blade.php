@@ -1,0 +1,2 @@
+<a class="remove-from-cart modal-effect" href="javascript:void(0);" title="{{__('Delete')}}" data-effect="effect-scale" onclick="$('#modal-danger form').attr('action', '{{route(auth()->getDefaultDriver().'.expenses.destroy', $id)}}'); $('#modal-danger form').attr('method', 'post');" data-toggle="modal" data-target="#modal-danger"><i class="fa fa-trash"></i></a>
+<a href="{{ route(auth()->getDefaultDriver().'.expenses.edit', $id) }}" class="btn-edit" data-placement="top" data-toggle="tooltip" title="{{__('Edit')}}"><i class="fa fa-edit"></i></a>
