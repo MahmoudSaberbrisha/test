@@ -5,6 +5,7 @@
     <div class="container mx-auto bg-white shadow-md rounded-lg p-4" dir="ltr">
         <form action="{{ route(auth()->getDefaultDriver() . '.entries.store') }}" method="POST">
             @csrf
+
             <div class="grid grid-cols-6 gap-4 mb-4" dir="ltr">
 
                 <div class="col-span-1">

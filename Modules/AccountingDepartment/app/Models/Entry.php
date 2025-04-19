@@ -24,7 +24,7 @@ class Entry extends Model
         'reference2',
         'debit',
         'credit',
-        'totel',
+        'total',
     ];
 
     public function chartOfAccount()

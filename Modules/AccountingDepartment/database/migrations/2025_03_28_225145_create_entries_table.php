@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('reference2');
             $table->decimal('debit', 10, 2);
             $table->decimal('credit', 10, 2);
-            $table->decimal('totel', 10, 2);
+            $table->decimal('total', 10, 2); // Changed from 'totel' to 'total'
             $table->timestamps();
         });
     }

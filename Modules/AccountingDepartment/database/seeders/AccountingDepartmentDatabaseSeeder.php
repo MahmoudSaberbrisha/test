@@ -2,7 +2,8 @@
 
 namespace Modules\AccountingDepartment\Database\Seeders;
 
-use Illuminate\Database\Seeder;
+
+use Modules\AccountingDepartment\Database\Seeders\EntriesSeeder;
 
 class AccountingDepartmentDatabaseSeeder extends Seeder
 {
@@ -11,6 +12,8 @@ class AccountingDepartmentDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // $this->call([]);
+        $this->call([
+            EntriesSeeder::class,
+        ]);
     }
 }
