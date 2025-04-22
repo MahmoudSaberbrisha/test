@@ -1,0 +1,138 @@
+button {
+    padding: 1.3em 3em;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    font-weight: 500;
+    color: #000;
+    background-color: #fff;
+    border: none;
+    border-radius: 45px;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease 0s;
+    cursor: pointer;
+    outline: none;
+}
+
+button:hover {
+    background-color: #23c483;
+    box-shadow: 0px 15px 20px rgba(46, 229, 157, 0.4);
+    color: #fff;
+    transform: translateY(-7px);
+}
+
+button:active {
+    transform: translateY(-1px);
+}
+
+/* Sidebar container perspective for 3D effect and transparent background */
+.app-sidebar {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Glow animation */
+@keyframes glowPulse {
+    0%,
+    100% {
+        box-shadow: 0 0 8px 2px #23c483, 0 0 20px 5px #23c483;
+    }
+    50% {
+        box-shadow: 0 0 12px 4px #23c483, 0 0 30px 8px #23c483;
+    }
+}
+
+/* Sidebar menu hover effect with 3D transform and glow */
+.side-menu__item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    color: #444;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease,
+        box-shadow 0.3s ease;
+    border-radius: 6px;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+}
+
+.side-menu__item:hover {
+    background-color: #23c483;
+    color: #fff;
+    text-decoration: none;
+    transform: translateZ(15px) rotateY(10deg);
+    animation: glowPulse 2s infinite;
+}
+
+/* Glow on icon path on hover */
+.side-menu__item:hover .side-menu__icon path {
+    fill: #fff;
+    filter: drop-shadow(0 0 6px #23c483);
+}
+
+/* Active menu item with subtle 3D effect and glow */
+.side-menu__item.active {
+    background-color: #1fa67a;
+    color: #fff;
+    transform: translateZ(10px);
+    box-shadow: 0 0 12px 3px #1fa67a, 0 0 25px 7px #1fa67a;
+    animation: glowPulse 2s infinite;
+}
+
+.side-menu__item.active .side-menu__icon path {
+    fill: #fff;
+    filter: drop-shadow(0 0 8px #1fa67a);
+}
+
+/* Submenu slide transition */
+.slide-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    padding-left: 20px;
+    transform-style: preserve-3d;
+}
+
+/* Expanded submenu */
+.slide.is-expanded > .slide-menu {
+    max-height: 1000px; /* large enough to show all items */
+}
+
+/* Icon rotation on submenu toggle with 3D rotation */
+.side-menu__item .angle {
+    transition: transform 0.5s ease;
+    transform-origin: center;
+    backface-visibility: hidden;
+}
+
+.slide.is-expanded > .side-menu__item .angle {
+    transform: rotateY(90deg);
+}
+
+/* Sidebar header logo hover effect with 3D scale, shadow and glow */
+.main-sidebar-header img.main-logo {
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    cursor: pointer;
+    transform-style: preserve-3d;
+}
+
+.main-sidebar-header img.main-logo:hover {
+    transform: scale(1.1) translateZ(20px);
+    box-shadow: 0 0 25px 8px #23c483;
+    animation: glowPulse 2s infinite;
+}
+
+/* User avatar hover effect with 3D scale, shadow and glow */
+.app-sidebar__user .avatar {
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    cursor: pointer;
+    transform-style: preserve-3d;
+}
+
+.app-sidebar__user .avatar:hover {
+    transform: scale(1.15) translateZ(20px);
+    box-shadow: 0 0 25px 8px #23c483;
+    animation: glowPulse 2s infinite;
+}

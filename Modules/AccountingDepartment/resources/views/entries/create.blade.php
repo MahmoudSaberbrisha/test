@@ -1,7 +1,6 @@
 @extends('accounting-department::entries.master')
 
 @section('entries')
-
     <div class="container mx-auto bg-white shadow-md rounded-lg p-4" dir="ltr">
         <form action="{{ route(auth()->getDefaultDriver() . '.entries.store') }}" method="POST">
             @csrf
@@ -62,94 +61,110 @@
             </div>
             <div class="overflow-x-auto w-full">
                 <table class="w-full scroll-y-auto text-sm text-center font-light border-collapse">
-                <thead>
-                    <tr class="bg-green-700 text-white">
-                        <th class="border border-gray-300 py-2 px-4">الإجراء</th>
-                        <th class="border border-gray-300 py-2 px-4">المرجع</th>
-                        <th class="border border-gray-300 py-2 px-4">مركز التكلفة</th>
-                        <th class="border border-gray-300 py-2 px-4">إسم الحساب</th>
-                        <th class="border border-gray-300 py-2 px-4">رقم الحساب</th>
-                        <th class="border border-gray-300 py-2 px-4">مدين</th>
+                    <thead>
+                        <tr class="bg-green-700 text-white">
+                            <th class="border border-gray-300 py-2 px-4">الإجراء</th>
+                            <th class="border border-gray-300 py-2 px-4">البيان</th>
 
-                        <th class="border border-gray-300 py-2 px-4">دائن</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body" class="input w-full">
-                    <tr>
-                        <td class="border border-gray-300 py-2 px-4 text-center" rowspan="100">
-                            <button type="button" class="bg-blue-500 text-black rounded-full p-2 input" onclick="addRow()">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </td>
-                        <td>
-                            <input type="text" name="entries[0][reference]" id="reference"
-                                class="border border-gray-300 rounded input px-2 py-3 w-full" required>
-                        </td>
-                        <td>
-                            <input type="text" name="entries[0][cost_center]" id="cost_center"
-                                class="border border-gray-300 rounded input px-2 py-3 w-full" required>
-                        </td>
-                        <td>
-                            <input type="text" name="entries[0][account_name]" id="account_name"
-                                class="border border-gray-300 rounded px-2 input py-3 w-full" required>
-                        </td>
-                        <td>
-                            <input type="text" name="entries[0][account_number]" id="account_number"
-                                class="border border-gray-300 rounded px-2 input py-3 w-full" required>
-                        </td>
-                        <td class="border py-1 px-1 bg-red-100">
-                            <input type="number" name="entries[0][credit]" id="credit" value=0.00 style="width: 300px"
-                                class="border border-gray-300 rounded py-3 input px-4 w-full credit-input"
-                                oninput="calculateDifference()">
-                        </td>
-                        <td class="border border-gray-300">
-                            <input type="number" name="entries[0][debit]" id="debit" value=0.00
-                                class="border border-gray-300 rounded px-2 input py-3 w-full debit-input"
-                                oninput="calculateDifference()" required>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type="text" name="entries[1][reference]" id="reference2"
-                                class="border border-gray-300 rounded px-2 input py-3 w-full" required>
-                        </td>
-                        <td>
-                            <input type="text" name="entries[1][cost_center]" id="cost_center2"
-                                class="border border-gray-300 rounded px-2 input py-3 w-full" required>
-                        </td>
-                        <td>
-                            <input type="text" name="entries[1][account_name]" id="account_name2"
-                                class="border border-gray-300 rounded px-2 py-3 input w-full" required>
-                        </td>
-                        <td>
-                            <input type="text" name="entries[1][account_number]" id="account_number2"
-                                class="border border-gray-300 rounded px-2  input py-3 w-full" required>
-                        </td>
-                        <td class="border py-1 px-1 bg-red-100">
-                            <input type="number" name="entries[1][credit]" id="credit" value=0.00
-                                class="border border-gray-300 rounded py-3 input px-4 w-full credit-input" style="width: 300px"
-                                oninput="calculateDifference()">
-                        </td>
-                        <td >
-                            <input type="number" name="entries[1][debit]" id="debit" value=0.00
-                                class="border border-gray-300 rounded input px-3 py-3 w-full debit-input"
-                                oninput="calculateDifference()" required>
-                        </td>
-                    </tr>
+                            <th class="border border-gray-300 py-2 px-4">المرجع</th>
+                            <th class="border border-gray-300 py-2 px-4">مركز التكلفة</th>
+                            <th class="border border-gray-300 py-2 px-4">إسم الحساب</th>
+                            <th class="border border-gray-300 py-2 px-4">رقم الحساب</th>
+                            <th class="border border-gray-300 py-2 px-4">مدين</th>
 
-                    <tr class="bg-green-100">
-                        <td class=" py-3  text-center" colspan="4">الإجمالي</td>
-                        <td class=" py-3  text-center" id="credit-total">0.00</td>
-                        <td class=" py-3  text-center" id="debit-total">0.00</td>
-                    </tr>
-                    <tr>
-                        <td class="border border-gray-300 py-2 px-4 text-center" colspan="5">الفرق بين الجانبين</td>
-                        <td class="border border-gray-300 py-2 px-4 text-center"><input id="difference" readonly
-                                type="number" class="border border-gray-300 py-2  input px-4 text-center" name="totel"
-                                required></td>
-                    </tr>
-                </tbody>
-            </table>
+                            <th class="border border-gray-300 py-2 px-4">دائن</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="input w-full">
+                        <tr>
+                            <td class="border border-gray-300 py-2 px-4 text-center" rowspan="100">
+                                <button type="button" class="bg-blue-500 text-black rounded-full p-2 input"
+                                    onclick="addRow()">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <input type="text" style="width:350px" name="entries[0][description]" id="description"
+                                    class="border border-gray-300 rounded px-2 input py-3 w-full" required>
+                            </td>
+                            <td>
+                                <input type="text" name="entries[0][reference]" id="reference"
+                                    class="border border-gray-300 rounded input px-2 py-3 w-full" required>
+                            </td>
+                            <td>
+                                <input type="text" name="entries[0][cost_center]" id="cost_center"
+                                    class="border border-gray-300 rounded input px-2 py-3 w-full" required>
+                            </td>
+                            <td>
+                                <input type="text" name="entries[0][account_name]" id="account_name"
+                                    class="border border-gray-300 rounded px-2 input py-3 w-full" required>
+                            </td>
+                            <td>
+                                <input type="text" name="entries[0][account_number]" id="account_number"
+                                    class="border border-gray-300 rounded px-2 input py-3 w-full" required>
+                            </td>
+                            <td class="border py-1 px-1  bg-red-100">
+                                <input type="number" name="entries[0][credit]" id="credit" value=0.00
+                                    style="width:120px"
+                                    class="border  border-gray-300 rounded py-3 input px-4 w-full credit-input"
+                                    oninput="calculateDifference()">
+                            </td>
+                            <td class="border border-gray-300">
+                                <input type="number" name="entries[0][debit]" id="debit" value=0.00
+                                    style="width:120px" class="border border-gray-300 rounded px-2 input py-3 debit-input"
+                                    oninput="calculateDifference()" required>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="text" style="width:350px" name="entries[1][description]"
+                                    id="description2" class="border border-gray-300 rounded px-2 input py-3 w-full"
+                                    required>
+                            </td>
+                            <td>
+                                <input type="text" name="entries[1][reference]" id="reference2"
+                                    class="border border-gray-300 rounded px-2 input py-3 w-full" required>
+                            </td>
+                            <td>
+                                <input type="text" name="entries[1][cost_center]" id="cost_center2"
+                                    class="border border-gray-300 rounded px-2 input py-3 w-full" required>
+                            </td>
+                            <td>
+                                <input type="text" name="entries[1][account_name]" id="account_name2"
+                                    class="border border-gray-300 rounded px-2 py-3 input w-full" required>
+                            </td>
+                            <td>
+                                <input type="text" name="entries[1][account_number]" id="account_number2"
+                                    class="border border-gray-300 rounded px-2  input py-3 w-full" required>
+                            </td>
+                            <td class="border py-1 px-1 bg-red-100">
+                                <input type="number" name="entries[1][credit]" id="credit" value=0.00
+                                    class="border border-gray-300 rounded py-3 input px-4 w-full credit-input"
+                                    style="width: 120px" oninput="calculateDifference()">
+                            </td>
+                            <td>
+                                <input type="number" style="width: 120px" name="entries[1][debit]" id="debit" value=0.00
+                                    class="border border-gray-300 rounded input px-3 py-3 w-full debit-input"
+                                    oninput="calculateDifference()" required>
+                            </td>
+
+                        </tr>
+
+                        <tr class="bg-green-100">
+                            <td class=" py-3  text-center" colspan="5">الإجمالي</td>
+                            <td style="width: 120px" class=" py-3  text-center" id="credit-total">0.00</td>
+                            <td  style="width: 120px" class=" py-3   text-center" id="debit-total">0.00</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-300 py-1 px-1 text-center" colspan="6">الفرق بين الجانبين
+                            </td>
+                            <td class="border border-gray-300 py-1 px-1 text-center"><input id="difference" readonly
+                                 style="width: 120px"   type="number" class="border border-gray-300 py-2  input px-4 text-center"
+                                    name="totel" required></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <div class="flex justify-between items-center mt-4">
                 <div class="flex space-x-2">

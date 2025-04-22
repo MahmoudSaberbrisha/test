@@ -1,11 +1,12 @@
-* text=auto eol=lf
+# Set default behavior to automatically normalize line endings
+* text=auto
 
-*.blade.php diff=html
-*.css diff=css
-*.html diff=html
-*.md diff=markdown
-*.php diff=php
+# Explicitly declare text files you want to always normalize
+*.js text
 
-/.github export-ignore
-CHANGELOG.md export-ignore
-.styleci.yml export-ignore
+# Binary files - do not modify line endings
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary

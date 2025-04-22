@@ -1,0 +1,73 @@
+/* Dark theme color overrides for login page */
+
+.container {
+    background: #121212 !important;
+    color: #eee !important;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.2) !important;
+}
+
+.container h1 {
+    color: #eee !important;
+}
+
+.container p {
+    color: #ccc !important;
+}
+
+.form-box {
+    background: #121212 !important;
+    color: #eee !important;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1) !important;
+}
+
+.input-box input {
+    background: #333 !important;
+    color: #eee !important;
+}
+
+.input-box input::placeholder {
+    color: #bbb !important;
+}
+
+.input-box i {
+    color: #eee !important;
+}
+
+.forgot-link a {
+    color: #bbb !important;
+}
+
+.btn {
+    background: #4a90e2 !important;
+    color: #fff !important;
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.7) !important;
+    transition: background 0.3s ease !important;
+}
+
+.btn:hover {
+    background: #357abd !important;
+}
+
+.social-icons a {
+    border-color: #555 !important;
+    color: #eee !important;
+    transition: border-color 0.3s ease, color 0.3s ease !important;
+}
+
+.social-icons a:hover {
+    border-color: #4a90e2 !important;
+    color: #4a90e2 !important;
+}
+
+.toggle-box::before {
+    background: #4a90e2 !important;
+}
+
+.toggle-panel {
+    color: #eee !important;
+}
+
+.toggle-panel .btn {
+    border-color: #eee !important;
+    color: #eee !important;
+}

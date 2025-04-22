@@ -25,6 +25,18 @@ class RevenuesExpensesController extends Controller
                 $total_debit = $accountEntries->sum('debit');
                 $total_credit = $accountEntries->sum('credit');
                 $account->balance = $total_debit - $total_credit;
+
+                // Calculate previous balance before last entry
+                $lastEntry = $accountEntries->sortByDesc('created_at')->first();
+                if ($lastEntry) {
+                    $previousEntries = $accountEntries->where('created_at', '<', $lastEntry->created_at);
+                    $prev_debit = $previousEntries->sum('debit');
+                    $prev_credit = $previousEntries->sum('credit');
+                    $account->previous_balance = $prev_debit - $prev_credit;
+                } else {
+                    $account->previous_balance = 0;
+                }
+
                 $accounts->push($account);
             }
         }
@@ -42,6 +54,18 @@ class RevenuesExpensesController extends Controller
                 $total_debit = $accountEntries->sum('debit');
                 $total_credit = $accountEntries->sum('credit');
                 $account->balance2 = $total_debit - $total_credit;
+
+                // Calculate previous balance before last entry
+                $lastEntry = $accountEntries->sortByDesc('created_at')->first();
+                if ($lastEntry) {
+                    $previousEntries = $accountEntries->where('created_at', '<', $lastEntry->created_at);
+                    $prev_debit = $previousEntries->sum('debit');
+                    $prev_credit = $previousEntries->sum('credit');
+                    $account->previous_balance2 = $prev_debit - $prev_credit;
+                } else {
+                    $account->previous_balance2 = 0;
+                }
+
                 $accounts->push($account);
             }
         }

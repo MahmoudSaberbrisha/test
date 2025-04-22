@@ -1,8 +1,5 @@
 @extends('accounting-department::entries.master')
 @section('entries')
- <link rel="stylesheet" href="{{ asset('assets') }}/style.css">
- <script src='https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.4/dat.gui.min.js'></script><script  src="{{ asset('assets') }}/script.js"></script>
-
     <div class="mb-4" dir="rtl">
         <form method="GET" action="" class="flex items-center gap-4">
             <label for="per_page" class="text-sm font-medium text-gray-700">عدد العناصر:</label>
@@ -15,7 +12,7 @@
             </select>
         </form>
         <div class="flex justify-between mt-4">
-            <button onclick="loadPreviousEntries()" class="LiquidButton bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            <button onclick="loadPreviousEntries()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                 عرض السابق
             </button>
             <button onclick="loadNextEntries()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
@@ -78,15 +75,13 @@
                         <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">
                             {{ $entry->typeOfRestriction ? $entry->typeOfRestriction->restriction_type : 'N/A' }}</td>
 
-                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs"> <a
-                                href="{{ route(auth()->getDefaultDriver() . '.entries.edit', $entry->id) }}"
-                                class="text-blue-500 hover:underline"><i class="fas fa-edit"></i></a>
-                            <form action="{{ route(auth()->getDefaultDriver() . '.entries.destroy', $entry->id) }}"
-                                method="POST" style="display:inline;">
+                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">
+                            <form action="{{ route(auth()->getDefaultDriver() . '.entries.approve', $entry->id) }}"
+                                method="POST">
                                 @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-500 hover:underline"><i
-                                        class="fas fa-trash"></i></button>
+                                <button type="submit" class="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600">
+                                    الموافقه علي القيد
+                                </button>
                             </form>
                         </td>
                         <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->date }}</td>
@@ -95,10 +90,6 @@
                         </td>
                         <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->description }}
                         </td>
-
-
-
-
                     </tr>
                 @endforeach
             </tbody>

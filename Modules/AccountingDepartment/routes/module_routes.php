@@ -15,6 +15,9 @@ Route::prefix('admin/accounting-department')->group(function () {
         return view('accounting-department::master');
     })->name('master');
 
+    Route::get('entries/reviewed', [EntryController::class, 'reviewedEntries'])->name('entries.reviewed');
+    Route::post('entries/{id}/approve', [EntryController::class, 'approveEntry'])->name('entries.approve');
+
     Route::resource('entries', EntryController::class);
     Route::get('account-movement', [EntryController::class, 'accountMovement'])->name('account.movement');
 

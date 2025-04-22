@@ -1,0 +1,237 @@
+/* Background that uses page colors for harmony */
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #121212 0%, #154174 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Remove previous body::after moon animation */
+body::after {
+    content: none;
+}
+
+/* Remove previous body::before orbiting circle */
+body::before {
+    content: none;
+}
+
+/* Container for moons and stars */
+.moon-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Common styles for moons */
+.orbiting-moon,
+.main-moon {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle at 30% 30%, #f0e9d2 40%, transparent 70%),
+        radial-gradient(circle at 60% 50%, #121212 50%, transparent 70%);
+    border-radius: 50%;
+    box-shadow: 0 0 10px 2px rgba(240, 233, 210, 0.7);
+}
+
+/* Main moon bigger */
+.main-moon {
+    width: 200px;
+    height: 200px;
+    box-shadow: 0 0 20px 5px rgba(240, 233, 210, 0.8);
+}
+
+/* Animations for moons moving across the background */
+
+/* Moon 1 */
+.moon1 {
+    animation: move1 25s linear infinite;
+}
+
+/* Moon 2 */
+.moon2 {
+    animation: move2 30s linear infinite;
+}
+
+/* Moon 3 */
+.moon3 {
+    animation: move3 35s linear infinite;
+}
+
+/* Moon 4 */
+.moon4 {
+    animation: move4 28s linear infinite;
+}
+
+/* Moon 5 */
+.moon5 {
+    animation: move5 32s linear infinite;
+}
+
+/* Main moon slow drift */
+.main-moon {
+    animation: main-move 40s linear infinite;
+}
+
+/* Stars container */
+.stars-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Common styles for stars */
+.star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation-timing-function: linear;
+}
+
+/* Different sizes for stars */
+.star.small {
+    width: 2px;
+    height: 2px;
+    animation-name: twinkle;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+}
+
+.star.medium {
+    width: 4px;
+    height: 4px;
+    animation-name: twinkle;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+}
+
+.star.large {
+    width: 6px;
+    height: 6px;
+    animation-name: twinkle;
+    animation-duration: 5s;
+    animation-iteration-count: infinite;
+}
+
+/* Twinkle animation for stars */
+@keyframes twinkle {
+    0%,
+    100% {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 0.2;
+    }
+}
+
+/* Keyframes for moons moving in different paths */
+
+@keyframes move1 {
+    0% {
+        top: 10%;
+        left: -10%;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    100% {
+        top: 80%;
+        left: 110%;
+        opacity: 0;
+    }
+}
+
+@keyframes move2 {
+    0% {
+        top: 90%;
+        left: 110%;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    100% {
+        top: 20%;
+        left: -10%;
+        opacity: 0;
+    }
+}
+
+@keyframes move3 {
+    0% {
+        top: 50%;
+        left: -15%;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    100% {
+        top: 50%;
+        left: 115%;
+        opacity: 0;
+    }
+}
+
+@keyframes move4 {
+    0% {
+        top: -10%;
+        left: 30%;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    100% {
+        top: 110%;
+        left: 70%;
+        opacity: 0;
+    }
+}
+
+@keyframes move5 {
+    0% {
+        top: 110%;
+        left: 70%;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    100% {
+        top: -10%;
+        left: 30%;
+        opacity: 0;
+    }
+}
+
+/* Main moon slow drift keyframe */
+@keyframes main-move {
+    0% {
+        top: 40%;
+        left: 50%;
+    }
+    50% {
+        top: 45%;
+        left: 55%;
+    }
+    100% {
+        top: 40%;
+        left: 50%;
+    }
+}

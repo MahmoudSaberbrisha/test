@@ -1,0 +1,27 @@
+/* Make navbar transparent */
+.main-header {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* Make sidebar header transparent and adjust size */
+.main-sidebar-header {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 10px 15px;
+    text-align: center;
+}
+
+.main-sidebar-header .main-logo {
+    height: 50px !important;
+    width: auto !important;
+    max-width: 100%;
+}
+
+.main-sidebar-header .logo-icon {
+    height: 40px !important;
+    width: auto !important;
+    max-width: 100%;
+}

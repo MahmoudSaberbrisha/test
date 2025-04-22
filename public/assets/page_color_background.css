@@ -1,0 +1,37 @@
+/* Background that uses page colors for harmony */
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #121212 0%, #4a90e2 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle at center,
+        rgba(74, 144, 226, 0.15),
+        transparent 70%
+    );
+    animation: shine 3s infinite linear;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes shine {
+    0% {
+        transform: rotate(0deg) translateX(-100%);
+    }
+    100% {
+        transform: rotate(360deg) translateX(100%);
+    }
+}

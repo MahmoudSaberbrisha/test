@@ -13,9 +13,29 @@ class EntryController extends Controller
     {
         $perPage = request('per_page', 10);
         $entries = Entry::with(['chartOfAccount', 'typeOfRestriction'])
+            ->where('approved', true)
             ->paginate($perPage)
             ->appends(request()->except('page'));
         return view('accountingdepartment::entries.index', compact('entries'));
+    }
+
+    public function reviewedEntries()
+    {
+        $perPage = request('per_page', 10);
+        $entries = Entry::with(['chartOfAccount', 'typeOfRestriction'])
+            ->where('approved', false)
+            ->paginate($perPage)
+            ->appends(request()->except('page'));
+        return view('accountingdepartment::entries.reviewed', compact('entries'));
+    }
+
+    public function approveEntry($id)
+    {
+        $entry = Entry::findOrFail($id);
+        $entry->approved = true;
+        $entry->save();
+
+        return redirect()->route('admin.entries.reviewed')->with('success', 'Entry approved successfully.');
     }
 
     public function create()
@@ -70,6 +90,11 @@ class EntryController extends Controller
         $entry = Entry::findOrFail($id);
         $entry->delete();
         return redirect()->route('admin.entries.index')->with('success', 'Entry deleted successfully.');
+    }
+
+    public function show($id)
+    {
+        abort(404);
     }
 
     public function accountMovement(Request $request)

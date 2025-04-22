@@ -1,23 +1,21 @@
 <!-- main-sidebar -->
 <div class="app-sidebar__overlay" data-toggle="sidebar"></div>
 <aside class="app-sidebar sidebar-scroll">
-    <div class="main-sidebar-header active">
-        <a  href="javascript:void(0);"><img
-                {{-- src="{{ $settings['site_logo']->getProcessedValue() ?? '' }}" class="main-logo" alt="logo"></a> --}}
-                src="{{asset('assets/admin/img/photos/m.jpg')}}"  style="height: 65px; width:350px" alt="logo"></a>
-        <a class="logo-icon mobile-logo icon-light active" href="javascript:void(0);"><img
-                {{-- src="{{ $settings['site_icon']->getProcessedValue() ?? '' }}" class="logo-icon" alt="logo"></a> --}}
+<div class="main-sidebar-header active">
+        <a href="javascript:void(0);"><img {{-- src="{{ $settings['site_logo']->getProcessedValue() ?? '' }}" class="main-logo" alt="logo"></a> --}} src="{{ asset('assets/admin/img/photos/m.jpg') }}"
+                class="main-logo" style="height: 65px; width:350px" alt="logo"></a>
+        <a class="logo-icon mobile-logo icon-light active" href="javascript:void(0);"><img {{-- src="{{ $settings['site_icon']->getProcessedValue() ?? '' }}" class="logo-icon" alt="logo"></a> --}}
                 src="{{ $settings['site_icon']->getProcessedValue() ?? '' }}" class="logo-icon" alt="logo"></a>
     </div>
     <div class="main-sidemenu">
         <div class="app-sidebar__user clearfix">
             <div class="dropdown user-pro-body">
                 <div class="">
-                    <img alt="{{ auth()->user()->name }}" class="avatar avatar-xl brround"
-                        {{-- src="{{ auth()->user()->image }}"><span class="avatar-status profile-status bg-green"></span> --}}
-                        src="{{asset('assets/admin/img/photos/m.jpg')}}"><span class="avatar-status profile-status bg-green"></span>
+                    <img alt="{{ auth()->user()->name }}" class="avatar avatar-xl brround" {{-- src="{{ auth()->user()->image }}"><span class="avatar-status profile-status bg-green"></span> --}}
+                        src="{{ asset('assets/admin/img/photos/m.jpg') }}"><span
+                        class="avatar-status profile-status bg-green"></span>
 
-                    </div>
+                </div>
                 <div class="user-info">
                     <h4 class="font-weight-semibold mt-3 mb-0">{{ auth()->user()->name }}</h4>
                     <span class="mb-0 text-muted">{{ auth()->user()->user_name }}</span>
@@ -56,126 +54,124 @@
                 </li>
             @endif
 
-            @if (
-    auth()->user()->can('View Site Settings') ||
-    auth()->user()->can('View Languages') ||
-    auth()->user()->can('View SMTP Settings') ||
-    auth()->user()->can('View File Manager') ||
-    auth()->user()->can('View Regions') ||
-    auth()->user()->can('View Branches') ||
-    auth()->user()->can('View Sales Areas') ||
-    auth()->user()->can('View Currencies') ||
-    auth()->user()->can('View Client Suppliers') ||
-    auth()->user()->can('View Goods') ||
-    auth()->user()->can('View Payment Methods') ||
-    auth()->user()->can('View Client Types') ||
-    auth()->user()->can('View Sailing Boats') ||
-    auth()->user()->can('View Goods Suppliers') ||
-    auth()->user()->can('View Expenses Types') ||
-    auth()->user()->can('View Experience Types')
-)
-                                <li class="slide {{ request()->segment(2) == 'settings' ? 'is-expanded' : '' }}">
-                                    <a class="side-menu__item" data-toggle="slide" href="javascript:void(0)"><svg
-                                            xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24">
-                                            <path fill=""
-                                                d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5a3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97s-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1s.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64z" />
-                                        </svg><span class="side-menu__label">{{ __('General Settings') }}</span><i
-                                            class="angle fe fe-chevron-down"></i></a>
-                                    <ul class="slide-menu">
-                                        @can('View Site Settings')
-                                            <li><a class="slide-item {{ request()->segment(3) == 'general-settings' ? 'active' : '' }}"
-                                                    href="{{ route(auth()->getDefaultDriver() . '.general-settings.index') }}">{{ __('Site Settings') }}</a>
-                                            </li>
-                                        @endcan
-                                        @feature('languages-feature')
-                                            @can('View Languages')
-                                                <li><a class="slide-item {{ request()->segment(3) == 'languages' ? 'active' : '' }}"
-                                                        href="{{ route(auth()->getDefaultDriver() . '.languages.index') }}">{{ __('Language Settings') }}</a>
-                                                </li>
-                                            @endcan
-                                        @endfeature
-                                        @feature('smtp-feature')
-                                            @can('View SMTP Settings')
-                                                <li><a class="slide-item {{ request()->segment(3) == 'smtp-settings' ? 'active' : '' }}"
-                                                        href="{{ route(auth()->getDefaultDriver() . '.smtp-settings.index') }}">{{ __('SMTP Settings') }}</a>
-                                                </li>
-                                            @endcan
-                                        @endfeature
-                                        @feature('firebase-feature')
-                                            @can('View Firebase Settings')
-                                                <li><a class="slide-item {{ request()->segment(3) == 'firebase-settings' ? 'active' : '' }}"
-                                                        href="{{ route(auth()->getDefaultDriver() . '.firebase-settings.index') }}">{{ __('Firebase Settings') }}</a>
-                                                </li>
-                                            @endcan
-                                        @endfeature
-                                        @feature('regions-branches-feature')
-                                            @can('View Regions')
-                                                <li><a class="slide-item {{ request()->segment(3) == 'study-classes' ? 'active' : '' }}"
-                                                        href="{{ route(auth()->getDefaultDriver() . '.regions.index') }}">{{ __('Regions Settings') }}</a>
-                                                </li>
-                                            @endcan
-                                        @endfeature
-                                        @if (feature('regions-branches-feature') || feature('branches-feature'))
-                                            @can('View Branches')
-                                                <li><a class="slide-item {{ request()->segment(3) == 'departments' ? 'active' : '' }}"
-                                                        href="{{ route(auth()->getDefaultDriver() . '.branches.index') }}">{{ __('Branches Settings') }}</a>
-                                                </li>
-                                            @endcan
-                                        @endif
-                                        @can('View Sales Areas')
-                                            <li><a class="slide-item {{ request()->segment(3) == 'sales-areas' ? 'active' : '' }}"
-                                                    href="{{ route(auth()->getDefaultDriver() . '.sales-areas.index') }}">{{ __('Sales Areas') }}</a>
-                                            </li>
-                                        @endcan
-                                        @feature('currencies-feature')
-                                            @can('View Currencies')
-                                                <li><a class="slide-item {{ request()->segment(3) == 'currencies' ? 'active' : '' }}"
-                                                        href="{{ route(auth()->getDefaultDriver() . '.currencies.index') }}">{{ __('Currencies Settings') }}</a>
-                                                </li>
-                                            @endcan
-                                        @endfeature
-                                        @can('View Client Suppliers')
-                                            <li><a class="slide-item {{ request()->segment(3) == 'client-suppliers' ? 'active' : '' }}"
-                                                    href="{{ route(auth()->getDefaultDriver() . '.client-suppliers.index') }}">{{ __('Client Suppliers Settings') }}</a>
-                                            </li>
-                                        @endcan
-                                        @can('View Goods')
-                                            <li><a class="slide-item {{ request()->segment(3) == 'goods' ? 'active' : '' }}"
-                                                    href="{{ route(auth()->getDefaultDriver() . '.goods.index') }}">{{ __('Goods Settings') }}</a>
-                                            </li>
-                                        @endcan
-                                        @can('View Payment Methods')
-                                            <li><a class="slide-item {{ request()->segment(3) == 'payment-methods' ? 'active' : '' }}"
-                                                    href="{{ route(auth()->getDefaultDriver() . '.payment-methods.index') }}">{{ __('Payment Methods Settings') }}</a>
-                                            </li>
-                                        @endcan
-                                        @can('View Client Types')
-                                            <li><a class="slide-item {{ request()->segment(3) == 'client-types' ? 'active' : '' }}"
-                                                    href="{{ route(auth()->getDefaultDriver() . '.client-types.index') }}">{{ __('Client Types Settings') }}</a>
-                                            </li>
-                                        @endcan
-                                        @can('View Sailing Boats')
-                                            <li><a class="slide-item {{ request()->segment(3) == 'sailing-boats' ? 'active' : '' }}"
-                                                    href="{{ route(auth()->getDefaultDriver() . '.sailing-boats.index') }}">{{ __('Sailing Boats Settings') }}</a>
-                                            </li>
-                                        @endcan
-                                        @can('View Goods Suppliers')
-                                            <li><a class="slide-item {{ request()->segment(3) == 'goods-suppliers' ? 'active' : '' }}"
-                                                    href="{{ route(auth()->getDefaultDriver() . '.goods-suppliers.index') }}">{{ __('Goods Suppliers') }}</a>
-                                            </li>
-                                        @endcan
-                                        @can('View Expenses Types')
-                                            <li><a class="slide-item {{ request()->segment(3) == 'expenses-types' ? 'active' : '' }}"
-                                                    href="{{ route(auth()->getDefaultDriver() . '.expenses-types.index') }}">{{ __('Expenses Types') }}</a>
-                                            </li>
-                                        @endcan
-                                        @can('View Experience Types')
-                                            <li><a class="slide-item {{ request()->segment(3) == 'experience-types' ? 'active' : '' }}"
-                                                    href="{{ route(auth()->getDefaultDriver() . '.experience-types.index') }}">{{ __('Experience Types') }}</a>
-                                            </li>
-                                        @endcan
-                                    </ul>
+            @if (auth()->user()->can('View Site Settings') ||
+                    auth()->user()->can('View Languages') ||
+                    auth()->user()->can('View SMTP Settings') ||
+                    auth()->user()->can('View File Manager') ||
+                    auth()->user()->can('View Regions') ||
+                    auth()->user()->can('View Branches') ||
+                    auth()->user()->can('View Sales Areas') ||
+                    auth()->user()->can('View Currencies') ||
+                    auth()->user()->can('View Client Suppliers') ||
+                    auth()->user()->can('View Goods') ||
+                    auth()->user()->can('View Payment Methods') ||
+                    auth()->user()->can('View Client Types') ||
+                    auth()->user()->can('View Sailing Boats') ||
+                    auth()->user()->can('View Goods Suppliers') ||
+                    auth()->user()->can('View Expenses Types') ||
+                    auth()->user()->can('View Experience Types'))
+                <li class="slide {{ request()->segment(2) == 'settings' ? 'is-expanded' : '' }}">
+                    <a class="side-menu__item" data-toggle="slide" href="javascript:void(0)"><svg
+                            xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24">
+                            <path fill=""
+                                d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5a3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97s-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1s.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64z" />
+                        </svg><span class="side-menu__label">{{ __('General Settings') }}</span><i
+                            class="angle fe fe-chevron-down"></i></a>
+                    <ul class="slide-menu">
+                        @can('View Site Settings')
+                            <li><a class="slide-item {{ request()->segment(3) == 'general-settings' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.general-settings.index') }}">{{ __('Site Settings') }}</a>
+                            </li>
+                        @endcan
+                        @feature('languages-feature')
+                            @can('View Languages')
+                                <li><a class="slide-item {{ request()->segment(3) == 'languages' ? 'active' : '' }}"
+                                        href="{{ route(auth()->getDefaultDriver() . '.languages.index') }}">{{ __('Language Settings') }}</a>
                                 </li>
+                            @endcan
+                        @endfeature
+                        @feature('smtp-feature')
+                            @can('View SMTP Settings')
+                                <li><a class="slide-item {{ request()->segment(3) == 'smtp-settings' ? 'active' : '' }}"
+                                        href="{{ route(auth()->getDefaultDriver() . '.smtp-settings.index') }}">{{ __('SMTP Settings') }}</a>
+                                </li>
+                            @endcan
+                        @endfeature
+                        @feature('firebase-feature')
+                            @can('View Firebase Settings')
+                                <li><a class="slide-item {{ request()->segment(3) == 'firebase-settings' ? 'active' : '' }}"
+                                        href="{{ route(auth()->getDefaultDriver() . '.firebase-settings.index') }}">{{ __('Firebase Settings') }}</a>
+                                </li>
+                            @endcan
+                        @endfeature
+                        @feature('regions-branches-feature')
+                            @can('View Regions')
+                                <li><a class="slide-item {{ request()->segment(3) == 'study-classes' ? 'active' : '' }}"
+                                        href="{{ route(auth()->getDefaultDriver() . '.regions.index') }}">{{ __('Regions Settings') }}</a>
+                                </li>
+                            @endcan
+                        @endfeature
+                        @if (feature('regions-branches-feature') || feature('branches-feature'))
+                            @can('View Branches')
+                                <li><a class="slide-item {{ request()->segment(3) == 'departments' ? 'active' : '' }}"
+                                        href="{{ route(auth()->getDefaultDriver() . '.branches.index') }}">{{ __('Branches Settings') }}</a>
+                                </li>
+                            @endcan
+                        @endif
+                        @can('View Sales Areas')
+                            <li><a class="slide-item {{ request()->segment(3) == 'sales-areas' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.sales-areas.index') }}">{{ __('Sales Areas') }}</a>
+                            </li>
+                        @endcan
+                        @feature('currencies-feature')
+                            @can('View Currencies')
+                                <li><a class="slide-item {{ request()->segment(3) == 'currencies' ? 'active' : '' }}"
+                                        href="{{ route(auth()->getDefaultDriver() . '.currencies.index') }}">{{ __('Currencies Settings') }}</a>
+                                </li>
+                            @endcan
+                        @endfeature
+                        @can('View Client Suppliers')
+                            <li><a class="slide-item {{ request()->segment(3) == 'client-suppliers' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.client-suppliers.index') }}">{{ __('Client Suppliers Settings') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Goods')
+                            <li><a class="slide-item {{ request()->segment(3) == 'goods' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.goods.index') }}">{{ __('Goods Settings') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Payment Methods')
+                            <li><a class="slide-item {{ request()->segment(3) == 'payment-methods' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.payment-methods.index') }}">{{ __('Payment Methods Settings') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Client Types')
+                            <li><a class="slide-item {{ request()->segment(3) == 'client-types' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.client-types.index') }}">{{ __('Client Types Settings') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Sailing Boats')
+                            <li><a class="slide-item {{ request()->segment(3) == 'sailing-boats' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.sailing-boats.index') }}">{{ __('Sailing Boats Settings') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Goods Suppliers')
+                            <li><a class="slide-item {{ request()->segment(3) == 'goods-suppliers' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.goods-suppliers.index') }}">{{ __('Goods Suppliers') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Expenses Types')
+                            <li><a class="slide-item {{ request()->segment(3) == 'expenses-types' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.expenses-types.index') }}">{{ __('Expenses Types') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Experience Types')
+                            <li><a class="slide-item {{ request()->segment(3) == 'experience-types' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.experience-types.index') }}">{{ __('Experience Types') }}</a>
+                            </li>
+                        @endcan
+                    </ul>
+                </li>
             @endif
 
             @feature('file-manager-feature')
@@ -281,230 +277,222 @@
                 </li>
             @endif
 
-            @if (
-                auth()->user()->can('View Account Types') ||
-                auth()->user()->can('View Accounts') ||
-                auth()->user()->can('View Expenses')
-            )
-                                                                <li class="slide {{ request()->segment(2) == 'financial-management' ? 'is-expanded' : '' }}">
-                                                                    <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
-                                                                            class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                                            viewBox="0 0 16 16">
-                                                                            <path fill=""
-                                                                                d="M7 2H5a3.5 3.5 0 1 0 0 7h2v3H2.5v2H7v2h2v-2h2a3.5 3.5 0 1 0 0-7H9V4h4.5V2H9V0H7zm2 7h2a1.5 1.5 0 0 1 0 3H9zM7 7H5a1.5 1.5 0 1 1 0-3h2z" />
-                                                                        </svg><span class="side-menu__label">{{ __('Financial Management') }}</span><i
-                                                                            class="angle fe fe-chevron-down"></i></a>
-                                                                    <ul class="slide-menu">
-                                                                        {{-- @can('View Account Types')
+            @if (auth()->user()->can('View Account Types') ||
+                    auth()->user()->can('View Accounts') ||
+                    auth()->user()->can('View Expenses'))
+                <li class="slide {{ request()->segment(2) == 'financial-management' ? 'is-expanded' : '' }}">
+                    <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
+                            class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            viewBox="0 0 16 16">
+                            <path fill=""
+                                d="M7 2H5a3.5 3.5 0 1 0 0 7h2v3H2.5v2H7v2h2v-2h2a3.5 3.5 0 1 0 0-7H9V4h4.5V2H9V0H7zm2 7h2a1.5 1.5 0 0 1 0 3H9zM7 7H5a1.5 1.5 0 1 1 0-3h2z" />
+                        </svg><span class="side-menu__label">{{ __('Financial Management') }}</span><i
+                            class="angle fe fe-chevron-down"></i></a>
+                    <ul class="slide-menu">
+                        {{-- @can('View Account Types')
                                                                         <li><a class="slide-item {{request()->segment(3) == 'account-types'?'active':''}}" href="{{ route(auth()->getDefaultDriver().'.account-types.index') }}">{{__('Account Types')}}</a></li>
                                                                         @endcan
                                                                         @can('View Accounts')
                                                                         <li><a class="slide-item {{request()->segment(3) == 'accounts'?'active':''}}" href="{{ route(auth()->getDefaultDriver().'.accounts.index') }}">{{__('Accounts')}}</a></li>
                                                                         @endcan --}}
-                                                                        @can('View Expenses')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'expenses' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.expenses.index') }}">{{ __('Expenses') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                    </ul>
-                                                                </li>
+                        @can('View Expenses')
+                            <li><a class="slide-item {{ request()->segment(3) == 'expenses' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.expenses.index') }}">{{ __('Expenses') }}</a>
+                            </li>
+                        @endcan
+                    </ul>
+                </li>
             @endif
 
-            @if (
-                auth()->user()->can('View Employee Types') ||
-                auth()->user()->can('View Employee Nationalities') ||
-                auth()->user()->can('View Employee Religions') ||
-                auth()->user()->can('View Employee Marital Status') ||
-                auth()->user()->can('View Employee Identity Types') ||
-                auth()->user()->can('View Employee Card Issuers') ||
-                auth()->user()->can('View Jobs') ||
-                auth()->user()->can('View Employees')
-            )
-                                                                <li class="slide {{ request()->segment(2) == 'employees-management' ? 'is-expanded' : '' }}">
-                                                                    <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
-                                                                            class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="36" height="36"
-                                                                            viewBox="0 0 36 36">
-                                                                            <circle cx="16.86" cy="9.73" r="6.46" fill="" />
-                                                                            <path fill="" d="M21 28h7v1.4h-7z" />
-                                                                            <path fill=""
-                                                                                d="M15 30v3a1 1 0 0 0 1 1h17a1 1 0 0 0 1-1V23a1 1 0 0 0-1-1h-7v-1.47a1 1 0 0 0-2 0V22h-2v-3.58a32 32 0 0 0-5.14-.42a26 26 0 0 0-11 2.39a3.28 3.28 0 0 0-1.88 3V30Zm17 2H17v-8h7v.42a1 1 0 0 0 2 0V24h6Z" />
-                                                                        </svg><span class="side-menu__label">{{ __('Employee Management') }}</span><i
-                                                                            class="angle fe fe-chevron-down"></i></a>
-                                                                    <ul class="slide-menu">
-                                                                        @can('View Employee Types')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'employee-types' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.employee-types.index') }}">{{ __('Employee Types Settings') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Employee Nationalities')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'employee-nationalities' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.employee-nationalities.index') }}">{{ __('Employee Nationalities Settings') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Employee Religions')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'employee-religions' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.employee-religions.index') }}">{{ __('Employee Religions Settings') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Employee Marital Status')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'employee-marital-status' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.employee-marital-status.index') }}">{{ __('Employee Marital Status Settings') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Employee Identity Types')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'employee-identity-types' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.employee-identity-types.index') }}">{{ __('Employee Identity Types Settings') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Employee Card Issuers')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'employee-card-issuers' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.employee-card-issuers.index') }}">{{ __('Employee Card Issuers Settings') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Jobs')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'jobs' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.jobs.index') }}">{{ __('Jobs Settings') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Employees')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'employees' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.employees.index') }}">{{ __('Employees') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                    </ul>
-                                                                </li>
+            @if (auth()->user()->can('View Employee Types') ||
+                    auth()->user()->can('View Employee Nationalities') ||
+                    auth()->user()->can('View Employee Religions') ||
+                    auth()->user()->can('View Employee Marital Status') ||
+                    auth()->user()->can('View Employee Identity Types') ||
+                    auth()->user()->can('View Employee Card Issuers') ||
+                    auth()->user()->can('View Jobs') ||
+                    auth()->user()->can('View Employees'))
+                <li class="slide {{ request()->segment(2) == 'employees-management' ? 'is-expanded' : '' }}">
+                    <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
+                            class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="36" height="36"
+                            viewBox="0 0 36 36">
+                            <circle cx="16.86" cy="9.73" r="6.46" fill="" />
+                            <path fill="" d="M21 28h7v1.4h-7z" />
+                            <path fill=""
+                                d="M15 30v3a1 1 0 0 0 1 1h17a1 1 0 0 0 1-1V23a1 1 0 0 0-1-1h-7v-1.47a1 1 0 0 0-2 0V22h-2v-3.58a32 32 0 0 0-5.14-.42a26 26 0 0 0-11 2.39a3.28 3.28 0 0 0-1.88 3V30Zm17 2H17v-8h7v.42a1 1 0 0 0 2 0V24h6Z" />
+                        </svg><span class="side-menu__label">{{ __('Employee Management') }}</span><i
+                            class="angle fe fe-chevron-down"></i></a>
+                    <ul class="slide-menu">
+                        @can('View Employee Types')
+                            <li><a class="slide-item {{ request()->segment(3) == 'employee-types' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.employee-types.index') }}">{{ __('Employee Types Settings') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Employee Nationalities')
+                            <li><a class="slide-item {{ request()->segment(3) == 'employee-nationalities' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.employee-nationalities.index') }}">{{ __('Employee Nationalities Settings') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Employee Religions')
+                            <li><a class="slide-item {{ request()->segment(3) == 'employee-religions' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.employee-religions.index') }}">{{ __('Employee Religions Settings') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Employee Marital Status')
+                            <li><a class="slide-item {{ request()->segment(3) == 'employee-marital-status' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.employee-marital-status.index') }}">{{ __('Employee Marital Status Settings') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Employee Identity Types')
+                            <li><a class="slide-item {{ request()->segment(3) == 'employee-identity-types' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.employee-identity-types.index') }}">{{ __('Employee Identity Types Settings') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Employee Card Issuers')
+                            <li><a class="slide-item {{ request()->segment(3) == 'employee-card-issuers' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.employee-card-issuers.index') }}">{{ __('Employee Card Issuers Settings') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Jobs')
+                            <li><a class="slide-item {{ request()->segment(3) == 'jobs' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.jobs.index') }}">{{ __('Jobs Settings') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Employees')
+                            <li><a class="slide-item {{ request()->segment(3) == 'employees' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.employees.index') }}">{{ __('Employees') }}</a>
+                            </li>
+                        @endcan
+                    </ul>
+                </li>
             @endif
 
-            @if (
-                auth()->user()->can('View Car Suppliers') ||
-                auth()->user()->can('View Car Contracts') ||
-                auth()->user()->can('View Car Expenses') ||
-                auth()->user()->can('View Car Tasks')
-            )
-                                                                <li class="slide {{ request()->segment(2) == 'cars-management' ? 'is-expanded' : '' }}">
-                                                                    <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
-                                                                            class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                                            viewBox="0 0 24 24">
-                                                                            <path fill=""
-                                                                                d="M6.5 5c-.66 0-1.22.42-1.42 1L3 12v8a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h5.3a7 7 0 0 1-.3-2a7 7 0 0 1 3.41-6H5l1.5-4.5h11l1.18 3.53a7 7 0 0 1 1.79.43L18.92 6c-.2-.58-.76-1-1.42-1zM17 12a.26.26 0 0 0-.26.21l-.19 1.32c-.3.13-.59.29-.85.47l-1.24-.5c-.11 0-.24 0-.31.13l-1 1.73c-.06.11-.04.24.06.32l1.06.82a4.2 4.2 0 0 0 0 1l-1.06.82a.26.26 0 0 0-.06.32l1 1.73c.06.13.19.13.31.13l1.24-.5c.26.18.54.35.85.47l.19 1.32c.02.12.12.21.26.21h2c.11 0 .22-.09.24-.21l.19-1.32c.3-.13.57-.29.84-.47l1.23.5c.13 0 .26 0 .33-.13l1-1.73a.26.26 0 0 0-.06-.32l-1.07-.82c.02-.17.04-.33.04-.5s-.01-.33-.04-.5l1.06-.82a.26.26 0 0 0 .06-.32l-1-1.73c-.06-.13-.19-.13-.32-.13l-1.23.5c-.27-.18-.54-.35-.85-.47l-.19-1.32A.236.236 0 0 0 19 12zM6.5 13A1.5 1.5 0 0 1 8 14.5A1.5 1.5 0 0 1 6.5 16A1.5 1.5 0 0 1 5 14.5A1.5 1.5 0 0 1 6.5 13M18 15.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5c-.84 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5" />
-                                                                        </svg><span class="side-menu__label">{{ __('Car Management') }}</span><i
-                                                                            class="angle fe fe-chevron-down"></i></a>
-                                                                    <ul class="slide-menu">
-                                                                        @can('View Car Suppliers')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'car-suppliers' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.car-suppliers.index') }}">{{ __('Car Suppliers Settings') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Car Expenses')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'car-expenses' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.car-expenses.index') }}">{{ __('Car Expenses Settings') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Car Contracts')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'car-contracts' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.car-contracts.index') }}">{{ __('Car Contracts') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Car Tasks')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'car-tasks' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.car-tasks.index') }}">{{ __('Car Tasks') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                    </ul>
-                                                                </li>
+            @if (auth()->user()->can('View Car Suppliers') ||
+                    auth()->user()->can('View Car Contracts') ||
+                    auth()->user()->can('View Car Expenses') ||
+                    auth()->user()->can('View Car Tasks'))
+                <li class="slide {{ request()->segment(2) == 'cars-management' ? 'is-expanded' : '' }}">
+                    <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
+                            class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24">
+                            <path fill=""
+                                d="M6.5 5c-.66 0-1.22.42-1.42 1L3 12v8a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h5.3a7 7 0 0 1-.3-2a7 7 0 0 1 3.41-6H5l1.5-4.5h11l1.18 3.53a7 7 0 0 1 1.79.43L18.92 6c-.2-.58-.76-1-1.42-1zM17 12a.26.26 0 0 0-.26.21l-.19 1.32c-.3.13-.59.29-.85.47l-1.24-.5c-.11 0-.24 0-.31.13l-1 1.73c-.06.11-.04.24.06.32l1.06.82a4.2 4.2 0 0 0 0 1l-1.06.82a.26.26 0 0 0-.06.32l1 1.73c.06.13.19.13.31.13l1.24-.5c.26.18.54.35.85.47l.19 1.32c.02.12.12.21.26.21h2c.11 0 .22-.09.24-.21l.19-1.32c.3-.13.57-.29.84-.47l1.23.5c.13 0 .26 0 .33-.13l1-1.73a.26.26 0 0 0-.06-.32l-1.07-.82c.02-.17.04-.33.04-.5s-.01-.33-.04-.5l1.06-.82a.26.26 0 0 0 .06-.32l-1-1.73c-.06-.13-.19-.13-.32-.13l-1.23.5c-.27-.18-.54-.35-.85-.47l-.19-1.32A.236.236 0 0 0 19 12zM6.5 13A1.5 1.5 0 0 1 8 14.5A1.5 1.5 0 0 1 6.5 16A1.5 1.5 0 0 1 5 14.5A1.5 1.5 0 0 1 6.5 13M18 15.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5c-.84 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5" />
+                        </svg><span class="side-menu__label">{{ __('Car Management') }}</span><i
+                            class="angle fe fe-chevron-down"></i></a>
+                    <ul class="slide-menu">
+                        @can('View Car Suppliers')
+                            <li><a class="slide-item {{ request()->segment(3) == 'car-suppliers' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.car-suppliers.index') }}">{{ __('Car Suppliers Settings') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Car Expenses')
+                            <li><a class="slide-item {{ request()->segment(3) == 'car-expenses' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.car-expenses.index') }}">{{ __('Car Expenses Settings') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Car Contracts')
+                            <li><a class="slide-item {{ request()->segment(3) == 'car-contracts' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.car-contracts.index') }}">{{ __('Car Contracts') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Car Tasks')
+                            <li><a class="slide-item {{ request()->segment(3) == 'car-tasks' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.car-tasks.index') }}">{{ __('Car Tasks') }}</a>
+                            </li>
+                        @endcan
+                    </ul>
+                </li>
             @endif
 
-            @if (
-                auth()->user()->can('View Detailed Clients Report') ||
-                auth()->user()->can('View Clients Report') ||
-                auth()->user()->can('View Client Suppliers Report') ||
-                auth()->user()->can('View Booking Groups Report') ||
-                auth()->user()->can('View Extra Services Report') ||
-                auth()->user()->can('View Credit Sales Bookings Report') ||
-                auth()->user()->can('View Expenses Report') ||
-                auth()->user()->can('View Trip Analysis Report') ||
-                auth()->user()->can('View Trip Analysis By Sales Area Report') ||
-                auth()->user()->can('View Car Expenses Report') ||
-                auth()->user()->can('View Car Income Report') ||
-                auth()->user()->can('View Car Income Expenses Report') ||
-                auth()->user()->can('View Car Contracts Due Amount Report')
-            )
-                                                                <li class="slide {{ request()->segment(2) == 'reports' ? 'is-expanded' : '' }}">
-                                                                    <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
-                                                                            class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                                            viewBox="0 0 24 24">
-                                                                            <path fill="" stroke="currentColor" stroke-width="1.5"
-                                                                                d="M9 21h6m-6 0v-5m0 5H3.6a.6.6 0 0 1-.6-.6v-3.8a.6.6 0 0 1 .6-.6H9m6 5V9m0 12h5.4a.6.6 0 0 0 .6-.6V3.6a.6.6 0 0 0-.6-.6h-4.8a.6.6 0 0 0-.6.6V9m0 0H9.6a.6.6 0 0 0-.6.6V16" />
-                                                                        </svg><span class="side-menu__label">{{ __('Reports & Statistics') }}</span><i
-                                                                            class="angle fe fe-chevron-down"></i></a>
-                                                                    <ul class="slide-menu">
-                                                                        @can('View Detailed Clients Report')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'detailed-clients-report' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.detailed-clients-report') }}">{{ __('Detailed Clients Report') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Clients Report')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'clients-report' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.clients-report') }}">{{ __('Clients Report') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Client Suppliers Report')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'client-suppliers-report' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.client-suppliers-report') }}">{{ __('Client Suppliers Report') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Booking Groups Report')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'booking-groups-report' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.booking-groups-report') }}">{{ __('Booking Groups Report') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Extra Services Report')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'extra-services-report' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.extra-services-report') }}">{{ __('Extra Services Report') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Credit Sales Bookings Report')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'credit-sales-bookings-report' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.credit-sales-bookings-report') }}">{{ __('Credit Sales Bookings Report') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Expenses Report')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'expenses-report' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.expenses-report') }}">{{ __('Expenses Report') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Trip Analysis Report')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'trip-analysis-report' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.trip-analysis-report') }}">{{ __('Trip Analysis Report') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Trip Analysis By Sales Area Report')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'trip-analysis-by-sales-area-report' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.trip-analysis-by-sales-area-report') }}">{{ __('Trip Analysis By Sales Area Report') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Car Expenses Report')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'car-expenses-report' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.car-expenses-report') }}">{{ __('Car Expenses Report') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Car Income Report')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'car-income-report' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.car-income-report') }}">{{ __('Car Income Report') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Car Income Expenses Report')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'car-income-expenses-report' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.car-income-expenses-report') }}">{{ __('Car Income Expenses Report') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                        @can('View Car Contracts Due Amount Report')
-                                                                            <li><a class="slide-item {{ request()->segment(3) == 'car-contract-due-report' ? 'active' : '' }}"
-                                                                                    href="{{ route(auth()->getDefaultDriver() . '.car-contract-due-report') }}">{{ __('Car Contract Due Amount Report') }}</a>
-                                                                            </li>
-                                                                        @endcan
-                                                                    </ul>
-                                                                </li>
+            @if (auth()->user()->can('View Detailed Clients Report') ||
+                    auth()->user()->can('View Clients Report') ||
+                    auth()->user()->can('View Client Suppliers Report') ||
+                    auth()->user()->can('View Booking Groups Report') ||
+                    auth()->user()->can('View Extra Services Report') ||
+                    auth()->user()->can('View Credit Sales Bookings Report') ||
+                    auth()->user()->can('View Expenses Report') ||
+                    auth()->user()->can('View Trip Analysis Report') ||
+                    auth()->user()->can('View Trip Analysis By Sales Area Report') ||
+                    auth()->user()->can('View Car Expenses Report') ||
+                    auth()->user()->can('View Car Income Report') ||
+                    auth()->user()->can('View Car Income Expenses Report') ||
+                    auth()->user()->can('View Car Contracts Due Amount Report'))
+                <li class="slide {{ request()->segment(2) == 'reports' ? 'is-expanded' : '' }}">
+                    <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
+                            class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24">
+                            <path fill="" stroke="currentColor" stroke-width="1.5"
+                                d="M9 21h6m-6 0v-5m0 5H3.6a.6.6 0 0 1-.6-.6v-3.8a.6.6 0 0 1 .6-.6H9m6 5V9m0 12h5.4a.6.6 0 0 0 .6-.6V3.6a.6.6 0 0 0-.6-.6h-4.8a.6.6 0 0 0-.6.6V9m0 0H9.6a.6.6 0 0 0-.6.6V16" />
+                        </svg><span class="side-menu__label">{{ __('Reports & Statistics') }}</span><i
+                            class="angle fe fe-chevron-down"></i></a>
+                    <ul class="slide-menu">
+                        @can('View Detailed Clients Report')
+                            <li><a class="slide-item {{ request()->segment(3) == 'detailed-clients-report' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.detailed-clients-report') }}">{{ __('Detailed Clients Report') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Clients Report')
+                            <li><a class="slide-item {{ request()->segment(3) == 'clients-report' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.clients-report') }}">{{ __('Clients Report') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Client Suppliers Report')
+                            <li><a class="slide-item {{ request()->segment(3) == 'client-suppliers-report' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.client-suppliers-report') }}">{{ __('Client Suppliers Report') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Booking Groups Report')
+                            <li><a class="slide-item {{ request()->segment(3) == 'booking-groups-report' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.booking-groups-report') }}">{{ __('Booking Groups Report') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Extra Services Report')
+                            <li><a class="slide-item {{ request()->segment(3) == 'extra-services-report' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.extra-services-report') }}">{{ __('Extra Services Report') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Credit Sales Bookings Report')
+                            <li><a class="slide-item {{ request()->segment(3) == 'credit-sales-bookings-report' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.credit-sales-bookings-report') }}">{{ __('Credit Sales Bookings Report') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Expenses Report')
+                            <li><a class="slide-item {{ request()->segment(3) == 'expenses-report' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.expenses-report') }}">{{ __('Expenses Report') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Trip Analysis Report')
+                            <li><a class="slide-item {{ request()->segment(3) == 'trip-analysis-report' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.trip-analysis-report') }}">{{ __('Trip Analysis Report') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Trip Analysis By Sales Area Report')
+                            <li><a class="slide-item {{ request()->segment(3) == 'trip-analysis-by-sales-area-report' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.trip-analysis-by-sales-area-report') }}">{{ __('Trip Analysis By Sales Area Report') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Car Expenses Report')
+                            <li><a class="slide-item {{ request()->segment(3) == 'car-expenses-report' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.car-expenses-report') }}">{{ __('Car Expenses Report') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Car Income Report')
+                            <li><a class="slide-item {{ request()->segment(3) == 'car-income-report' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.car-income-report') }}">{{ __('Car Income Report') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Car Income Expenses Report')
+                            <li><a class="slide-item {{ request()->segment(3) == 'car-income-expenses-report' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.car-income-expenses-report') }}">{{ __('Car Income Expenses Report') }}</a>
+                            </li>
+                        @endcan
+                        @can('View Car Contracts Due Amount Report')
+                            <li><a class="slide-item {{ request()->segment(3) == 'car-contract-due-report' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.car-contract-due-report') }}">{{ __('Car Contract Due Amount Report') }}</a>
+                            </li>
+                        @endcan
+                    </ul>
+                </li>
             @endif
 
             <li class="slide {{ request()->segment(2) == 'accounting-department' ? 'is-expanded' : '' }}">

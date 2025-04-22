@@ -1,18 +1,20 @@
-<!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="{{ session()->get('rtl', 1) ? 'rtl' : 'ltr' }}">
+<html dir="{!! session()->get('rtl', 1) ? 'rtl' : 'ltr' !!}" lang="{!! app()->getLocale() !!}">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=0'>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="Description" content="{{$settings['site_description']->value}}">
-    <meta name="Keywords" content="{{$settings['site_keywords']->value}}" />
-    <meta name="language" content="{{ app()->getLocale() }}">
-    <meta http-equiv="Content-Language" content="{{ app()->getLocale() }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, user-scalable=0" name="viewport" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta content="{{ csrf_token() }}" name="csrf-token" />
+    <meta content="{!! $settings['site_description']->value !!}" name="Description" />
+    <meta content="{!! $settings['site_keywords']->value !!}" name="Keywords">
+    <meta content="{!! app()->getLocale() !!}" name="language" />
+    <meta content="{!! app()->getLocale() !!}" http-equiv="Content-Language" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     @include('admin.partials.head-links')
-    </head>
+    <link rel="stylesheet" href="{{ asset('assets/global_button_styles.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/navbar_transparent.css') }}" />
+    </meta>
+</head>
 <style>
     /* Container and layout */
     .h-screen {
@@ -215,8 +217,113 @@
     .block {
         display: block;
     }
+
+    /* Added CSS to replace Tailwind CDN */
+
+    /* Positioning */
+    .fixed {
+        position: fixed;
+    }
+
+    /* Ensure gallery panel is above all */
+    #galleryPanel {
+        z-index: 9999 !important;
+    }
+
+    .top-1\/2 {
+        top: 50%;
+    }
+
+    .left-0 {
+        left: 0;
+    }
+
+    .right-0 {
+        right: 0;
+    }
+
+    /* Transform utilities */
+    .transform {
+        transition-property: transform;
+        transition-duration: 0.3s;
+        transition-timing-function: ease;
+    }
+
+    .-translate-y-1\/2 {
+        transform: translateY(-50%);
+    }
+
+    /* Hover states */
+    .hover\:bg-green-700:hover {
+        background-color: #15803d;
+    }
+
+    .hover\:text-gray-900:hover {
+        color: #111827;
+    }
+
+    .hover\:ring-4:hover {
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.5);
+    }
+
+    .hover\:ring-green-600:hover {
+        box-shadow: 0 0 0 4px #16a34a;
+    }
+
+    /* Focus states */
+    .focus\:outline-none:focus {
+        outline: none;
+    }
+
+    .focus\:ring-2:focus {
+        box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.5);
+    }
+
+    .focus\:ring-green-400:focus {
+        box-shadow: 0 0 0 2px #4ade80;
+    }
+
+    /* Grid layout */
+    .grid {
+        display: grid;
+    }
+
+    .grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .gap-4 {
+        gap: 1rem;
+    }
+
+    /* Cursor */
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    /* Transition */
+    .transition {
+        transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+        transition-duration: 150ms;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Typography */
+    .text-lg {
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+    }
+
+    .font-semibold {
+        font-weight: 600;
+    }
+
+    .text-gray-800 {
+        color: #1f2937;
+    }
 </style>
-<body class="main-body app sidebar-mini">
+
+<body class="main-body app sidebar-mini relative" id="appBody" style="transition: background-color 0.3s ease;">
     <style>
         .main-footer {
             position: fixed;
@@ -228,7 +335,7 @@
             z-index: 1000;
             box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
         }
-    
+
         .main-content.app-content {
             padding-bottom: 50px;
             /* space for footer */
@@ -236,14 +343,13 @@
     </style>
     <!-- Loader -->
     <div id="global-loader">
-        <img src="{{asset('assets/admin')}}/img/loader.svg" class="loader-img" alt="Loader">
+        <img alt="Loader" class="loader-img" src="{{ asset('assets/admin') }}/img/loader.svg" />
     </div>
     <!-- /Loader -->
     @include('admin.partials.sidebar')
     <!-- main-content -->
-    <di v class="main-content app-content">
+    <div class="main-content app-content">
         @include('admin.partials.header')
-
         <div class="container-fluid">
             @yield('breadcrumb')
             @yield('content')
@@ -252,9 +358,121 @@
             @include('admin.partials.footer-scripts')
 
             @if ($errors->any())
-            @foreach ($errors->all() as $error)
-            @php(toastr()->error($error))
-            @endforeach
+                @foreach ($errors->all() as $error)
+                    @php(toastr()->error($error))
+                @endforeach
             @endif
+        </div>
+    </div>
+    <!-- Button on the side center -->
+    <button type="button" aria-label="Open background image gallery"
+        class="fixed top-1/2 {{ session()->get('rtl', 1) ? 'left-0' : 'right-0' }} transform -translate-y-1/2 bg-green-600 hover:bg-green-700 text-white p-3 rounded-l shadow z-50 focus:outline-none focus:ring-2 focus:ring-green-400"
+        id="openGalleryBtn">
+        <i class="fas fa-images fa-lg">
+        </i>
+    </button>
+    <!-- Gallery panel -->
+    <div class="fixed top-0 {{ session()->get('rtl', 1) ? 'left-0' : 'right-0' }} h-full w-64 bg-white shadow-lg transform {{ session()->get('rtl', 1) ? '-translate-x-full' : 'translate-x-full' }} transition-transform duration-300 ease-in-out z-50 overflow-y-auto"
+        id="galleryPanel" style="display: none;">
+        <div class="p-4 border-b border-gray-300 flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-gray-800">
+                اختر الخلفية
+            </h2>
+            <button aria-label="Close background image gallery"
+                class="text-gray-600 hover:text-gray-900 focus:outline-none" id="closeGalleryBtn">
+                <i class="fas fa-times fa-lg">
+                </i>
+            </button>
+        </div>
+        <div class="p-4 grid grid-cols-2 gap-4">
+            <img alt="صورة خلفية رقم 1: خلفية ثلاثية الأبعاد مزيج ألوان"
+                class="cursor-pointer rounded shadow hover:ring-4 hover:ring-green-600 transition" height="150"
+                src="{{asset('assets/bg-themes/1.png')}}"
+                tabindex="0" width="200" />
+            <img alt="صورة خلفية رقم 2: خلفية ثلاثية الأبعاد مزيج ألوان"
+                class="cursor-pointer rounded shadow hover:ring-4 hover:ring-green-600 transition" height="150"
+                src="{{asset('assets/bg-themes/2.png')}}"
+                tabindex="0" width="200" />
+            <img alt="صورة خلفية رقم 3: خلفية ثلاثية الأبعاد مزيج ألوان"
+                class="cursor-pointer rounded shadow hover:ring-4 hover:ring-green-600 transition" height="150"
+                src="{{asset('assets/bg-themes/3.png')}}"
+                tabindex="0" width="200" />
+            <img alt="صورة خلفية رقم 4: خلفية ثلاثية الأبعاد مزيج ألوان"
+                class="cursor-pointer rounded shadow hover:ring-4 hover:ring-green-600 transition" height="150"
+                src="{{asset('assets/bg-themes/4.png')}}"
+                tabindex="0" width="200" />
+            <img alt="صورة خلفية رقم 5: خلفية ثلاثية الأبعاد مزيج ألوان"
+                class="cursor-pointer rounded shadow hover:ring-4 hover:ring-green-600 transition" height="150"
+                src="{{asset('assets/bg-themes/5.png')}}"
+                tabindex="0" width="200" />
+            <img alt="صورة خلفية رقم 6: خلفية ثلاثية الأبعاد مزيج ألوان"
+                class="cursor-pointer rounded shadow hover:ring-4 hover:ring-green-600 transition" height="150"
+                src="{{asset('assets/bg-themes/6.png')}}"
+                tabindex="0" width="200" />
+
+        </div>
+    </div>
+    <script>
+        const openBtn = document.getElementById('openGalleryBtn');
+        const closeBtn = document.getElementById('closeGalleryBtn');
+        const galleryPanel = document.getElementById('galleryPanel');
+        const appBody = document.getElementById('appBody');
+        const images = galleryPanel.querySelectorAll('img.cursor-pointer');
+        const isRtl = {!! json_encode(session()->get('rtl', 1)) !!} === 1;
+
+        // Open gallery panel
+        openBtn.addEventListener('click', () => {
+            galleryPanel.style.display = 'block';
+            if ({!! json_encode(session()->get('rtl', 1)) !!} === 1) {
+                galleryPanel.style.transform = 'translateX(0)';
+            } else {
+                galleryPanel.style.transform = 'translateX(0)';
+            }
+            openBtn.setAttribute('aria-expanded', 'true');
+        });
+
+        // Close gallery panel
+        closeBtn.addEventListener('click', () => {
+            if ({!! json_encode(session()->get('rtl', 1)) !!} === 1) {
+                galleryPanel.style.transform = 'translateX(-100%)';
+            } else {
+                galleryPanel.style.transform = 'translateX(100%)';
+            }
+            setTimeout(() => {
+                galleryPanel.style.display = 'none';
+            }, 300);
+            openBtn.setAttribute('aria-expanded', 'false');
+        });
+
+        // On page load, apply saved background if any
+        const savedBackground = localStorage.getItem('selectedBackground');
+        if (savedBackground) {
+            appBody.style.backgroundImage = `url('${savedBackground}')`;
+            appBody.style.backgroundRepeat = 'no-repeat';
+            appBody.style.backgroundSize = 'cover';
+            appBody.style.backgroundPosition = 'center center';
+        }
+
+        // Change background on image click and save selection
+        images.forEach(img => {
+            img.addEventListener('click', () => {
+                // Set the body background to the clicked image's src
+                appBody.style.backgroundImage = `url('${img.src}')`;
+                appBody.style.backgroundRepeat = 'no-repeat';
+                appBody.style.backgroundSize = 'cover';
+                appBody.style.backgroundPosition = 'center center';
+                // Save selected background to localStorage
+                localStorage.setItem('selectedBackground', img.src);
+            });
+            // Also allow keyboard selection (Enter or Space)
+            img.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    img.click();
+                }
+            });
+        });
+    </script>
 </body>
+
 </html>

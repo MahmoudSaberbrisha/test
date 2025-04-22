@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\AccountingDepartment\Models;
 
 
@@ -24,6 +25,7 @@ class Entry extends Model
         'reference2',
         'debit',
         'credit',
+        'description',
         'total',
     ];
 
