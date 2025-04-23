@@ -1,7 +1,8 @@
 @extends('accounting-department::entries.master')
 @section('entries')
- <link rel="stylesheet" href="{{ asset('assets') }}/style.css">
- <script src='https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.4/dat.gui.min.js'></script><script  src="{{ asset('assets') }}/script.js"></script>
+    <link rel="stylesheet" href="{{ asset('assets') }}/style.css">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.4/dat.gui.min.js'></script>
+    <script src="{{ asset('assets') }}/script.js"></script>
 
     <div class="mb-4" dir="rtl">
         <form method="GET" action="" class="flex items-center gap-4">
@@ -15,7 +16,8 @@
             </select>
         </form>
         <div class="flex justify-between mt-4">
-            <button onclick="loadPreviousEntries()" class="LiquidButton bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            <button onclick="loadPreviousEntries()"
+                class="LiquidButton bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                 عرض السابق
             </button>
             <button onclick="loadNextEntries()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
@@ -46,38 +48,34 @@
             <thead>
                 <tr class="bg-green-800 text-white">
 
-                    <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">اسم الحساب</th>
-                    <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">رقم الحساب</th>
                     <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">مركز التكلفة</th>
                     <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">المرجع</th>
-                    <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">دائن</th>
-                    <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">مدين</th>
 
                     <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">نوع القيد</th>
-                    <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">إجراء</th>
                     <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">تاريخ</th>
                     <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">رقم القيد</th>
                     <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">البيان</th>
+                    <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">إجراء</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
                 @foreach ($entries as $entry)
                     <tr class="hover:bg-gray-100">
 
-                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->account_name }}
-                        </td>
-                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">
-                            {{ $entry->account_number }}</td>
                         <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->cost_center }}
                         </td>
                         <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->reference }}
                         </td>
-                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->debit }}</td>
-                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->credit }}</td>
 
                         <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">
                             {{ $entry->typeOfRestriction ? $entry->typeOfRestriction->restriction_type : 'N/A' }}</td>
 
+                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->date }}</td>
+
+                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->entry_number }}
+                        </td>
+                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->description }}
+                        </td>
                         <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs"> <a
                                 href="{{ route(auth()->getDefaultDriver() . '.entries.edit', $entry->id) }}"
                                 class="text-blue-500 hover:underline"><i class="fas fa-edit"></i></a>
@@ -89,16 +87,6 @@
                                         class="fas fa-trash"></i></button>
                             </form>
                         </td>
-                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->date }}</td>
-
-                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->entry_number }}
-                        </td>
-                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->description }}
-                        </td>
-
-
-
-
                     </tr>
                 @endforeach
             </tbody>

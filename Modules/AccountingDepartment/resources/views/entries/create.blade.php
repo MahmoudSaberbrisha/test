@@ -14,30 +14,8 @@
                 </div>
                 <div class="col-span-1">
                     <label for="entry-number" class="block text-gray-700">رقم القيد</label>
-                    <input type="text" name="entry_number" id="entry_number"
+                    <input type="text" name="entry_number" id="entry_number" value="{{ $nextEntryNumber ?? '' }}"
                         class="border input border-gray-300 rounded px-4 py-2 w-full" required>
-                </div>
-                <div class="col-span-1">
-                    <label for="entry-type" class="block text-gray-700">الحساب الاول</label>
-                    <select name="entries[0][chart_of_account_id]" id="entry-type"
-                        class="border input border-gray-300 rounded py-2 px-4 w-full" onchange="updateAccountDetails(this)">
-                        <option>إختر الحساب</option>
-                        @foreach ($accounts as $account)
-                            <option value="{{ $account->id }}" data-name="{{ $account->account_name }}"
-                                data-number="{{ $account->account_number }}">{{ $account->account_name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-span-1">
-                    <label for="entry-type" class="block text-gray-700">الحساب الثاني</label>
-                    <select name="entries[1][chart_of_account_id]" id="entry-type"
-                        class="border input border-gray-300 rounded py-2 px-4 w-full" onchange="upAccountDetails(this)">
-                        <option>إختر الحساب</option>
-                        @foreach ($accounts as $account)
-                            <option value="{{ $account->id }}" data-name="{{ $account->account_name }}"
-                                data-number="{{ $account->account_number }}">{{ $account->account_name }}</option>
-                        @endforeach
-                    </select>
                 </div>
                 <div class="col-span-1">
                     <label for="entry-status" class="block text-gray-700">حالة القيد</label>
@@ -96,14 +74,23 @@
                                     class="border border-gray-300 rounded input px-2 py-3 w-full" required>
                             </td>
                             <td>
-                                <input type="text" name="entries[0][account_name]" id="account_name"
-                                    class="border border-gray-300 rounded px-2 input py-3 w-full" required>
+                                <input type="hidden" name="entries[0][account_name]" id="account_name_0" value="">
+                                <select name="entries[0][chart_of_account_id]" id="chart_of_account_id_0"
+                                    class="border border-gray-300 rounded px-2 py-3 input w-full account-select"
+                                    data-index="0" onchange="updateAccountDetails(this)" required>
+                                    <option value="">إختر الحساب</option>
+                                    @foreach ($accounts as $account)
+                                        <option value="{{ $account->id }}" data-name="{{ $account->account_name }}"
+                                            data-number="{{ $account->account_number }}">{{ $account->account_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </td>
                             <td>
-                                <input type="text" name="entries[0][account_number]" id="account_number"
-                                    class="border border-gray-300 rounded px-2 input py-3 w-full" required>
+                                <input type="text" name="entries[0][account_number]" id="account_number_0" value=""
+                                    class="border border-gray-300 rounded px-2  input py-3 w-full" required readonly>
                             </td>
-                            <td class="border py-1 px-1  bg-red-100">
+                            <td class="border py-1 px-1 bg-red-100">
                                 <input type="number" name="entries[0][credit]" id="credit" value=0.00
                                     style="width:120px"
                                     class="border  border-gray-300 rounded py-3 input px-4 w-full credit-input"
@@ -131,12 +118,23 @@
                                     class="border border-gray-300 rounded px-2 input py-3 w-full" required>
                             </td>
                             <td>
-                                <input type="text" name="entries[1][account_name]" id="account_name2"
-                                    class="border border-gray-300 rounded px-2 py-3 input w-full" required>
+                                <input type="hidden" name="entries[1][account_name]" id="account_name_1"
+                                    value="">
+                                <select name="entries[1][chart_of_account_id]" id="chart_of_account_id_1"
+                                    class="border border-gray-300 rounded px-2 py-3 input w-full account-select"
+                                    data-index="1" onchange="updateAccountDetails(this)" required>
+                                    <option value="">إختر الحساب</option>
+                                    @foreach ($accounts as $account)
+                                        <option value="{{ $account->id }}" data-name="{{ $account->account_name }}"
+                                            data-number="{{ $account->account_number }}">{{ $account->account_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </td>
                             <td>
-                                <input type="text" name="entries[1][account_number]" id="account_number2"
-                                    class="border border-gray-300 rounded px-2  input py-3 w-full" required>
+                                <input type="text" name="entries[1][account_number]" id="account_number_1"
+                                    value="" class="border border-gray-300 rounded px-2  input py-3 w-full" required
+                                    readonly>
                             </td>
                             <td class="border py-1 px-1 bg-red-100">
                                 <input type="number" name="entries[1][credit]" id="credit" value=0.00
@@ -144,8 +142,8 @@
                                     style="width: 120px" oninput="calculateDifference()">
                             </td>
                             <td>
-                                <input type="number" style="width: 120px" name="entries[1][debit]" id="debit" value=0.00
-                                    class="border border-gray-300 rounded input px-3 py-3 w-full debit-input"
+                                <input type="number" style="width: 120px" name="entries[1][debit]" id="debit"
+                                    value=0.00 class="border border-gray-300 rounded input px-3 py-3 w-full debit-input"
                                     oninput="calculateDifference()" required>
                             </td>
 
@@ -154,14 +152,15 @@
                         <tr class="bg-green-100">
                             <td class=" py-3  text-center" colspan="5">الإجمالي</td>
                             <td style="width: 120px" class=" py-3  text-center" id="credit-total">0.00</td>
-                            <td  style="width: 120px" class=" py-3   text-center" id="debit-total">0.00</td>
+                            <td style="width: 120px" class=" py-3   text-center" id="debit-total">0.00</td>
                         </tr>
                         <tr>
                             <td class="border border-gray-300 py-1 px-1 text-center" colspan="6">الفرق بين الجانبين
                             </td>
                             <td class="border border-gray-300 py-1 px-1 text-center"><input id="difference" readonly
-                                 style="width: 120px"   type="number" class="border border-gray-300 py-2  input px-4 text-center"
-                                    name="totel" required></td>
+                                    style="width: 120px" type="number"
+                                    class="border border-gray-300 py-2  input px-4 text-center" name="totel" required>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -192,21 +191,59 @@
     <script>
         function updateAccountDetails(selectElement) {
             const selectedAccount = selectElement.options[selectElement.selectedIndex];
-            const accountNameInput = document.getElementById('account_name');
-            const accountNumberInput = document.getElementById('account_number');
+            const index = selectElement.getAttribute('data-index');
+            const accountNameInput = document.getElementById('account_name_' + index);
+            const accountNumberInput = document.getElementById('account_number_' + index);
 
             accountNameInput.value = selectedAccount.getAttribute('data-name');
             accountNumberInput.value = selectedAccount.getAttribute('data-number');
         }
 
-        function upAccountDetails(selectElement) {
-            const selectedAccount = selectElement.options[selectElement.selectedIndex];
+        function addRow() {
+            const tableBody = document.getElementById('table-body');
+            // Count only data rows (exclude total and difference rows)
+            const dataRows = tableBody.querySelectorAll('tr:not(.bg-green-100):not(:last-child)');
+            const newIndex = dataRows.length;
 
-            const accountNameInput2 = document.getElementById('account_name2');
-            const accountNumberInput2 = document.getElementById('account_number2');
+            const chartOfAccountOptions = `
+                <option value="">إختر الحساب</option>
+                    @foreach ($accounts as $account)
+                        @if ($account->parent_id !== null)
+                            <option value="{{ $account->id }}" data-name="{{ $account->account_name }}" data-number="{{ $account->account_number }}">{{ $account->account_name }}</option>
+                        @endif
+                    @endforeach
+            `;
 
-            accountNameInput2.value = selectedAccount.getAttribute('data-name');
-            accountNumberInput2.value = selectedAccount.getAttribute('data-number');
+            const newRow = document.createElement('tr');
+
+            newRow.innerHTML = `
+                <td>
+                    <input type="text" style="width:350px" name="entries[${newIndex}][description]" class="border border-gray-300 rounded px-2 input py-3 w-full" required>
+                </td>
+                <td>
+                    <input type="text" name="entries[${newIndex}][reference]" class="border border-gray-300 rounded input px-2 py-3 w-full" required>
+                </td>
+                <td>
+                    <input type="text" name="entries[${newIndex}][cost_center]" class="border border-gray-300 rounded input px-2 py-3 w-full" required>
+                </td>
+                <td>
+                    <input type="hidden" name="entries[${newIndex}][account_name]" id="account_name_${newIndex}" value="">
+                    <select name="entries[${newIndex}][chart_of_account_id]" id="chart_of_account_id_${newIndex}" class="border border-gray-300 rounded px-2 py-3 input w-full account-select" data-index="${newIndex}" required onchange="updateAccountDetails(this)">
+                        ${chartOfAccountOptions}
+                    </select>
+                </td>
+                <td>
+                    <input type="text" name="entries[${newIndex}][account_number]" id="account_number_${newIndex}" value="" class="border border-gray-300 rounded px-2  input py-3 w-full" required readonly>
+                </td>
+                <td class="border py-1 px-1 bg-red-100">
+                    <input type="number" name="entries[${newIndex}][credit]" value=0.00 class="border border-gray-300 rounded py-3 input px-4 w-full credit-input" style="width: 120px" oninput="calculateDifference()">
+                </td>
+                <td>
+                    <input type="number" style="width: 120px" name="entries[${newIndex}][debit]" value=0.00 class="border border-gray-300 rounded input px-3 py-3 w-full debit-input" oninput="calculateDifference()" required>
+                </td>
+            `;
+
+            tableBody.insertBefore(newRow, dataRows[dataRows.length - 1]);
         }
     </script>
 @endsection

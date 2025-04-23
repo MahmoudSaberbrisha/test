@@ -12,56 +12,114 @@ class EntryController extends Controller
     public function index()
     {
         $perPage = request('per_page', 10);
-        $entries = Entry::with(['chartOfAccount', 'typeOfRestriction'])
-            ->where('approved', true)
+
+        // Get distinct entry_numbers with pagination
+        $distinctEntryNumbers = Entry::where('approved', true)
+            ->select('entry_number')
+            ->groupBy('entry_number')
+            ->orderBy('entry_number', 'desc')
             ->paginate($perPage)
             ->appends(request()->except('page'));
-        return view('accountingdepartment::entries.index', compact('entries'));
+
+        // Fetch the first entry for each distinct entry_number
+        $entries = Entry::whereIn('entry_number', $distinctEntryNumbers->pluck('entry_number'))
+            ->with(['chartOfAccount', 'typeOfRestriction'])
+            ->orderBy('entry_number', 'desc')
+            ->get();
+
+        // Re-key entries by entry_number to ensure one entry per number
+        $uniqueEntries = $entries->unique('entry_number')->values();
+
+        // Manually create a LengthAwarePaginator for the entries collection
+        $paginatedEntries = new \Illuminate\Pagination\LengthAwarePaginator(
+            $uniqueEntries,
+            $distinctEntryNumbers->total(),
+            $perPage,
+            $distinctEntryNumbers->currentPage(),
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        return view('accountingdepartment::entries.index', ['entries' => $paginatedEntries]);
     }
 
     public function reviewedEntries()
     {
         $perPage = request('per_page', 10);
-        $entries = Entry::with(['chartOfAccount', 'typeOfRestriction'])
-            ->where('approved', false)
+
+        // Get distinct entry_numbers with pagination
+        $distinctEntryNumbers = Entry::where('approved', false)
+            ->select('entry_number')
+            ->groupBy('entry_number')
+            ->orderBy('entry_number', 'desc')
             ->paginate($perPage)
             ->appends(request()->except('page'));
-        return view('accountingdepartment::entries.reviewed', compact('entries'));
+
+        // Fetch the first entry for each distinct entry_number
+        $entries = Entry::whereIn('entry_number', $distinctEntryNumbers->pluck('entry_number'))
+            ->with(['chartOfAccount', 'typeOfRestriction'])
+            ->orderBy('entry_number', 'desc')
+            ->get();
+
+        // Re-key entries by entry_number to ensure one entry per number
+        $uniqueEntries = $entries->unique('entry_number')->values();
+
+        // Manually create a LengthAwarePaginator for the entries collection
+        $paginatedEntries = new \Illuminate\Pagination\LengthAwarePaginator(
+            $uniqueEntries,
+            $distinctEntryNumbers->total(),
+            $perPage,
+            $distinctEntryNumbers->currentPage(),
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        return view('accountingdepartment::entries.reviewed', ['entries' => $paginatedEntries]);
     }
 
-    public function approveEntry($id)
+    public function approveEntry($entryNumber)
     {
-        $entry = Entry::findOrFail($id);
-        $entry->approved = true;
-        $entry->save();
+        $entries = Entry::where('entry_number', $entryNumber)->get();
+        foreach ($entries as $entry) {
+            $entry->approved = true;
+            $entry->save();
+        }
 
-        return redirect()->route('admin.entries.reviewed')->with('success', 'Entry approved successfully.');
+        return redirect()->route('admin.entries.reviewed')->with('success', 'All entries with entry number ' . $entryNumber . ' approved successfully.');
     }
 
     public function create()
     {
-        $accounts = ChartOfAccount::all();
-        return view('accountingdepartment::entries.create', compact('accounts'));
+        // Fetch only sub-accounts (accounts with account_status = 'فرعي')
+        $accounts = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_status', 'فرعي')->get();
+
+        // Get the last entry number from the database
+        $lastEntry = Entry::orderBy('id', 'desc')->first();
+        $lastEntryNumber = $lastEntry ? $lastEntry->entry_number : null;
+
+        // Default prefix and number
+        $prefix = 'EN';
+        $number = 0;
+
+        if ($lastEntryNumber) {
+            // Extract numeric part from last entry number
+            $numberPart = intval(substr($lastEntryNumber, strlen($prefix)));
+            $number = $numberPart;
+        }
+
+        // Increment number for next entry
+        $nextNumber = $number + 1;
+
+        // Format next entry number with leading zeros (e.g., EN001)
+        $nextEntryNumber = $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+
+        return view('accountingdepartment::entries.create', compact('accounts', 'nextEntryNumber'));
     }
 
     public function store(Request $request)
     {
         foreach ($request->input('entries') as $entryData) {
-            $entryData['chart_of_account_id'] = $request->input('parent_id');
             $entry = Entry::create(array_merge($entryData, [
                 'date' => $request->input('date'),
                 'entry_number' => $request->input('entry_number'),
-                'account_name' => $entryData['account_name'],
-                'account_name2' => $entryData['account_name2'] ?? '',
-
-                'account_number2' => $entryData['account_number2'] ?? '',
-
-                'cost_center2' => $entryData['cost_center2'] ?? '',
-
-                'reference2' => $entryData['reference2'] ?? '',
-
-                'total' => $request->input('totel')
-
             ]));
             if ($request->has('type_of_restriction') && !empty($request->input('type_of_restriction'))) {
                 $entry->typeOfRestriction()->create([
@@ -75,7 +133,8 @@ class EntryController extends Controller
     public function edit($id)
     {
         $entry = Entry::findOrFail($id);
-        return view('accountingdepartment::entries.edit', compact('entry'));
+        $entries = Entry::where('entry_number', $entry->entry_number)->get();
+        return view('accountingdepartment::entries.edit', compact('entries'));
     }
 
     public function update(Request $request, $id)
@@ -83,6 +142,20 @@ class EntryController extends Controller
         $entry = Entry::findOrFail($id);
         $entry->update($request->all());
         return redirect()->route('admin.entries.index')->with('success', 'Entry updated successfully.');
+    }
+
+    public function updateMultiple(Request $request)
+    {
+        $entriesData = $request->input('entries', []);
+        foreach ($entriesData as $entryData) {
+            if (isset($entryData['id'])) {
+                $entry = Entry::find($entryData['id']);
+                if ($entry) {
+                    $entry->update($entryData);
+                }
+            }
+        }
+        return redirect()->route('admin.entries.index')->with('success', 'Entries updated successfully.');
     }
 
     public function destroy($id)

@@ -2,58 +2,72 @@
 
 @section('entries')
     <div class="container mx-auto p-4">
-        <div class="bg-white shadow-md rounded-lg p-4">
+        <div class="bg-white shadow-md rounded-lg p-4 overflow-x-auto">
             <h2 class="text-xl font-bold mb-4">تعديل قيد محاسبي</h2>
-            <form action="{{ route(auth()->getDefaultDriver() . '.entries.update', $entry->id) }}" method="POST">
+            <form action="{{ route('admin.entries.updateMultiple') }}" method="POST">
                 @csrf
                 @method('PUT')
-                <div class="mb-4">
-                    <label for="date" class="block text-gray-700">التاريخ</label>
-                    <input type="date" name="date" id="date"
-                        class="border border-gray-300 rounded px-2 py-1 w-full" value="{{ $entry->date }}" required>
+                <table class="min-w-full border border-gray-300">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border border-gray-300 px-3 py-2">التاريخ</th>
+                            <th class="border border-gray-300 px-3 py-2">رقم القيد</th>
+                            <th class="border border-gray-300 px-3 py-2">اسم الحساب</th>
+                            <th class="border border-gray-300 px-3 py-2">رقم الحساب</th>
+                            <th class="border border-gray-300 px-3 py-2">مركز التكلفة</th>
+                            <th class="border border-gray-300 px-3 py-2">المرجع</th>
+                            <th class="border border-gray-300 px-3 py-2">البيان</th>
+                            <th class="border border-gray-300 px-3 py-2">مدين</th>
+                            <th class="border border-gray-300 px-3 py-2">دائن</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($entries as $index => $entry)
+                            <tr>
+                                <input type="hidden" name="entries[{{ $index }}][id]" value="{{ $entry->id }}">
+                                <td class="border border-gray-300 px-2 py-1">
+                                    <input type="date" name="entries[{{ $index }}][date]" value="{{ $entry->date }}" required
+                                        class="w-full border border-gray-300 rounded px-2 py-1">
+                                </td>
+                                <td class="border border-gray-300 px-2 py-1">
+                                    <input type="text" name="entries[{{ $index }}][entry_number]" value="{{ $entry->entry_number }}" required
+                                        class="w-full border border-gray-300 rounded px-2 py-1">
+                                </td>
+                                <td class="border border-gray-300 px-2 py-1">
+                                    <input type="text" name="entries[{{ $index }}][account_name]" value="{{ $entry->account_name }}" required
+                                        class="w-full border border-gray-300 rounded px-2 py-1">
+                                </td>
+                                <td class="border border-gray-300 px-2 py-1">
+                                    <input type="text" name="entries[{{ $index }}][account_number]" value="{{ $entry->account_number }}" required
+                                        class="w-full border border-gray-300 rounded px-2 py-1">
+                                </td>
+                                <td class="border border-gray-300 px-2 py-1">
+                                    <input type="text" name="entries[{{ $index }}][cost_center]" value="{{ $entry->cost_center }}" required
+                                        class="w-full border border-gray-300 rounded px-2 py-1">
+                                </td>
+                                <td class="border border-gray-300 px-2 py-1">
+                                    <input type="text" name="entries[{{ $index }}][reference]" value="{{ $entry->reference }}" required
+                                        class="w-full border border-gray-300 rounded px-2 py-1">
+                                </td>
+                                <td class="border border-gray-300 px-2 py-1">
+                                    <input type="text" name="entries[{{ $index }}][description]" value="{{ $entry->description }}" required
+                                        class="w-full border border-gray-300 rounded px-2 py-1">
+                                </td>
+                                <td class="border border-gray-300 px-2 py-1">
+                                    <input type="number" name="entries[{{ $index }}][debit]" value="{{ $entry->debit }}" required
+                                        class="w-full border border-gray-300 rounded px-2 py-1">
+                                </td>
+                                <td class="border border-gray-300 px-2 py-1">
+                                    <input type="number" name="entries[{{ $index }}][credit]" value="{{ $entry->credit }}" required
+                                        class="w-full border border-gray-300 rounded px-2 py-1">
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                <div class="mt-4">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">تحديث الكل</button>
                 </div>
-                <div class="mb-4">
-                    <label for="entry_number" class="block text-gray-700">رقم القيد</label>
-                    <input type="text" name="entry_number" id="entry_number"
-                        class="border border-gray-300 rounded px-2 py-1 w-full" value="{{ $entry->entry_number }}" required>
-                </div>
-                <div class="mb-4">
-                    <label for="account_name" class="block text-gray-700">اسم الحساب</label>
-                    <input type="text" name="account_name" id="account_name"
-                        class="border border-gray-300 rounded px-2 py-1 w-full" value="{{ $entry->account_name }}" required>
-                </div>
-                <div class="mb-4">
-                    <label for="account_number" class="block text-gray-700">رقم الحساب</label>
-                    <input type="text" name="account_number" id="account_number"
-                        class="border border-gray-300 rounded px-2 py-1 w-full" value="{{ $entry->account_number }}"
-                        required>
-                </div>
-                <div class="mb-4">
-                    <label for="cost_center" class="block text-gray-700">مركز التكلفة</label>
-                    <input type="text" name="cost_center" id="cost_center"
-                        class="border border-gray-300 rounded px-2 py-1 w-full" value="{{ $entry->cost_center }}" required>
-                </div>
-                <div class="mb-4">
-                    <label for="reference" class="block text-gray-700">المرجع</label>
-                    <input type="text" name="reference" id="reference"
-                        class="border border-gray-300 rounded px-2 py-1 w-full" value="{{ $entry->reference }}" required>
-                </div>
-                <div class="mb-4">
-                    <label for="description" class="block text-gray-700">البيان</label>
-                    <input type="text" name="description" id="description"
-                        class="border border-gray-300 rounded px-2 py-1 w-full" value="{{ $entry->description }}" required>
-                </div>
-                <div class="mb-4">
-                    <label for="debit" class="block text-gray-700">مدين</label>
-                    <input type="number" name="debit" id="debit"
-                        class="border border-gray-300 rounded px-2 py-1 w-full" value="{{ $entry->debit }}" required>
-                </div>
-                <div class="mb-4">
-                    <label for="credit" class="block text-gray-700">دائن</label>
-                    <input type="number" name="credit" id="credit"
-                        class="border border-gray-300 rounded px-2 py-1 w-full" value="{{ $entry->credit }}" required>
-                </div>
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">تحديث</button>
             </form>
         </div>
     </div>

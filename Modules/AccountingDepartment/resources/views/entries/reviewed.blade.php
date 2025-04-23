@@ -43,12 +43,8 @@
             <thead>
                 <tr class="bg-green-800 text-white">
 
-                    <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">اسم الحساب</th>
-                    <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">رقم الحساب</th>
                     <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">مركز التكلفة</th>
                     <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">المرجع</th>
-                    <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">دائن</th>
-                    <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">مدين</th>
 
                     <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">نوع القيد</th>
                     <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">إجراء</th>
@@ -61,22 +57,17 @@
                 @foreach ($entries as $entry)
                     <tr class="hover:bg-gray-100">
 
-                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->account_name }}
-                        </td>
-                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">
-                            {{ $entry->account_number }}</td>
                         <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->cost_center }}
                         </td>
                         <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->reference }}
                         </td>
-                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->debit }}</td>
-                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->credit }}</td>
 
                         <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">
                             {{ $entry->typeOfRestriction ? $entry->typeOfRestriction->restriction_type : 'N/A' }}</td>
 
                         <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">
-                            <form action="{{ route(auth()->getDefaultDriver() . '.entries.approve', $entry->id) }}"
+                            <form
+                                action="{{ route(auth()->getDefaultDriver() . '.entries.approve', $entry->entry_number) }}"
                                 method="POST">
                                 @csrf
                                 <button type="submit" class="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600">

@@ -16,7 +16,9 @@ Route::prefix('admin/accounting-department')->group(function () {
     })->name('master');
 
     Route::get('entries/reviewed', [EntryController::class, 'reviewedEntries'])->name('entries.reviewed');
-    Route::post('entries/{id}/approve', [EntryController::class, 'approveEntry'])->name('entries.approve');
+    Route::post('entries/{entryNumber}/approve', [EntryController::class, 'approveEntry'])->name('entries.approve');
+
+    Route::put('entries/update-multiple', [EntryController::class, 'updateMultiple'])->name('entries.updateMultiple');
 
     Route::resource('entries', EntryController::class);
     Route::get('account-movement', [EntryController::class, 'accountMovement'])->name('account.movement');
