@@ -49,9 +49,9 @@
                 </div>
             @endif
 
-@yield('cc')
-                </div>
-            </div>
+            @yield('cc')
+        </div>
+        </div>
         </div>
 
         <script>
@@ -66,8 +66,31 @@
                 }
             }
 
+            // Add a JS variable for the API base URL
+            const nextChildAccountNumberUrlTemplate =
+                "{{ route(auth()->getDefaultDriver() . '.accounts.nextChildAccountNumber', ['parentId' => 'PARENT_ID_PLACEHOLDER']) }}";
+
             function showAddChildModal(parentId) {
                 document.getElementById('parent_id').value = parentId;
+
+                // Replace placeholder with actual parentId
+                const url = nextChildAccountNumberUrlTemplate.replace('PARENT_ID_PLACEHOLDER', parentId);
+
+                // Fetch next child account number from API
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.next_account_number) {
+                            document.getElementById('account_number').value = data.next_account_number;
+                        } else {
+                            document.getElementById('account_number').value = '';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching next child account number:', error);
+                        document.getElementById('account_number').value = '';
+                    });
+
                 document.getElementById('addChildModal').classList.remove('hidden');
             }
 
@@ -98,25 +121,25 @@
                                 required>
                         </div>
                         <div class="mb-4">
-                        <label for="account_status" class="block text-gray-700 font-medium mb-2">حاله الحساب</label>
-                        <select name="account_status" id="account_status"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">اختر حالة الحساب</option>
-                            <option value="رئيسي">رئيسي</option>
-                            <option value="فرعي">فرعي</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="account_type" class="block text-gray-700 font-medium mb-2">نوع الحساب</label>
-                        <select name="account_type" id="account_type"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required>
+                            <label for="account_status" class="block text-gray-700 font-medium mb-2">حاله الحساب</label>
+                            <select name="account_status" id="account_status"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">اختر حالة الحساب</option>
+                                <option value="رئيسي">رئيسي</option>
+                                <option value="فرعي">فرعي</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="account_type" class="block text-gray-700 font-medium mb-2">نوع الحساب</label>
+                            <select name="account_type" id="account_type"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required>
 
-                            <option value="">اختر نوع الحساب</option>
-                            <option value="دائن">دائن</option>
-                            <option value="مدين">مدين</option>
-                        </select>
-                    </div>
+                                <option value="">اختر نوع الحساب</option>
+                                <option value="دائن">دائن</option>
+                                <option value="مدين">مدين</option>
+                            </select>
+                        </div>
                         <div class="flex justify-between px-4 py-3">
                             <button type="button" onclick="hideAddChildModal()"
                                 class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">

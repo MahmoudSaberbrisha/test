@@ -35,6 +35,12 @@ Route::prefix('admin/accounting-department')->group(function () {
 
     Route::get('trial-balance', [AccountingDepartmentController::class, 'trialBalance'])->name('trial.balance');
 
+    // API route to get next child account number
+    Route::get('accounts/next-child-account-number/{parentId}', [ChartOfAccountController::class, 'getNextChildAccountNumber'])->name('accounts.nextChildAccountNumber');
+
+    // Route for exporting accounts to Excel
+    Route::get('accounts/export-excel', [ChartOfAccountController::class, 'exportExcel'])->name('admin.accounts.exportExcel');
+
     // Resource route comes last
     Route::resource('accounts', ChartOfAccountController::class);
 });

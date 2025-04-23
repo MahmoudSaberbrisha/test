@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
 use Modules\AccountingDepartment\Models\Entry;
+use Maatwebsite\Excel\Facades\Excel;
+use Modules\AccountingDepartment\Exports\AccountsExport;
 
 class ChartOfAccountController extends Controller
 {
@@ -15,6 +17,42 @@ class ChartOfAccountController extends Controller
     {
         $accounts = ChartOfAccount::getTree();
         return view('accountingdepartment::accounts.tree', compact('accounts'));
+    }
+
+    public function exportExcel()
+    {
+        return Excel::download(new AccountsExport, 'accounts.xlsx');
+    }
+
+    public function getNextChildAccountNumber($parentId)
+    {
+        $parent = ChartOfAccount::find($parentId);
+        if (!$parent) {
+            return response()->json(['error' => 'Parent account not found'], 404);
+        }
+
+        $parentAccountNumber = $parent->account_number;
+
+        // Get all child account numbers of this parent
+        $childAccountNumbers = ChartOfAccount::where('parent_id', $parentId)
+            ->pluck('account_number')
+            ->toArray();
+
+        // Find the next available child account number by appending digits with '0' separator
+        $nextNumber = null;
+        for ($i = 1; $i <= 99; $i++) {
+            $candidate = $parentAccountNumber . '0' . $i;
+            if (!in_array($candidate, $childAccountNumbers)) {
+                $nextNumber = $candidate;
+                break;
+            }
+        }
+
+        if ($nextNumber === null) {
+            return response()->json(['error' => 'No available child account number'], 400);
+        }
+
+        return response()->json(['next_account_number' => $nextNumber]);
     }
 
     public function balances()
