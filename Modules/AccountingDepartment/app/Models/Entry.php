@@ -17,6 +17,7 @@ class Entry extends Model
         'entry_number2',
         'account_name',
         'account_name2',
+        'account_type', // added account_type
         'account_number',
         'account_number2',
         'cost_center',

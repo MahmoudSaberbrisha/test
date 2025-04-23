@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\AccountingDepartment\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -34,7 +35,10 @@ class ChartOfAccount extends Model
 
     protected $fillable = [
         'account_name',
+        'account_type',
+        'account_status',
         'account_number',
         'parent_id',
+        'is_cost_center',
     ];
 }

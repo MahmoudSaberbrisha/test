@@ -9,7 +9,8 @@
                             <div class="flex justify-between items-center">
                                 <div class="flex items-center space-x-2 space-x-reverse">
                                     @if (count($account->children) > 0)
-                                        <button onclick="toggleChildren('account-{{ $account->id }}')"
+                                        <button style="height: 30px!important"
+                                            onclick="toggleChildren('account-{{ $account->id }}')"
                                             class="text-gray-500 hover:text-gray-700">
                                             <i class="fas fa-chevron-up"></i>
                                         </button>
@@ -20,7 +21,7 @@
                                     <span class="text-gray-500">({{ $account->account_number }})</span>
                                 </div>
                                 <div class="space-x-2 space-x-reverse">
-                                    <button onclick="showAddChildModal({{ $account->id }})"
+                                    <button style="height: 30px!important" onclick="showAddChildModal({{ $account->id }})"
                                         class="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 inline-block">إضافة
                                         فرعي</button>
                                     <a href="{{ route(auth()->getDefaultDriver() . '.accounts.edit', $account->id) }}"
@@ -30,7 +31,7 @@
                                         method="POST" class="inline-block">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit"
+                                        <button style="height: 30px!important" type="submit"
                                             class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">Delete</button>
                                     </form>
                                 </div>
@@ -57,11 +58,13 @@
                                                 </span>
                                             </div>
                                             <div class="flex space-x-2 space-x-reverse">
-                                                <button onclick="showAddChildModal({{ $child->id }})"
+                                                <button style="height: 30px!important"
+                                                    onclick="showAddChildModal({{ $child->id }})"
                                                     class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200">
                                                     إضافة فرعي
                                                 </button>
-                                                <a href="{{ route(auth()->getDefaultDriver() . '.accounts.edit', $child->id) }}"
+                                                <a style="height: 30px!important"
+                                                    href="{{ route(auth()->getDefaultDriver() . '.accounts.edit', $child->id) }}"
                                                     class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-200">
                                                     Edit
                                                 </a>
@@ -70,7 +73,7 @@
                                                     method="POST" class="inline-block">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit"
+                                                    <button style="height: 30px!important" type="submit"
                                                         class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200">
                                                         Delete
                                                     </button>

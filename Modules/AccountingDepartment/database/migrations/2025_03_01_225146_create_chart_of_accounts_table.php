@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('chart_of_accounts', function (Blueprint $table) {
             $table->id();
             $table->string('account_name');
+            $table->string('account_type');
             $table->string('account_number')->unique();
             $table->string('parent_id')->nullable(); // For hierarchical structure
+            $table->string('account_status')->nullable(); // Account status added
             $table->timestamps();
         });
     }

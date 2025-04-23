@@ -32,6 +32,26 @@
                             value="{{ $account->account_number }}" required>
                     </div>
                     <div class="mb-4">
+                        <label for="account_type" class="block text-gray-700 font-medium mb-2">Account Type</label>
+                        <select name="account_type" id="account_type"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required>
+
+                            <option value="">اختر نوع الحساب</option>
+                            <option value="دائن">دائن</option>
+                            <option value="مدين">مدين</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="account_status" class="block text-gray-700 font-medium mb-2">Account Status</label>
+                        <select name="account_status" id="account_status"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">اختر حالة الحساب</option>
+                            <option value="رئيسي">رئيسي</option>
+                            <option value="فرعي">فرعي</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
                         <label for="parent_id" class="block text-gray-700 font-medium mb-2">Parent Account
                             (optional)</label>
                         <input type="text" name="parent_id" id="parent_id"

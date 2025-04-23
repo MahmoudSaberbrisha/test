@@ -97,6 +97,26 @@
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 required>
                         </div>
+                        <div class="mb-4">
+                        <label for="account_status" class="block text-gray-700 font-medium mb-2">حاله الحساب</label>
+                        <select name="account_status" id="account_status"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">اختر حالة الحساب</option>
+                            <option value="رئيسي">رئيسي</option>
+                            <option value="فرعي">فرعي</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="account_type" class="block text-gray-700 font-medium mb-2">نوع الحساب</label>
+                        <select name="account_type" id="account_type"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required>
+
+                            <option value="">اختر نوع الحساب</option>
+                            <option value="دائن">دائن</option>
+                            <option value="مدين">مدين</option>
+                        </select>
+                    </div>
                         <div class="flex justify-between px-4 py-3">
                             <button type="button" onclick="hideAddChildModal()"
                                 class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">

@@ -24,10 +24,32 @@
                                 placeholder="Enter Account Name" required>
                         </div>
                         <div class="mb-4">
-                            <label for="account_number" class="block text-gray-700 text-sm font-bold mb-2">رقم الحساب</label>
+                            <label for="account_number" class="block text-gray-700 text-sm font-bold mb-2">رقم
+                                الحساب</label>
                             <input type="text" name="account_number" id="account_number"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 placeholder="Enter Account Number" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="account_type" class="block text-gray-700 text-sm font-bold mb-2">نوع الحساب</label>
+                            <select name="account_type" id="account_type"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                required>
+                                <option value="">اختر نوع الحساب</option>
+                                <option value="دائن">دائن</option>
+                                <option value="مدين">مدين</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="account_status" class="block text-gray-700 text-sm font-bold mb-2">حالة
+                                الحساب</label>
+                            <select name="account_status" id="account_status"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                required>
+                                <option value="">اختر حالة الحساب</option>
+                                <option value="رئيسي">رئيسي</option>
+                                <option value="فرعي">فرعي</option>
+                            </select>
                         </div>
                         <div class="mb-4">
                             <label for="parent_id" class="block text-gray-700 text-sm font-bold mb-2">الحساب الرئيسي</label>

@@ -1,6 +1,7 @@
 <?php
 
 namespace Modules\AccountingDepartment\Http\Controllers;
+
 use Modules\AccountingDepartment\Models\ChartOfAccount;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -18,10 +19,10 @@ class ChartOfAccountController extends Controller
 
     public function balances()
     {
-        $accounts = ChartOfAccount::with('entries')->get()->map(function($account) {
+        $accounts = ChartOfAccount::with('entries')->get()->map(function ($account) {
             $total_debit = $account->entries->sum('debit');
             $total_credit = $account->entries->sum('credit');
-            $account->balance =  $total_debit -$total_credit ;
+            $account->balance =  $total_debit - $total_credit;
             return $account;
         });
         return view('accountingdepartment::accounts.balances', compact('accounts'));
@@ -69,7 +70,7 @@ class ChartOfAccountController extends Controller
         // Calculate balance like in balances() method
         $total_debit = $account->entries->sum('debit');
         $total_credit = $account->entries->sum('credit');
-        $account->balance = $total_debit-$total_credit  ;
+        $account->balance = $total_debit - $total_credit;
 
         $accounts = ChartOfAccount::getTree();
         return view('accountingdepartment::accounts.print', compact('account', 'transactions', 'accounts'));
@@ -79,7 +80,7 @@ class ChartOfAccountController extends Controller
     {
         $parentAccounts = ChartOfAccount::whereNull('parent_id')->get();
         $accounts = ChartOfAccount::all();
-        return view('accountingdepartment::accounts.create',compact('parentAccounts','accounts'));
+        return view('accountingdepartment::accounts.create', compact('parentAccounts', 'accounts'));
     }
 
     public function store(Request $request)
@@ -87,6 +88,8 @@ class ChartOfAccountController extends Controller
         try {
             $validated = $request->validate([
                 'account_name' => 'required|string|max:255',
+                'account_type' => 'required|string|max:255',
+                'account_status' => 'nullable|string|max:255',
                 'account_number' => [
                     'required',
                     'string',
@@ -95,13 +98,14 @@ class ChartOfAccountController extends Controller
                             ->where('parent_id', $request->parent_id)
                             ->exists();
                         if ($exists) {
-                            $fail('رقم الحساب '.$value.' مسجل مسبقاً لنفس الحساب الرئيسي');
+                            $fail('رقم الحساب ' . $value . ' مسجل مسبقاً لنفس الحساب الرئيسي');
                         }
                     }
                 ],
                 'parent_id' => 'nullable|exists:chart_of_accounts,id'
             ], [
                 'account_name.required' => 'حقل اسم الحساب مطلوب',
+                'account_type.required' => 'حقل نوع الحساب مطلوب',
                 'account_number.required' => 'حقل رقم الحساب مطلوب',
                 'parent_id.exists' => 'الحساب الرئيسي المحدد غير صحيح'
             ]);
@@ -125,7 +129,21 @@ class ChartOfAccountController extends Controller
     public function update(Request $request, $id)
     {
         $account = ChartOfAccount::findOrFail($id);
-        $account->update($request->all());
+
+        $validated = $request->validate([
+            'account_name' => 'required|string|max:255',
+            'account_type' => 'required|string|max:255',
+            'account_status' => 'nullable|string|max:255',
+            'account_number' => 'required|string',
+            'parent_id' => 'nullable|exists:chart_of_accounts,id'
+        ], [
+            'account_name.required' => 'حقل اسم الحساب مطلوب',
+            'account_type.required' => 'حقل نوع الحساب مطلوب',
+            'account_number.required' => 'حقل رقم الحساب مطلوب',
+            'parent_id.exists' => 'الحساب الرئيسي المحدد غير صحيح'
+        ]);
+
+        $account->update($validated);
         return redirect()->route('admin.accounts.index')->with('success', 'Account updated successfully.');
     }
 
