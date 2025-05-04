@@ -47,7 +47,7 @@ class StoreRasidAyniController extends Controller
             return redirect()->back()->with('error', 'Failed to create rasid ayni.');
         }
 
-        return redirect()->route('storerasidayni.index')->with('success', 'Rasid ayni created successfully.');
+        return redirect()->route('admin.storerasidayni.index')->with('success', 'Rasid ayni created successfully.');
     }
 
     /**
@@ -86,7 +86,7 @@ class StoreRasidAyniController extends Controller
             return redirect()->back()->with('error', 'Failed to update rasid ayni.');
         }
 
-        return redirect()->route('storerasidayni.index')->with('success', 'Rasid ayni updated successfully.');
+        return redirect()->route('admin.storerasidayni.index')->with('success', 'Rasid ayni updated successfully.');
     }
 
     /**
@@ -97,7 +97,7 @@ class StoreRasidAyniController extends Controller
         $record = StoreRasidAyni::findOrFail($id);
         $record->delete();
 
-        return redirect()->route('storerasidayni.index')->with('success', 'Rasid ayni deleted successfully.');
+        return redirect()->route('admin.storerasidayni.index')->with('success', 'Rasid ayni deleted successfully.');
     }
 
     // Add any relevant calculations or business logic methods here

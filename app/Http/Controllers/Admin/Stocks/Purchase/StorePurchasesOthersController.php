@@ -8,7 +8,7 @@ use App\Models\Stocks\Purchase\StorePurchasesOthers;
 
 class StorePurchasesOthersController extends StocksBaseController
 {
-    protected $routeName = 'admin.stocks.storepurchasesothers';
+    protected $routeName = 'admin.storepurchasesothers';
 
     /**
      * Display a listing of the purchases others records.

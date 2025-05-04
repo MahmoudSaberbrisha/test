@@ -94,7 +94,7 @@ class StoreMasrofAsnafFar3Controller extends Controller
             return redirect()->back()->with('error', 'Failed to create masrof asnaf far3.');
         }
 
-        return redirect()->route('storemasrofasnaffar3.index')->with('success', 'Masrof asnaf far3 created successfully.');
+        return redirect()->route('admin.storemasrofasnaffar3.index')->with('success', 'Masrof asnaf far3 created successfully.');
     }
 
     /**
@@ -135,7 +135,7 @@ class StoreMasrofAsnafFar3Controller extends Controller
             return redirect()->back()->with('error', 'Failed to update masrof asnaf far3.');
         }
 
-        return redirect()->route('storemasrofasnaffar3.index')->with('success', 'Masrof asnaf far3 updated successfully.');
+        return redirect()->route('admin.storemasrofasnaffar3.index')->with('success', 'Masrof asnaf far3 updated successfully.');
     }
 
     /**
@@ -146,7 +146,7 @@ class StoreMasrofAsnafFar3Controller extends Controller
         $record = StoreMasrofAsnafFar3::findOrFail($id);
         $record->delete();
 
-        return redirect()->route('storemasrofasnaffar3.index')->with('success', 'Masrof asnaf far3 deleted successfully.');
+        return redirect()->route('admin.storemasrofasnaffar3.index')->with('success', 'Masrof asnaf far3 deleted successfully.');
     }
 
     // Add any relevant calculations or business logic methods here

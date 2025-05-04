@@ -10,7 +10,7 @@ use Modules\AdminRoleAuthModule\Models\Admin;
 
 class StoreOtherSupplierController extends StocksBaseController
 {
-    protected $routeName = 'admin.stocks.storeothersupplier';
+    protected $routeName = 'admin.storeothersupplier';
 
     /**
      * Display a listing of the other suppliers.

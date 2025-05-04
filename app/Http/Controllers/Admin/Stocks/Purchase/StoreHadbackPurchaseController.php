@@ -11,7 +11,7 @@ use App\Models\Stocks\Items\StoreItem;
 
 class StoreHadbackPurchaseController extends StocksBaseController
 {
-    protected $routeName = 'admin.stocks.storehadbackpurchase';
+    protected $routeName = 'admin.storehadbackpurchase';
 
     /**
      * Display a listing of the hadback purchase records.

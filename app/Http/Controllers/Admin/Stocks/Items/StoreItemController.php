@@ -9,7 +9,7 @@ use App\Models\Stocks\Setting\StoreBranchSetting;
 
 class StoreItemController extends StocksBaseController
 {
-    protected $routeName = 'admin.stocks.storeitems';
+    protected $routeName = 'admin.storeitems';
 
     /**
      * Display a listing of the store items.

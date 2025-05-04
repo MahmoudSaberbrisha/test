@@ -8,7 +8,7 @@ use App\Models\Stocks\Khazina\StoreKhazina;
 
 class StoreKhazinaController extends StocksBaseController
 {
-    protected $routeName = 'admin.stocks.storekhazina';
+    protected $routeName = 'admin.storekhazina';
 
     /**
      * Display a listing of the khazina records.

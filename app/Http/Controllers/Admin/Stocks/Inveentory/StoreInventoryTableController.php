@@ -9,7 +9,7 @@ use Modules\AdminRoleAuthModule\Models\Admin;
 
 class StoreInventoryTableController extends StocksBaseController
 {
-    protected $routeName = 'admin.stocks.storeinventorytable';
+    protected $routeName = 'admin.storeinventorytable';
 
     /**
      * Display a listing of the inventory records.
@@ -80,7 +80,7 @@ class StoreInventoryTableController extends StocksBaseController
     public function show($id)
     {
         $inventory = StoreInventoryTable::findOrFail($id);
-        return view('storeinventorytable.show', compact('inventory'));
+        return view('admin.stocks.storeinventorytable.show', compact('inventory'));
     }
     public function create()
     {
