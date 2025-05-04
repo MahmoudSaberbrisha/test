@@ -32,9 +32,10 @@
                 <tr class="bg-gray-100">
                     <th class="border p-2">التاريخ</th>
                     <th class="border p-2">البيان</th>
-                    <th class="border p-2">دائن</th>
+                  
 
                     <th class="border p-2">مدين</th>
+                      <th class="border p-2">دائن</th>
                     <th class="border p-2">الرصيد</th>
                 </tr>
             </thead>
@@ -45,7 +46,7 @@
                         <td class="border p-2">{{ $transaction->description }}</td>
                         <td class="border p-2 text-right">{{ number_format($transaction->debit, 2) }}</td>
                         <td class="border p-2 text-right">{{ number_format($transaction->credit, 2) }}</td>
-                        <td class="border p-2 text-right">{{ number_format($transaction->debit- $transaction->credit, 2) }}</td>
+                        <td class="border p-2 text-right">{{ number_format($transaction->credit - $transaction->debit, 2) }}</td>
                     </tr>
                 @endforeach
             </tbody>

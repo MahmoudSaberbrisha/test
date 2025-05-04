@@ -1,4 +1,18 @@
 <?php
+
+use App\Http\Controllers\Admin\Stocks\Inveentory\StoreInventoryTableController;
+use App\Http\Controllers\Admin\Stocks\Items\StoreItemController;
+use App\Http\Controllers\Admin\Stocks\Khazina\StoreKhazinaController;
+use App\Http\Controllers\Admin\Stocks\Other\StoreOtherSupplierController;
+use App\Http\Controllers\Admin\Stocks\Purchase\StoreHadbackPurchaseController;
+use App\Http\Controllers\Admin\Stocks\Purchase\StorePurchasesFatoraController;
+use App\Http\Controllers\Admin\Stocks\Purchase\StorePurchasesOthersController;
+use App\Http\Controllers\Admin\Stocks\Rasid\StoreMasrofAsnafFar3Controller;
+use App\Http\Controllers\Admin\Stocks\Rasid\StoreRasidAyniController;
+use App\Http\Controllers\Admin\Stocks\Setting\StoreBranchSettingController;
+use App\Http\Controllers\Admin\Stocks\Setting\StoreTasnefSettingController;
+use App\Http\Controllers\Admin\Stocks\Setting\StoreUnitsSettingController;
+use App\Http\Controllers\Admin\Stocks\Tahwelat\StoreTahwelatAsnafController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\Settings\ClientSupplierController;
@@ -36,7 +50,7 @@ use App\Http\Controllers\Admin\CarManagement\CarTaskController;
 Route::get('/{home?}', [DashboardController::class, 'index'])->where('home', 'dashboard')->name('dashboard');
 
 Route::prefix('settings')->group(function () {
-	//Client Suppliers Settings
+    //Client Suppliers Settings
     Route::resource('client-suppliers', ClientSupplierController::class)->except(['create', 'edit', 'show']);
     Route::post('client-suppliers/changeActive', [ClientSupplierController::class, 'changeActive'])->name('client-supplier-active');
     //Goods Settings
@@ -115,22 +129,22 @@ Route::prefix('financial-management')->group(function () {
 Route::prefix('employees-management')->group(function () {
     //Employee Types
     Route::resource('employee-types', EmployeeTypeController::class)->except(['create', 'edit', 'show']);
-	Route::post('employee-types/changeActive', [EmployeeTypeController::class, 'changeActive'])->name('employee-types-active');
+    Route::post('employee-types/changeActive', [EmployeeTypeController::class, 'changeActive'])->name('employee-types-active');
     //Employee Nationality
     Route::resource('employee-nationalities', EmployeeNationalityController::class)->except(['create', 'edit', 'show']);
-	Route::post('employee-nationalities/changeActive', [EmployeeNationalityController::class, 'changeActive'])->name('employee-nationalities-active');
+    Route::post('employee-nationalities/changeActive', [EmployeeNationalityController::class, 'changeActive'])->name('employee-nationalities-active');
     //Employee Religion
     Route::resource('employee-religions', EmployeeReligionController::class)->except(['create', 'edit', 'show']);
-	Route::post('employee-religions/changeActive', [EmployeeReligionController::class, 'changeActive'])->name('employee-religions-active');
+    Route::post('employee-religions/changeActive', [EmployeeReligionController::class, 'changeActive'])->name('employee-religions-active');
     //Employee Marital Status
     Route::resource('employee-marital-status', EmployeeMaritalStatusController::class)->except(['create', 'edit', 'show']);
-	Route::post('employee-marital-status/changeActive', [EmployeeMaritalStatusController::class, 'changeActive'])->name('employee-marital-status-active');
+    Route::post('employee-marital-status/changeActive', [EmployeeMaritalStatusController::class, 'changeActive'])->name('employee-marital-status-active');
     //Employee Identity Type
     Route::resource('employee-identity-types', EmployeeIdentityTypeController::class)->except(['create', 'edit', 'show']);
-	Route::post('employee-identity-types/changeActive', [EmployeeIdentityTypeController::class, 'changeActive'])->name('employee-identity-types-active');
+    Route::post('employee-identity-types/changeActive', [EmployeeIdentityTypeController::class, 'changeActive'])->name('employee-identity-types-active');
     //Employee Card Issuers
     Route::resource('employee-card-issuers', EmployeeCardIssuerController::class)->except(['create', 'edit', 'show']);
-	Route::post('employee-card-issuers/changeActive', [EmployeeCardIssuerController::class, 'changeActive'])->name('employee-card-issuers-active');
+    Route::post('employee-card-issuers/changeActive', [EmployeeCardIssuerController::class, 'changeActive'])->name('employee-card-issuers-active');
     //Employee Jobs Settings
     Route::resource('jobs', JobController::class)->except(['create', 'edit', 'show']);
     Route::post('jobs/changeActive', [JobController::class, 'changeActive'])->name('job-active');
@@ -141,13 +155,13 @@ Route::prefix('employees-management')->group(function () {
 Route::prefix('cars-management')->group(function () {
     //Car Suppliers
     Route::resource('car-suppliers', CarSupplierController::class)->except(['create', 'edit', 'show']);
-	Route::post('car-suppliers/changeActive', [CarSupplierController::class, 'changeActive'])->name('car-suppliers-active');
+    Route::post('car-suppliers/changeActive', [CarSupplierController::class, 'changeActive'])->name('car-suppliers-active');
     //Car Contracts
     Route::resource('car-contracts', CarContractController::class);
     Route::get('car-contracts/print-invoice/{id}', [CarContractController::class, 'printPdf'])->name('print-car-invoice');
     //Car Expenses
     Route::resource('car-expenses', CarExpensesController::class)->except(['create', 'edit', 'show']);
-	Route::post('car-expenses/changeActive', [CarExpensesController::class, 'changeActive'])->name('car-expenses-active');
+    Route::post('car-expenses/changeActive', [CarExpensesController::class, 'changeActive'])->name('car-expenses-active');
     //Car Tasks
     Route::resource('car-tasks', CarTaskController::class);
     Route::get('car-tasks/print-invoice/{id}', [CarTaskController::class, 'printPdf'])->name('car-task-invoice');
@@ -168,4 +182,42 @@ Route::prefix('reports')->group(function () {
     Route::get('car-contract-due-report', [ReportController::class, 'carContractDueReport'])->name('car-contract-due-report');
     Route::get('trip-analysis-report', [ReportController::class, 'tripAnalysisReport'])->name('trip-analysis-report');
     Route::get('trip-analysis-by-sales-area-report', [ReportController::class, 'tripAnalysisBySalesAreaReport'])->name('trip-analysis-by-sales-area-report');
+});
+Route::prefix('Warehouse-management')->group(function () {
+    Route::get('/stocks-master', function () {
+        return view('admin.stocks.stocks_master');
+    })->name('stocks.master');
+    Route::get('storemasrofasnaffar3/available-quantity/{sanf_code}', [StoreMasrofAsnafFar3Controller::class, 'getAvailableQuantity']);
+
+    // Items routes
+    Route::resource('storeitems', StoreItemController::class);
+
+    // Inventory routes
+    Route::resource('storeinventorytable', StoreInventoryTableController::class);
+
+    // Khazina routes
+    Route::resource('storekhazina', StoreKhazinaController::class);
+
+    // Other routes
+
+    Route::resource('storeothersupplier', StoreOtherSupplierController::class);
+
+    Route::get('storeothersupplier/next-code', [StoreOtherSupplierController::class, 'getNextCode'])->name('storeothersupplier.nextCode');
+    // Purchase routes
+    Route::resource('storehadbackpurchase', StoreHadbackPurchaseController::class);
+    Route::resource('storepurchasesfatora', StorePurchasesFatoraController::class);
+    Route::resource('storepurchasesothers', StorePurchasesOthersController::class);
+
+
+    // Rasid routes
+    Route::resource('storemasrofasnaffar3', StoreMasrofAsnafFar3Controller::class);
+    Route::resource('storerasidayni', StoreRasidAyniController::class);
+
+    // Setting routes
+    Route::resource('storebranchsetting', StoreBranchSettingController::class);
+    Route::resource('storetasnefsetting', StoreTasnefSettingController::class);
+    Route::resource('storeunitssetting', StoreUnitsSettingController::class);
+
+    // Tahwelat routes
+    Route::resource('storetahwelatasnaf', StoreTahwelatAsnafController::class);
 });

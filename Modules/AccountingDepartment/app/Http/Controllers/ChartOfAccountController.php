@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Log;
 use Modules\AccountingDepartment\Models\Entry;
 use Maatwebsite\Excel\Facades\Excel;
 use Modules\AccountingDepartment\Exports\AccountsExport;
+use App\Models\BookingGroup;
+use App\Imports\AccountsImport;
 
 class ChartOfAccountController extends Controller
 {
@@ -22,6 +24,21 @@ class ChartOfAccountController extends Controller
     public function exportExcel()
     {
         return Excel::download(new AccountsExport, 'accounts.xlsx');
+    }
+
+    public function importExcel(Request $request)
+    {
+        $request->validate([
+            'import_file' => 'required|file|mimes:xlsx,xls',
+        ]);
+
+        try {
+            Excel::import(new AccountsImport, $request->file('import_file'));
+            return redirect()->route('admin.accounts.index')->with('success', 'Accounts imported successfully.');
+        } catch (\Exception $e) {
+            Log::error('Accounts import error: ' . $e->getMessage());
+            return redirect()->route('admin.accounts.index')->with('error', 'Error importing accounts: ' . $e->getMessage());
+        }
     }
 
     public function getNextChildAccountNumber($parentId)
@@ -60,7 +77,18 @@ class ChartOfAccountController extends Controller
         $accounts = ChartOfAccount::with('entries')->get()->map(function ($account) {
             $total_debit = $account->entries->sum('debit');
             $total_credit = $account->entries->sum('credit');
-            $account->balance =  $total_debit - $total_credit;
+            $account->balance = $total_credit - $total_debit;
+
+            // Calculate previous balance before last entry
+            $lastEntry = $account->entries->sortByDesc('date')->first();
+            if ($lastEntry) {
+                $previous_debit = $total_debit - $lastEntry->debit;
+                $previous_credit = $total_credit - $lastEntry->credit;
+                $account->previous_balance = $previous_credit - $previous_debit;
+            } else {
+                $account->previous_balance = $account->balance;
+            }
+
             return $account;
         });
         return view('accountingdepartment::accounts.balances', compact('accounts'));
@@ -68,8 +96,6 @@ class ChartOfAccountController extends Controller
 
     public function statement($id, Request $request)
     {
-
-
         $request->validate([
             'from_date' => 'nullable|date',
             'to_date' => 'nullable|date|after_or_equal:from_date'
@@ -86,12 +112,9 @@ class ChartOfAccountController extends Controller
             $query->where('date', '>=', $request->from_date);
         }
 
-
         if ($request->has('to_date') && $request->to_date) {
             $query->where('date', '<=', $request->to_date);
         }
-
-
 
         $transactions = $query->get();
 
@@ -108,7 +131,7 @@ class ChartOfAccountController extends Controller
         // Calculate balance like in balances() method
         $total_debit = $account->entries->sum('debit');
         $total_credit = $account->entries->sum('credit');
-        $account->balance = $total_debit - $total_credit;
+        $account->balance = $total_credit - $total_debit;
 
         $accounts = ChartOfAccount::getTree();
         return view('accountingdepartment::accounts.print', compact('account', 'transactions', 'accounts'));

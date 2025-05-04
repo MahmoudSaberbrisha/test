@@ -1,11 +1,18 @@
 @extends('accountingdepartment::accounts.index')
 @section('cc')
     <div class="bg-white shadow-md rounded-lg p-6">
-        <div class="mb-4">
+        <div class="mb-4 flex items-center space-x-4">
             <a href="{{ route('admin.admin.accounts.exportExcel') }}"
                class="inline-block bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
                 Export Excel
             </a>
+            <form action="{{ route('admin.admin.accounts.importExcel') }}" method="POST" enctype="multipart/form-data" class="inline-block">
+                @csrf
+                <input type="file" name="import_file" accept=".xlsx,.xls" required class="inline-block">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Import Excel
+                </button>
+            </form>
         </div>
         <div class="overflow-x-auto">
             <div class="max-h-[70vh] overflow-y-auto pr-2">

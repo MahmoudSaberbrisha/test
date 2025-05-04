@@ -12,7 +12,7 @@
     </head>
 
     <body class="bg-gray-100 font-roboto flex flex-col min-h-screen">
-        <div class="container mx-auto p-4 flex-grow">
+        <div class=" mx-auto p-4 flex-grow">
             <h1 class="text-2xl font-bold mb-4">الحسابات</h1>
             <div class="flex space-x-2 space-x-reverse mb-3">
                 <a href="{{ route(auth()->getDefaultDriver() . '.accounts.create') }}"

@@ -1,20 +1,127 @@
 <!-- main-sidebar -->
+<style>
+    /* Sidebar font color white */
+    .app-sidebar,
+    .app-sidebar .side-menu__item,
+    .app-sidebar .side-menu__label,
+    .app-sidebar .slide-item {
+        color: white !important;
+    }
+
+    /* Active menu item highlight moon-like background, white text, and subtle shadow */
+    .app-sidebar .side-menu__item.active,
+    .app-sidebar .slide-item.active,
+    .app-sidebar .side-menu__item.active:hover,
+    .app-sidebar .slide-item.active:hover {
+        background-color: #cbd5e1 !important;
+        /* Moon-like pale blue-gray */
+        color: #1f2937 !important;
+        /* Dark text for contrast */
+        box-shadow:
+            0 0 3px 1px #e0e7ff,
+            0 0 6px 2.5px #c7d2fe,
+            0 0 9px 5px #a5b4fc;
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+    /* Hover effect for menu items with subtle glowing effect */
+    .app-sidebar .side-menu__item:hover,
+    .app-sidebar .slide-item:hover {
+        background-color: #cbd5e1 !important;
+        /* Moon-like pale blue-gray */
+        color: #1f2937 !important;
+        /* Dark text for contrast */
+        box-shadow:
+            0 0 3px 1px #e0e7ff,
+            0 0 6px 2.5px #c7d2fe,
+            0 0 9px 5px #a5b4fc;
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+    /* Water floating effect on all side-menu__item and slide-item */
+    .app-sidebar .side-menu__item,
+    .app-sidebar .slide-item {
+        position: relative;
+        animation: floatWater 4s ease-in-out infinite;
+        transform-origin: center bottom;
+    }
+
+    /* Slight delay for nested slide-items for natural effect */
+    .app-sidebar .slide-menu .slide-item {
+        animation-delay: 0.2s;
+    }
+
+    /* Keyframes for floating effect */
+    @keyframes floatWater {
+
+        0%,
+        100% {
+            transform: translateY(0) rotate(0deg);
+            filter: drop-shadow(0 0 0 rgba(68, 68, 68, 0));
+        }
+
+        25% {
+            transform: translateY(-4px) rotate(-1deg);
+            filter: drop-shadow(0 2px 2px rgba(68, 68, 68, 0.3));
+        }
+
+        50% {
+            transform: translateY(-8px) rotate(1deg);
+            filter: drop-shadow(0 4px 4px rgba(68, 68, 68, 0.5));
+        }
+
+        75% {
+            transform: translateY(-4px) rotate(-1deg);
+            filter: drop-shadow(0 2px 2px rgba(68, 68, 68, 0.3));
+        }
+    }
+
+    /* Ensure the sidebar scroll and layout */
+    .app-sidebar {
+        background-color: #1f2937;
+        /* Tailwind slate-800 */
+        width: 240px;
+        height: 100vh;
+        overflow-y: auto;
+        direction: rtl;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1100;
+        /* Ensure sidebar is above footer */
+        opacity: 0.85;
+        /* Slightly faded */
+    }
+
+    /* Scrollbar styling for better UX */
+    .app-sidebar::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .app-sidebar::-webkit-scrollbar-thumb {
+        background-color: #555555;
+        border-radius: 4px;
+    }
+
+    .app-sidebar::-webkit-scrollbar-track {
+        background-color: #374151;
+        /* Tailwind slate-700 */
+    }
+</style>
 <div class="app-sidebar__overlay" data-toggle="sidebar"></div>
 <aside class="app-sidebar sidebar-scroll">
-<div class="main-sidebar-header active">
-        <a href="javascript:void(0);"><img {{-- src="{{ $settings['site_logo']->getProcessedValue() ?? '' }}" class="main-logo" alt="logo"></a> --}} src="{{ asset('assets/admin/img/photos/m.jpg') }}"
-                class="main-logo" style="height: 65px; width:350px" alt="logo"></a>
-        <a class="logo-icon mobile-logo icon-light active" href="javascript:void(0);"><img {{-- src="{{ $settings['site_icon']->getProcessedValue() ?? '' }}" class="logo-icon" alt="logo"></a> --}}
+    <div class="main-sidebar-header active">
+        <a class="desktop-logo logo-light active" href="javascript:void(0);"><img
+                src="{{ $settings['site_logo']->getProcessedValue() ?? '' }}" class="main-logo" alt="logo"></a>
+        <a class="logo-icon mobile-logo icon-light active" href="javascript:void(0);"><img
                 src="{{ $settings['site_icon']->getProcessedValue() ?? '' }}" class="logo-icon" alt="logo"></a>
     </div>
     <div class="main-sidemenu">
         <div class="app-sidebar__user clearfix">
             <div class="dropdown user-pro-body">
                 <div class="">
-                    <img alt="{{ auth()->user()->name }}" class="avatar avatar-xl brround" {{-- src="{{ auth()->user()->image }}"><span class="avatar-status profile-status bg-green"></span> --}}
-                        src="{{ asset('assets/admin/img/photos/m.jpg') }}"><span
-                        class="avatar-status profile-status bg-green"></span>
-
+                    <img alt="{{ auth()->user()->name }}" class="avatar avatar-xl brround"
+                        src="{{ auth()->user()->image }}"><span class="avatar-status profile-status bg-green"></span>
                 </div>
                 <div class="user-info">
                     <h4 class="font-weight-semibold mt-3 mb-0">{{ auth()->user()->name }}</h4>
@@ -313,7 +420,7 @@
                     auth()->user()->can('View Jobs') ||
                     auth()->user()->can('View Employees'))
                 <li class="slide {{ request()->segment(2) == 'employees-management' ? 'is-expanded' : '' }}">
-                    <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
+                    <a class="side-menu__item" data-toggle="slide" href="javascript:void(0)"><svg
                             class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="36" height="36"
                             viewBox="0 0 36 36">
                             <circle cx="16.86" cy="9.73" r="6.46" fill="" />
@@ -494,7 +601,6 @@
                     </ul>
                 </li>
             @endif
-
             <li class="slide {{ request()->segment(2) == 'accounting-department' ? 'is-expanded' : '' }}">
                 <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
                         class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -523,6 +629,26 @@
                 </ul>
             </li>
 
+            <li class="slide {{ request()->segment(2) == 'Warehouse-management' ? 'is-expanded' : '' }}">
+                <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
+                        class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                        viewBox="0 0 24 24">
+                        <path fill=""
+                            d="M12 2L2 7v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7L12 2zm0 2.18L19.74 7H4.26L12 4.18zM4 20v-9h16v9H4z" />
+                    </svg><span class="side-menu__label">{{ __('Warehouse management') }}</span><i
+                        class="angle fe fe-chevron-down"></i></a>
+                <ul class="slide-menu">
+
+                    <li><a class="slide-item {{ request()->segment(3) == 'Control area' ? 'active' : '' }}"
+                            href="{{ route(auth()->getDefaultDriver() . '.stocks.master') }}">{{ __('Control area') }}</a>
+                    </li>
+
+
+
+
+
+                </ul>
+            </li>
         </ul>
     </div>
 </aside>

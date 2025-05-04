@@ -69,10 +69,10 @@ class AccountingDepartmentController extends Controller
     public function financialBalance()
     {
         // Fetch accounts with balances similar to ChartOfAccountController@balances()
-        $accounts = \Modules\AccountingDepartment\Models\ChartOfAccount::with('entries')->get()->map(function($account) {
+        $accounts = \Modules\AccountingDepartment\Models\ChartOfAccount::with('entries')->get()->map(function ($account) {
             $total_debit = $account->entries->sum('debit');
             $total_credit = $account->entries->sum('credit');
-            $account->balance =  $total_debit - $total_credit;
+            $account->balance = $total_credit - $total_debit;
             return $account;
         });
         return view('accountingdepartment::financial_balance', compact('accounts'));
@@ -87,10 +87,10 @@ class AccountingDepartmentController extends Controller
         $costCenters = \Modules\AccountingDepartment\Models\ChartOfAccount::where('is_cost_center', true)
             ->with('entries')
             ->get()
-            ->map(function($costCenter) {
+            ->map(function ($costCenter) {
                 $total_debit = $costCenter->entries->sum('debit');
                 $total_credit = $costCenter->entries->sum('credit');
-                $costCenter->balance = $total_debit - $total_credit;
+            $costCenter->balance =  $total_credit - $total_debit;
                 return $costCenter;
             });
         return view('accountingdepartment::cost_centers_report', compact('costCenters'));
@@ -109,13 +109,27 @@ class AccountingDepartmentController extends Controller
      */
     public function trialBalance()
     {
-        $accounts = \Modules\AccountingDepartment\Models\ChartOfAccount::with('entries')->get()->map(function($account) {
-            $total_debit = $account->entries->sum('debit');
-            $total_credit = $account->entries->sum('credit');
-            $account->total_debit = $total_debit;
-            $account->total_credit = $total_credit;
+        $accounts = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_status', 'فرعي')
+            ->with('entries')
+            ->get()
+            ->map(function ($account) {
+                $total_debit = $account->entries->sum('debit');
+                $total_credit = $account->entries->sum('credit');
+                $account->total_debit = $total_debit;
+                $account->total_credit = $total_credit;
+
+            // Calculate previous balance before last entry
+            $lastEntry = $account->entries->sortByDesc('date')->first();
+            if ($lastEntry) {
+                $previous_debit = $total_debit - $lastEntry->debit;
+                $previous_credit = $total_credit - $lastEntry->credit;
+                $account->previous_balance = $previous_credit - $previous_debit;
+            } else {
+                $account->previous_balance = $total_credit - $total_debit;
+            }
+
             return $account;
-        });
+            });
 
         // dd($accounts);
 

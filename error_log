@@ -1,0 +1,4 @@
+[24-Apr-2025 17:32:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/albulayi/poseidon.al-bulayi.com/poseidon/database/migrations/2025_07_02_000001_add_created_by_to_entries_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/albulayi/poseidon.al-bulayi.com/poseidon/database/migrations/2025_07_02_000001_add_created_by_to_entries_table.php on line 7

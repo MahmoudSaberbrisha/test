@@ -8,11 +8,11 @@ use Modules\AccountingDepartment\Http\Controllers\RevenuesExpensesController;
 
 Route::prefix('admin/accounting-department')->group(function () {
     Route::get('entries/master', function () {
-        return view('accounting-department::entries.master');
+        return view('accountingdepartment::entries.master');
     })->name('entries.master');
 
     Route::get('master', function () {
-        return view('accounting-department::master');
+        return view('accountingdepartment::master');
     })->name('master');
 
     Route::get('entries/reviewed', [EntryController::class, 'reviewedEntries'])->name('entries.reviewed');
@@ -43,6 +43,12 @@ Route::prefix('admin/accounting-department')->group(function () {
     // Route for exporting accounts to Excel
     Route::get('accounts/export-excel', [ChartOfAccountController::class, 'exportExcel'])->name('admin.accounts.exportExcel');
 
+    Route::post('accounts/import-excel', [ChartOfAccountController::class, 'importExcel'])->name('admin.accounts.importExcel');
+
     // Resource route comes last
+    // Removed booking revenue entry routes as they are now integrated into booking group creation
+    // Route::get('accounts/booking-revenue-entry', [ChartOfAccountController::class, 'bookingRevenueEntryPage'])->name('accounts.bookingRevenueEntryPage');
+    // Route::post('accounts/booking-revenue-entry', [ChartOfAccountController::class, 'storeBookingRevenueEntry'])->name('accounts.storeBookingRevenueEntry');
+
     Route::resource('accounts', ChartOfAccountController::class);
 });

@@ -17,18 +17,18 @@
             </div>
             <div class="flex space-x-2 space-x-reverse">
                 <button onclick="showAddChildModal({{ $child->id }})"
-                    class="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200 text-sm" style="height: 15px!important">
+                    class="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200 text-sm" style="height: 30px!important">
                     إضافة فرعي
                 </button>
                 <a href="{{ route(auth()->getDefaultDriver() . '.accounts.edit', $child->id) }}"
-                    class="bg-yellow-500 text-white px-2 py-1 rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-200 text-sm">
+                  style="height: 30px!important"  class="bg-yellow-500 text-white px-2 py-1 rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-200 text-sm">
                     Edit
                 </a>
                 <form action="{{ route(auth()->getDefaultDriver() . '.accounts.destroy', $child->id) }}" method="POST"
                     class="inline-block">
                     @csrf
                     @method('DELETE')
-                    <button style="height: 15px!important" type="submit"
+                    <button style="height: 30px!important" type="submit"
                         class="bg-red-500 text-white px-2 py-1 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200 text-sm">
                         Delete
                     </button>

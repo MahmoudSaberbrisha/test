@@ -10,7 +10,8 @@ use Modules\AdminRoleAuthModule\Models\Scopes\RecordOrderScope;
 
 class EmployeeNationality extends Model implements TranslatableContract
 {
-    use Translatable, softDeletes;
+    use Translatable, SoftDeletes;
+
 
     protected $table = 'employee_nationalities';
 
@@ -20,9 +21,9 @@ class EmployeeNationality extends Model implements TranslatableContract
 
     public $fillable = ['active'];
 
-    protected static function boot() {
+    protected static function boot()
+    {
         parent::boot();
         static::addGlobalScope(new RecordOrderScope('employee_nationalities.id', 'DESC'));
     }
-
 }

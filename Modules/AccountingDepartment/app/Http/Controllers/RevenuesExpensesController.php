@@ -24,7 +24,7 @@ class RevenuesExpensesController extends Controller
                 $accountEntries = $account->entries;
                 $total_debit = $accountEntries->sum('debit');
                 $total_credit = $accountEntries->sum('credit');
-                $account->balance = $total_debit - $total_credit;
+                $account->balance = $total_credit -$total_debit;
 
                 // Calculate previous balance before last entry
                 $lastEntry = $accountEntries->sortByDesc('created_at')->first();
@@ -32,7 +32,7 @@ class RevenuesExpensesController extends Controller
                     $previousEntries = $accountEntries->where('created_at', '<', $lastEntry->created_at);
                     $prev_debit = $previousEntries->sum('debit');
                     $prev_credit = $previousEntries->sum('credit');
-                    $account->previous_balance = $prev_debit - $prev_credit;
+                    $account->previous_balance = $prev_credit - $prev_debit;
                 } else {
                     $account->previous_balance = 0;
                 }
@@ -53,7 +53,7 @@ class RevenuesExpensesController extends Controller
                 $accountEntries = $account->entries;
                 $total_debit = $accountEntries->sum('debit');
                 $total_credit = $accountEntries->sum('credit');
-                $account->balance2 = $total_debit - $total_credit;
+                $account->balance2 = $total_credit - $total_debit;
 
                 // Calculate previous balance before last entry
                 $lastEntry = $accountEntries->sortByDesc('created_at')->first();
@@ -61,7 +61,7 @@ class RevenuesExpensesController extends Controller
                     $previousEntries = $accountEntries->where('created_at', '<', $lastEntry->created_at);
                     $prev_debit = $previousEntries->sum('debit');
                     $prev_credit = $previousEntries->sum('credit');
-                    $account->previous_balance2 = $prev_debit - $prev_credit;
+                    $account->previous_balance2 =  $prev_credit - $prev_debit;
                 } else {
                     $account->previous_balance2 = 0;
                 }

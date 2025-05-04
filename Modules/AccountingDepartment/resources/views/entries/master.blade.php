@@ -26,7 +26,7 @@
 
                 document.getElementById('debit-total').innerText = debitTotal.toFixed(2);
                 document.getElementById('credit-total').innerText = creditTotal.toFixed(2);
-                document.getElementById('difference').value = (debitTotal - creditTotal).toFixed(2);
+                document.getElementById('difference').value = (creditTotal - debitTotal).toFixed(2);
             }
 
             function addRow() {
@@ -85,7 +85,7 @@
                     class="bg-green-500 text-white py-2 px-4 rounded" style="color: rgb(3, 180, 3)">اضافة قيد
                     محاسبي</a>
                 <div class="flex space-x-2 space-x-reverse">
-                    <a href="{{ route(auth()->getDefaultDriver() . '.entries.reviewed' ) }}"
+                    <a href="{{ route(auth()->getDefaultDriver() . '.entries.reviewed') }}"
                         class="bg-yellow-500 text-white py-2 px-4 rounded">قيود قيد
                         المراجعة</a>
                     <a href="{{ route(auth()->getDefaultDriver() . '.entries.index') }}"

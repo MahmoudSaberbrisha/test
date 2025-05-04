@@ -17,7 +17,7 @@ use DataTables;
 
 class BookingGroupController extends Controller implements HasMiddleware
 {
-    protected 
+    protected
         $dataRepository,
         $clientRepository,
         $supplierRepository;
@@ -42,7 +42,7 @@ class BookingGroupController extends Controller implements HasMiddleware
      */
     public function index(Request $request)
     {
-        return redirect()->route(auth()->getDefaultDriver().'.bookings.index');
+        return redirect()->route(auth()->getDefaultDriver() . '.bookings.index');
     }
 
     public function create(): View
@@ -56,27 +56,101 @@ class BookingGroupController extends Controller implements HasMiddleware
     public function store(BookingGroupRequest $request): RedirectResponse
     {
         try {
+
             $bookingGroup = $this->dataRepository->create($request->validated());
             toastr()->success(__('Record successfully created.'));
+            $this->processBookingRevenueEntry();
+
+            if ($request->save == 'close') {
+                return redirect()->route('admin.bookings.index')->with('success', 'تمت إضافة إيرادات الحجوزات بنجاح');
+            }
         } catch (\Exception $e) {
             // dd($e->getMessage());
-            toastr()->error(__('Something went wrong.'));  
+            toastr()->error(__('Something went wrong.'));
         }
 
-        $pdfUrl = route(auth()->getDefaultDriver().'.print-invoice', ['id' => $bookingGroup->id]);
+        $pdfUrl = route('admin.print-invoice', ['id' => $bookingGroup->id]);
         session()->flash('generatePdf', $pdfUrl);
 
-        if ($request->save == 'new') 
-            return redirect()->route(auth()->getDefaultDriver().'.booking-groups.create');
-        elseif ($request->save == 'continue') 
-            return redirect()->route(auth()->getDefaultDriver().'.booking-groups.edit', $bookingGroup->id);
+        if ($request->save == 'new')
+            return redirect()->route('admin.booking-groups.create');
+        elseif ($request->save == 'continue')
+            return redirect()->route('admin.booking-groups.edit', $bookingGroup->id);
         elseif ($request->save == 'book') {
             session()->put('bookingGroupId', $bookingGroup->id);
-            return redirect()->route(auth()->getDefaultDriver() . '.booking-extra-services.create');
+            return redirect()->route('admin.booking-extra-services.create');
         }
         session()->forget('bookingId');
         session()->forget('bookingGroupId');
-        return redirect()->route(auth()->getDefaultDriver().'.bookings.index');
+        return redirect()->route('admin.bookings.index');
+    }
+
+    private function processBookingRevenueEntry()
+    {
+        $accountNumber = '3010101';
+        $account = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_number', $accountNumber)->first();
+
+        if (!$account) {
+            toastr()->error('حساب إيرادات الحجوزات غير موجود');
+            return;
+        }
+
+        $bookingGroups = \App\Models\BookingGroup::all()->filter(function ($group) {
+            return $group->paid > 0;
+        });
+
+        if ($bookingGroups->isEmpty()) {
+            toastr()->error('لا يوجد مبالغ مدفوعة لإضافتها');
+            return;
+        }
+
+        $existingDescriptions = \Modules\AccountingDepartment\Models\Entry::where('description', 'like', 'ايرادات الحجوزات - مدفوعات الحجز رقم %')
+            ->pluck('description')
+            ->toArray();
+
+        $existingGroupIds = [];
+        foreach ($existingDescriptions as $desc) {
+            if (preg_match('/مدفوعات الحجز رقم (\d+)/u', $desc, $matches)) {
+                $existingGroupIds[] = intval($matches[1]);
+            }
+        }
+
+        // Remove filtering out existing entries, process all booking groups with paid > 0
+        if ($bookingGroups->isEmpty()) {
+            toastr()->error('لا يوجد مبالغ مدفوعة لإضافتها');
+            return;
+        }
+
+        $lastEntryNumber = \Modules\AccountingDepartment\Models\Entry::orderBy('id', 'desc')->value('entry_number');
+        $newEntryNumber = 1;
+        if ($lastEntryNumber !== null && is_numeric($lastEntryNumber)) {
+            $newEntryNumber = intval($lastEntryNumber) + 1;
+        }
+
+        foreach ($bookingGroups as $group) {
+            // Find existing entry for this booking group by description
+            $entry = \Modules\AccountingDepartment\Models\Entry::where('description', 'ايرادات الحجوزات - مدفوعات الحجز رقم ' . $group->id)->first();
+
+            if (!$entry) {
+                $entry = new \Modules\AccountingDepartment\Models\Entry();
+                $entry->entry_number = (string)$newEntryNumber;
+                $newEntryNumber++;
+            }
+
+            // Only update and save if credit value has changed or new entry
+            if (!$entry->exists || $entry->credit != $group->paid) {
+                $entry->chart_of_account_id = $account->id;
+                $entry->account_number = $account->account_number;
+                $entry->account_name = $account->account_name;
+                $entry->debit = 0;
+                $entry->credit = $group->paid;
+                $entry->date = now();
+                $entry->description = 'ايرادات الحجوزات - مدفوعات الحجز رقم ' . $group->id;
+                $entry->created_by = \Illuminate\Support\Facades\Auth::id();
+                $entry->approved = 1;
+                $entry->save();
+            }
+        }
     }
 
     public function edit($id): View
@@ -94,15 +168,15 @@ class BookingGroupController extends Controller implements HasMiddleware
             session()->forget('bookingId');
             toastr()->success(__('Record successfully updated.'));
         } catch (\Exception $e) {
-            toastr()->error(__('Something went wrong.'));  
+            toastr()->error(__('Something went wrong.'));
         }
 
-        $pdfUrl = route(auth()->getDefaultDriver().'.print-invoice', ['id' => $booking_group]);
+        $pdfUrl = route(auth()->getDefaultDriver() . '.print-invoice', ['id' => $booking_group]);
         session()->flash('generatePdf', $pdfUrl);
 
-        if ($request->save == 'new') 
-            return redirect()->route(auth()->getDefaultDriver().'.booking-groups.create');
-        elseif ($request->save == 'continue') 
+        if ($request->save == 'new')
+            return redirect()->route(auth()->getDefaultDriver() . '.booking-groups.create');
+        elseif ($request->save == 'continue')
             return redirect()->back();
         elseif ($request->save == 'book') {
             session()->put('bookingGroupId', $booking_group);
@@ -110,7 +184,7 @@ class BookingGroupController extends Controller implements HasMiddleware
         }
         session()->forget('bookingId');
         session()->forget('bookingGroupId');
-        return redirect()->route(auth()->getDefaultDriver().'.bookings.index');
+        return redirect()->route(auth()->getDefaultDriver() . '.bookings.index');
     }
 
     /**
@@ -123,7 +197,7 @@ class BookingGroupController extends Controller implements HasMiddleware
             toastr()->success(__('Record successfully deleted.'));
         } catch (\Exception $e) {
             // dd($e->getMessage());
-            toastr()->error(__('Something went wrong.'));  
+            toastr()->error(__('Something went wrong.'));
         }
         return redirect()->back();
     }
@@ -133,7 +207,7 @@ class BookingGroupController extends Controller implements HasMiddleware
         try {
             return $this->dataRepository->active($request->id, $request->value);
         } catch (\Exception $e) {
-            return response()->json( array('type' => 'error', 'text' => __('Something went wrong.')) );
+            return response()->json(array('type' => 'error', 'text' => __('Something went wrong.')));
         }
     }
 
@@ -142,10 +216,10 @@ class BookingGroupController extends Controller implements HasMiddleware
         $booking = $this->dataRepository->findById($id);
         if ($booking) {
             session()->put('bookingId', $id);
-            return redirect()->route(auth()->getDefaultDriver().'.booking-groups.create');
+            return redirect()->route(auth()->getDefaultDriver() . '.booking-groups.create');
         } else {
             toastr()->warning(__('No such booking.'));
-            return redirect()->route(auth()->getDefaultDriver().'.booking-groups.index');
+            return redirect()->route(auth()->getDefaultDriver() . '.booking-groups.index');
         }
     }
 
@@ -161,11 +235,10 @@ class BookingGroupController extends Controller implements HasMiddleware
         $booking = BookingGroup::where('active', 1)->find($id);
         if ($booking) {
             session()->put('bookingGroupId', $id);
-            return redirect()->route(auth()->getDefaultDriver().'.booking-extra-services.create');
+            return redirect()->route(auth()->getDefaultDriver() . '.booking-extra-services.create');
         } else {
             toastr()->warning(__('No such booking.'));
-            return redirect()->route(auth()->getDefaultDriver().'.booking-groups.index');
+            return redirect()->route(auth()->getDefaultDriver() . '.booking-groups.index');
         }
     }
-
 }

@@ -340,11 +340,83 @@
             padding-bottom: 50px;
             /* space for footer */
         }
+
+        #starsMoonsOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            /* below main content but above background */
+            background: transparent;
+        }
+
+        @keyframes waveBackground {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Stars style */
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+            box-shadow: 0 0 10px 4px white;
+            animation: twinkle 2s infinite alternate;
+        }
+
+        /* Moons style */
+        .moon {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, #f0e9d2, #bfbf9c);
+            border-radius: 50%;
+            box-shadow: inset -5px -5px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0.9;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            from {
+                opacity: 0.5;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
     </style>
+
     <!-- Loader -->
     <div id="global-loader">
         <img alt="Loader" class="loader-img" src="{{ asset('assets/admin') }}/img/loader.svg" />
     </div>
+    <!--<div id="starsMoonsOverlay"></div>-->
     <!-- /Loader -->
     @include('admin.partials.sidebar')
     <!-- main-content -->
@@ -364,6 +436,8 @@
             @endif
         </div>
     </div>
+    <!--<div id="starsMoonsOverlay"></div>-->
+
     <!-- Button on the side center -->
     <button type="button" aria-label="Open background image gallery"
         class="fixed top-1/2 {{ session()->get('rtl', 1) ? 'left-0' : 'right-0' }} transform -translate-y-1/2 bg-green-600 hover:bg-green-700 text-white p-3 rounded-l shadow z-50 focus:outline-none focus:ring-2 focus:ring-green-400"
@@ -387,32 +461,28 @@
         <div class="p-4 grid grid-cols-2 gap-4">
             <img alt="صورة خلفية رقم 1: خلفية ثلاثية الأبعاد مزيج ألوان"
                 class="cursor-pointer rounded shadow hover:ring-4 hover:ring-green-600 transition" height="150"
-                src="{{asset('assets/bg-themes/1.png')}}"
-                tabindex="0" width="200" />
+                src="{{ asset('assets/bg-themes/1.png') }}" tabindex="0" width="200" />
             <img alt="صورة خلفية رقم 2: خلفية ثلاثية الأبعاد مزيج ألوان"
                 class="cursor-pointer rounded shadow hover:ring-4 hover:ring-green-600 transition" height="150"
-                src="{{asset('assets/bg-themes/2.png')}}"
-                tabindex="0" width="200" />
+                src="{{ asset('assets/bg-themes/2.png') }}" tabindex="0" width="200" />
             <img alt="صورة خلفية رقم 3: خلفية ثلاثية الأبعاد مزيج ألوان"
                 class="cursor-pointer rounded shadow hover:ring-4 hover:ring-green-600 transition" height="150"
-                src="{{asset('assets/bg-themes/3.png')}}"
-                tabindex="0" width="200" />
+                src="{{ asset('assets/bg-themes/3.png') }}" tabindex="0" width="200" />
             <img alt="صورة خلفية رقم 4: خلفية ثلاثية الأبعاد مزيج ألوان"
                 class="cursor-pointer rounded shadow hover:ring-4 hover:ring-green-600 transition" height="150"
-                src="{{asset('assets/bg-themes/4.png')}}"
-                tabindex="0" width="200" />
+                src="{{ asset('assets/bg-themes/4.png') }}" tabindex="0" width="200" />
             <img alt="صورة خلفية رقم 5: خلفية ثلاثية الأبعاد مزيج ألوان"
                 class="cursor-pointer rounded shadow hover:ring-4 hover:ring-green-600 transition" height="150"
-                src="{{asset('assets/bg-themes/5.png')}}"
-                tabindex="0" width="200" />
+                src="{{ asset('assets/bg-themes/5.png') }}" tabindex="0" width="200" />
             <img alt="صورة خلفية رقم 6: خلفية ثلاثية الأبعاد مزيج ألوان"
                 class="cursor-pointer rounded shadow hover:ring-4 hover:ring-green-600 transition" height="150"
-                src="{{asset('assets/bg-themes/6.png')}}"
-                tabindex="0" width="200" />
+                src="{{ asset('assets/bg-themes/6.png') }}" tabindex="0" width="200" />
 
         </div>
     </div>
     <script>
+        const starsMoonsOverlay = document.getElementById('starsMoonsOverlay');
+
         const openBtn = document.getElementById('openGalleryBtn');
         const closeBtn = document.getElementById('closeGalleryBtn');
         const galleryPanel = document.getElementById('galleryPanel');
@@ -444,10 +514,16 @@
             openBtn.setAttribute('aria-expanded', 'false');
         });
 
-        // On page load, apply saved background if any
+        // On page load, apply saved background if any, else set default background
         const savedBackground = localStorage.getItem('selectedBackground');
         if (savedBackground) {
             appBody.style.backgroundImage = `url('${savedBackground}')`;
+            appBody.style.backgroundRepeat = 'no-repeat';
+            appBody.style.backgroundSize = 'cover';
+            appBody.style.backgroundPosition = 'center center';
+        } else {
+            const defaultBackground = "{{ asset('assets/bg-themes/2.png') }}";
+            appBody.style.backgroundImage = `url('${defaultBackground}')`;
             appBody.style.backgroundRepeat = 'no-repeat';
             appBody.style.backgroundSize = 'cover';
             appBody.style.backgroundPosition = 'center center';
@@ -472,6 +548,45 @@
                 }
             });
         });
+        // Function to create a star element
+        function createStar() {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            const size = Math.random() * 6 + 3; // 3px to 9px
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.animationDuration = (Math.random() * 2 + 1) + 's';
+            return star;
+        }
+
+        // Function to create a moon element
+        function createMoon() {
+            const moon = document.createElement('div');
+            moon.classList.add('moon');
+            moon.style.top = Math.random() * 90 + '%';
+            moon.style.left = Math.random() * 90 + '%';
+            moon.style.width = '40px';
+            moon.style.height = '40px';
+            moon.style.animationDuration = (Math.random() * 4 + 3) + 's';
+            return moon;
+        }
+
+        // Add stars and moons to the overlay
+        function addStarsAndMoons() {
+            const starCount = 50;
+            const moonCount = 5;
+            for (let i = 0; i < starCount; i++) {
+                starsMoonsOverlay.appendChild(createStar());
+            }
+            for (let i = 0; i < moonCount; i++) {
+                starsMoonsOverlay.appendChild(createMoon());
+            }
+        }
+
+        // Initialize stars and moons on page load
+        addStarsAndMoons();
     </script>
 </body>
 

@@ -1,6 +1,6 @@
 @extends('accounting-department::master')
 @section('coco')
-    <div class="container p-4">
+    <div class="container p-4" style="margin:50px">
         <form method="GET" action="{{ route(auth()->getDefaultDriver() . '.account.movement') }}" class="mb-4">
             <div class="flex flex-wrap justify-between items-center mb-4 space-x-4 space-x-reverse">
                 <div class="flex space-x-4 space-x-reverse" style="flex-wrap: nowrap; overflow-x: auto;">
@@ -12,7 +12,8 @@
                             <option value="">إختر الحساب</option>
                             @foreach ($accounts as $account)
                                 <option value="{{ $account->id }}" data-name="{{ $account->account_name }}"
-                                    data-number="{{ $account->account_number }}" {{ request('account_id') == $account->id ? 'selected' : '' }}>
+                                    data-number="{{ $account->account_number }}"
+                                    {{ request('account_id') == $account->id ? 'selected' : '' }}>
                                     {{ $account->account_name }} ({{ $account->account_number }})
                                 </option>
                             @endforeach
@@ -58,8 +59,9 @@
                                 <th class="py-2 px-4">رقم القيد</th>
                                 <th class="py-2 px-4">رقم المرجع</th>
                                 <th class="py-2 px-4">البيان</th>
+                                  <th class="py-2 px-4">الدائن</th>
                                 <th class="py-2 px-4">المدين</th>
-                                <th class="py-2 px-4">الدائن</th>
+                              
                                 <th class="py-2 px-4">الرصيد</th>
                             </tr>
                         </thead>
@@ -68,13 +70,13 @@
                                 <tr class="border-b">
                                     <td class="py-2 px-4">{{ $loop->iteration }}</td>
                                     <td class="py-2 px-4">{{ $entry->date }}</td>
-                                    <td class="py-2 px-4">{{ $entry->entry_type }}</td>
+                                    <td class="py-2 px-4">{{ $entry->typeOfRestriction?->restriction_type ?? '' }}</td>
                                     <td class="py-2 px-4">{{ $entry->entry_number }}</td>
-                                    <td class="py-2 px-4">{{ $entry->reference_number }}</td>
+                                    <td class="py-2 px-4">{{ $entry->reference }}</td>
                                     <td class="py-2 px-4">{{ $entry->description }}</td>
                                     <td class="py-2 px-4">{{ number_format($entry->credit, 2) }}</td>
                                     <td class="py-2 px-4">{{ number_format($entry->debit, 2) }}</td>
-                                    <td class="py-2 px-4">{{ number_format($entry->debit - $entry->credit, 2) }}</td>
+                                    <td class="py-2 px-4">{{ number_format($entry->credit - $entry->debit, 2) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -88,7 +90,7 @@
             @php
                 $totalDebit = $entries->sum('debit');
                 $totalCredit = $entries->sum('credit');
-                $totalDifference = $totalDebit - $totalCredit;
+                $totalDifference = $totalCredit - $totalDebit;
             @endphp
             <div class="bg-yellow-500 text-white p-2 rounded mt-4">
                 <div class="flex justify-between">

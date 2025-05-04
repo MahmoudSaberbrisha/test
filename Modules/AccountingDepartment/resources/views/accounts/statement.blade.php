@@ -37,19 +37,20 @@
                         <tr>
                             <th class="px-4 py-2">التاريخ</th>
                             <th class="px-4 py-2">البيان</th>
+                                <th class="px-4 py-2">دائن</th>
                             <th class="px-4 py-2">مدين</th>
-                            <th class="px-4 py-2">دائن</th>
+                        
                             <th class="px-4 py-2">الرصيد</th>
                         </tr>
                     </thead>
                     <tbody>
                         @php
-                            $totalBalance = 0; // متغير لتخزين مجموع الأرصدة
+                            $totalBalance = 0; 
                         @endphp
                         @foreach ($transactions as $transaction)
                             @php
-                                $currentBalance = $transaction->debit - $transaction->credit; // حساب الرصيد الحالي
-                                $totalBalance += $currentBalance; // إضافة الرصيد الحالي إلى المجموع
+                                $currentBalance =$transaction->credit - $transaction->debit; 
+                                $totalBalance += $currentBalance;  
                             @endphp
                             <tr class="border-t">
                                 <td class="px-4 py-2">{{ $transaction->date }}</td>

@@ -79,7 +79,8 @@
                         <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs"> <a
                                 href="{{ route(auth()->getDefaultDriver() . '.entries.edit', $entry->id) }}"
                                 class="text-blue-500 hover:underline"><i class="fas fa-edit"></i></a>
-                            <form action="{{ route(auth()->getDefaultDriver() . '.entries.destroy', $entry->id) }}"
+                            <form
+                                action="{{ route(auth()->getDefaultDriver() . '.entries.destroy', $entry->entry_number) }}"
                                 method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')

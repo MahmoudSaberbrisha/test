@@ -13,7 +13,6 @@
         "alexusmai/laravel-file-manager": "^3.2",
         "astrotomic/laravel-translatable": "^11.15",
         "binary-cats/laravel-sku": "^0.7.0",
-        "cloudinary-labs/cloudinary-laravel": "^3.0",
         "doctrine/dbal": "^4.2",
         "haruncpi/laravel-id-generator": "^1.1",
         "laravel/framework": "^11.31",

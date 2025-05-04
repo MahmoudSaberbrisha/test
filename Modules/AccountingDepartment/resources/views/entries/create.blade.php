@@ -48,9 +48,10 @@
                             <th class="border border-gray-300 py-2 px-4">مركز التكلفة</th>
                             <th class="border border-gray-300 py-2 px-4">إسم الحساب</th>
                             <th class="border border-gray-300 py-2 px-4">رقم الحساب</th>
+                            <th class="border border-gray-300 py-2 px-4">دائن</th>
+
                             <th class="border border-gray-300 py-2 px-4">مدين</th>
 
-                            <th class="border border-gray-300 py-2 px-4">دائن</th>
                         </tr>
                     </thead>
                     <tbody id="table-body" class="input w-full">
@@ -70,7 +71,7 @@
                                     class="border border-gray-300 rounded input px-2 py-3 w-full" required>
                             </td>
                             <td>
-                                <input type="text" name="entries[0][cost_center]" id="cost_center"
+                                <input type="text" name="entries[0][is_cost_center]" id="cost_center"
                                     class="border border-gray-300 rounded input px-2 py-3 w-full" required>
                             </td>
                             <td>
@@ -90,13 +91,13 @@
                                 <input type="text" name="entries[0][account_number]" id="account_number_0" value=""
                                     class="border border-gray-300 rounded px-2  input py-3 w-full" required readonly>
                             </td>
-                            <td class="border py-1 px-1 bg-red-100">
+                            <td class="border py-1 px-1 ">
                                 <input type="number" name="entries[0][credit]" id="credit" value=0.00
                                     style="width:120px"
                                     class="border  border-gray-300 rounded py-3 input px-4 w-full credit-input"
                                     oninput="calculateDifference()">
                             </td>
-                            <td class="border border-gray-300">
+                            <td class="border bg-red-100 border-gray-300">
                                 <input type="number" name="entries[0][debit]" id="debit" value=0.00
                                     style="width:120px" class="border border-gray-300 rounded px-2 input py-3 debit-input"
                                     oninput="calculateDifference()" required>
@@ -114,8 +115,8 @@
                                     class="border border-gray-300 rounded px-2 input py-3 w-full" required>
                             </td>
                             <td>
-                                <input type="text" name="entries[1][cost_center]" id="cost_center2"
-                                    class="border border-gray-300 rounded px-2 input py-3 w-full" required>
+                                <input type="text" name="entries[1][is_cost_center]" id="cost_center2"
+                                    class="border border-gray-300 rounded px-2 py-3 input w-full" required>
                             </td>
                             <td>
                                 <input type="hidden" name="entries[1][account_name]" id="account_name_1"
@@ -136,14 +137,14 @@
                                     value="" class="border border-gray-300 rounded px-2  input py-3 w-full" required
                                     readonly>
                             </td>
-                            <td class="border py-1 px-1 bg-red-100">
+                            <td class="border py-1 px-1 ">
                                 <input type="number" name="entries[1][credit]" id="credit" value=0.00
                                     class="border border-gray-300 rounded py-3 input px-4 w-full credit-input"
                                     style="width: 120px" oninput="calculateDifference()">
                             </td>
-                            <td>
+                            <td class="bg-red-100 border py-1 px-1 ">
                                 <input type="number" style="width: 120px" name="entries[1][debit]" id="debit"
-                                    value=0.00 class="border border-gray-300 rounded input px-3 py-3 w-full debit-input"
+                                    value=0.00 class="border bg-red-100 border-gray-300 rounded input px-3 py-3 w-full debit-input"
                                     oninput="calculateDifference()" required>
                             </td>
 
@@ -224,7 +225,7 @@
                     <input type="text" name="entries[${newIndex}][reference]" class="border border-gray-300 rounded input px-2 py-3 w-full" required>
                 </td>
                 <td>
-                    <input type="text" name="entries[${newIndex}][cost_center]" class="border border-gray-300 rounded input px-2 py-3 w-full" required>
+                    <input type="text" name="entries[${newIndex}][is_cost_center]" class="border border-gray-300 rounded input px-2 py-3 w-full" required>
                 </td>
                 <td>
                     <input type="hidden" name="entries[${newIndex}][account_name]" id="account_name_${newIndex}" value="">
@@ -235,10 +236,10 @@
                 <td>
                     <input type="text" name="entries[${newIndex}][account_number]" id="account_number_${newIndex}" value="" class="border border-gray-300 rounded px-2  input py-3 w-full" required readonly>
                 </td>
-                <td class="border py-1 px-1 bg-red-100">
+                <td class="border py-1 px-1 ">
                     <input type="number" name="entries[${newIndex}][credit]" value=0.00 class="border border-gray-300 rounded py-3 input px-4 w-full credit-input" style="width: 120px" oninput="calculateDifference()">
                 </td>
-                <td>
+                <td class="border py-1 px-1 bg-red-100">
                     <input type="number" style="width: 120px" name="entries[${newIndex}][debit]" value=0.00 class="border border-gray-300 rounded input px-3 py-3 w-full debit-input" oninput="calculateDifference()" required>
                 </td>
             `;

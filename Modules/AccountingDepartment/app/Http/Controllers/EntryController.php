@@ -117,10 +117,22 @@ class EntryController extends Controller
     public function store(Request $request)
     {
         foreach ($request->input('entries') as $entryData) {
+            // Map 'is_cost_center' input to both 'cost_center' and 'cost_center2' fields
+            $costCenterValue = $entryData['is_cost_center'] ?? null;
+            $entryData['cost_center'] = $costCenterValue;
+            $entryData['cost_center2'] = $costCenterValue;
+
             $entry = Entry::create(array_merge($entryData, [
                 'date' => $request->input('date'),
                 'entry_number' => $request->input('entry_number'),
             ]));
+
+            // Update the is_cost_center field in chart_of_accounts table for the selected account
+            if (!empty($entryData['chart_of_account_id']) && $costCenterValue !== null) {
+                \Modules\AccountingDepartment\Models\ChartOfAccount::where('id', $entryData['chart_of_account_id'])
+                    ->update(['is_cost_center' => $costCenterValue]);
+            }
+
             if ($request->has('type_of_restriction') && !empty($request->input('type_of_restriction'))) {
                 $entry->typeOfRestriction()->create([
                     'restriction_type' => $request->input('type_of_restriction'),
@@ -158,11 +170,13 @@ class EntryController extends Controller
         return redirect()->route('admin.entries.index')->with('success', 'Entries updated successfully.');
     }
 
-    public function destroy($id)
+    public function destroy($entryNumber)
     {
-        $entry = Entry::findOrFail($id);
-        $entry->delete();
-        return redirect()->route('admin.entries.index')->with('success', 'Entry deleted successfully.');
+        $entries = Entry::where('entry_number', $entryNumber)->get();
+        foreach ($entries as $entry) {
+            $entry->delete();
+        }
+        return redirect()->route('admin.entries.index')->with('success', 'All entries with entry number ' . $entryNumber . ' deleted successfully.');
     }
 
     public function show($id)
@@ -173,13 +187,15 @@ class EntryController extends Controller
     public function accountMovement(Request $request)
     {
         $accounts = ChartOfAccount::all();
-        $entries = Entry::all();
+
+        $query = Entry::with('typeOfRestriction');
 
         if ($request->has(['account_number', 'from_date', 'to_date'])) {
-            $entries = Entry::where('account_number', $request->account_number)
-                ->whereBetween('date', [$request->from_date, $request->to_date])
-                ->get();
+            $query->where('account_number', $request->account_number)
+                ->whereBetween('date', [$request->from_date, $request->to_date]);
         }
+
+        $entries = $query->get();
 
         return view('accountingdepartment::account-movement', compact('entries', 'accounts'));
     }
