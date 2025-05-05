@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Stocks\Khazina;
 
 use App\Http\Controllers\Stocks\StocksBaseController;
+use App\Models\Stocks\Setting\StoreBranchSetting;
 use Illuminate\Http\Request;
 use App\Models\Stocks\Khazina\StoreKhazina;
 
@@ -21,8 +22,9 @@ class StoreKhazinaController extends StocksBaseController
 
     public function create()
     {
-        $branches = \App\Models\Stocks\Setting\StoreBranchSetting::all();
-        return view('admin.stocks.storekhazina.create', compact('branches'));
+        $branches = StoreBranchSetting::all();
+        $khazina = new StoreKhazina();
+        return view('admin.stocks.storekhazina.create', compact('branches', 'khazina'));
     }
 
     /**
@@ -34,7 +36,17 @@ class StoreKhazinaController extends StocksBaseController
             'main_branch_id_fk' => 'required|integer',
             'sub_branch_id_fk' => 'required|integer',
             'name' => 'required|string|max:255',
+            'balance' => 'required|numeric|min:0',
         ]);
+
+        // Check if khazina already exists for the given main and sub branch
+        $exists = StoreKhazina::where('main_branch_id_fk', $validated['main_branch_id_fk'])
+            ->where('sub_branch_id_fk', $validated['sub_branch_id_fk'])
+            ->exists();
+
+        if ($exists) {
+            return redirect()->back()->withErrors(['error' => 'Khazina already exists for the selected branch combination.'])->withInput();
+        }
 
         $khazina = StoreKhazina::create($validated);
         $khazina->save();
@@ -62,7 +74,18 @@ class StoreKhazinaController extends StocksBaseController
             'main_branch_id_fk' => 'sometimes|required|integer',
             'sub_branch_id_fk' => 'sometimes|required|integer',
             'name' => 'sometimes|required|string|max:255',
+            'balance' => 'sometimes|required|numeric|min:0',
         ]);
+
+        // Check if another khazina exists for the given main and sub branch
+        $exists = StoreKhazina::where('main_branch_id_fk', $validated['main_branch_id_fk'] ?? $khazina->main_branch_id_fk)
+            ->where('sub_branch_id_fk', $validated['sub_branch_id_fk'] ?? $khazina->sub_branch_id_fk)
+            ->where('id', '!=', $id)
+            ->exists();
+
+        if ($exists) {
+            return redirect()->back()->withErrors(['error' => 'Khazina already exists for the selected branch combination.'])->withInput();
+        }
 
         $khazina->update($validated);
         $khazina->save();
@@ -92,5 +115,14 @@ class StoreKhazinaController extends StocksBaseController
         $khazina = StoreKhazina::findOrFail($id);
         $branches = \App\Models\Stocks\Setting\StoreBranchSetting::all();
         return view('admin.stocks.storekhazina.edit', compact('khazina', 'branches'));
+    }
+
+    /**
+     * Get boxes by sub branch id (ajax).
+     */
+    public function getBoxesBySubBranch($subBranchId)
+    {
+        $boxes = StoreKhazina::where('sub_branch_id_fk', $subBranchId)->get(['id', 'name']);
+        return response()->json($boxes);
     }
 }

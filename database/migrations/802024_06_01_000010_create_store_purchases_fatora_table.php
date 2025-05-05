@@ -30,7 +30,7 @@ class CreateStorePurchasesFatoraTable extends Migration
             $table->string('fatora_cost_after_discount', 300);
             $table->integer('paid_type');
             $table->integer('box_name');
-            $table->integer('paid', 300);
+            $table->integer('paid');
             $table->string('remain', 300);
             $table->string('byan', 255);
             $table->date('date');

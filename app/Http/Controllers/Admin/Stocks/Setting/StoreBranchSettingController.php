@@ -42,7 +42,7 @@ class StoreBranchSettingController extends Controller
             return redirect()->back()->with('error', 'Failed to create branch setting.');
         }
 
-        return redirect()->route('storebranchsetting.index')->with('success', 'Branch setting created successfully.');
+        return redirect()->route('admin.storebranchsetting.index')->with('success', 'Branch setting created successfully.');
     }
 
     /**
@@ -86,7 +86,7 @@ class StoreBranchSettingController extends Controller
             return redirect()->back()->with('error', 'Failed to update branch setting.');
         }
 
-        return redirect()->route('storebranchsetting.index')->with('success', 'Branch setting updated successfully.');
+        return redirect()->route('admin.storebranchsetting.index')->with('success', 'Branch setting updated successfully.');
     }
 
     /**
@@ -97,7 +97,7 @@ class StoreBranchSettingController extends Controller
         $branch = StoreBranchSetting::findOrFail($id);
         $branch->delete();
 
-        return redirect()->route('storebranchsetting.index')->with('success', 'Branch setting deleted successfully.');
+        return redirect()->route('admin.storebranchsetting.index')->with('success', 'Branch setting deleted successfully.');
     }
 
     // Add any relevant calculations or business logic methods here

@@ -1,9 +1,9 @@
 <?php
 
-namespace app\Models\Stocks\Khazina;
+namespace App\Models\Stocks\Khazina;
 
 use Illuminate\Database\Eloquent\Model;
-use app\Models\Stocks\Setting\StoreBranchSetting;
+use App\Models\Stocks\Setting\StoreBranchSetting;
 
 class StoreKhazina extends Model
 {
@@ -13,6 +13,11 @@ class StoreKhazina extends Model
         'main_branch_id_fk',
         'sub_branch_id_fk',
         'name',
+        'balance',
+    ];
+
+    protected $casts = [
+        'balance' => 'decimal:2',
     ];
 
     public $timestamps = false;

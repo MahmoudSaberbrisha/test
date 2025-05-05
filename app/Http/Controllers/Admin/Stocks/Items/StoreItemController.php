@@ -55,8 +55,35 @@ class StoreItemController extends StocksBaseController
             'category' => 'required|integer|in:1,2,3',
         ]);
 
+        // Check if all_buy_cost exceeds sub-branch balance
+        if (!empty($validated['all_buy_cost']) && !empty($validated['sub_branch_id_fk'])) {
+            $subBranchId = $validated['sub_branch_id_fk'];
+            $allBuyCost = $validated['all_buy_cost'];
+
+            $storeKhazina = \App\Models\Stocks\Khazina\StoreKhazina::where('sub_branch_id_fk', $subBranchId)->first();
+            if ($storeKhazina) {
+                if ($allBuyCost > $storeKhazina->balance) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->withErrors(['all_buy_cost' => "القيمة المطلوبة ($allBuyCost) أكبر من الرصيد المتوفر ({$storeKhazina->balance}) في الخزنة الفرعية."]);
+                }
+            }
+        }
+
         $item = StoreItem::create($validated);
         $item->save();
+
+        // Deduct all_buy_cost from the sub-branch's StoreKhazina balance
+        if (!empty($validated['all_buy_cost']) && !empty($validated['sub_branch_id_fk'])) {
+            $subBranchId = $validated['sub_branch_id_fk'];
+            $allBuyCost = $validated['all_buy_cost'];
+
+            $storeKhazina = \App\Models\Stocks\Khazina\StoreKhazina::where('sub_branch_id_fk', $subBranchId)->first();
+            if ($storeKhazina) {
+                $storeKhazina->balance = $storeKhazina->balance - $allBuyCost;
+                $storeKhazina->save();
+            }
+        }
 
         return redirect()->route($this->routeName . '.index')->with('success', 'Item created successfully.');
     }
@@ -153,7 +180,7 @@ class StoreItemController extends StocksBaseController
 
         $newSanfCode = 'PTY' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
 
-        return view($this->routeName . '.create', compact('branches', 'newSanfCode'));
+        return view('admin.stocks.storeitems.create', compact('branches', 'newSanfCode'));
     }
     /**
      * Calculate the profit margin for the item.

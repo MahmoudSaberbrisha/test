@@ -103,16 +103,15 @@
                     maxlength="50" readonly value="{{ old('date_ar', $currentDateAr ?? '') }}">
             </div>
             <div class="col-md-6 mb-3">
-                <label class="form-label d-block">الناشر</label>
-                <input type="hidden" id="publisher" name="publisher" value="{{ old('publisher') }}">
-                <ul class="list-group" id="publisher-list" style="max-height: 200px; overflow-y: auto;">
+                <label for="publisher" class="form-label">الناشر</label>
+                <select class="form-select form-control-3d" id="publisher" name="publisher" required>
+                    <option value="">اختر الناشر</option>
                     @foreach ($users as $user)
-                        <li class="list-group-item list-group-item-action {{ old('publisher') == $user->id ? 'active' : '' }}"
-                            data-id="{{ $user->id }}" style="cursor: pointer;">
+                        <option value="{{ $user->id }}" {{ old('publisher') == $user->id ? 'selected' : '' }}>
                             {{ $user->name ?? $user->id }}
-                        </li>
+                        </option>
                     @endforeach
-                </ul>
+                </select>
             </div>
         </div>
 

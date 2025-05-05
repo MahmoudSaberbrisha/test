@@ -19,6 +19,8 @@
                     <div class="card-body p-2">
                         <div class="row g-2">
                             <div class="col-6"><strong>ID:</strong> {{ $khazina->id }}</div>
+                            <div class="col-6"><strong>Main Branch:</strong> {{ $khazina->mainBranch->title ?? 'N/A' }}</div>
+                            <div class="col-6"><strong>Sub Branch:</strong> {{ $khazina->subBranch->title ?? 'N/A' }}</div>
                             <div class="col-6"><strong>Description:</strong> {{ $khazina->description }}</div>
                             <div class="col-6"><strong>Balance:</strong> {{ $khazina->balance }}</div>
                         </div>

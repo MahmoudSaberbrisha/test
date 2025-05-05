@@ -19,6 +19,19 @@ class StorePurchasesOthersController extends StocksBaseController
         return view('admin.stocks.storepurchasesothers.index', compact('purchases'));
     }
 
+    /**
+     * Get balance by box id (ajax).
+     */
+    public function getBalanceByBoxId($box_id)
+    {
+        $box = \App\Models\Stocks\Khazina\StoreKhazina::find($box_id);
+        if ($box) {
+            return response()->json(['balance' => $box->balance]);
+        } else {
+            return response()->json(['error' => 'Box not found'], 404);
+        }
+    }
+
     public function create()
     {
         // Fetch publishers for dropdown
@@ -62,10 +75,28 @@ class StorePurchasesOthersController extends StocksBaseController
             'had_back_date' => 'nullable|date',
             'had_back_amount' => 'required|numeric',
             'old' => 'nullable|boolean',
+            'box_id_fk' => 'required|integer',
         ]);
 
         $purchase = StorePurchasesOthers::create($validated);
         $purchase->save();
+
+        // Deduct the total purchase cost from the balance of the selected box
+        $box = \App\Models\Stocks\Khazina\StoreKhazina::find($validated['box_id_fk']);
+        if ($box) {
+            $box->balance -= $validated['all_cost_buy'];
+            if ($box->balance < 0) {
+                $box->balance = 0; // Prevent negative balance
+            }
+            $box->save();
+        }
+
+        // Add the amount_buy to the all_amount field of the StoreItem
+        $item = \App\Models\Stocks\Items\StoreItem::where('sanf_code', $validated['product_code'])->first();
+        if ($item) {
+            $item->all_amount += $validated['amount_buy'];
+            $item->save();
+        }
 
         return redirect()->route($this->routeName . '.index')->with('success', 'Purchases others created successfully.');
     }

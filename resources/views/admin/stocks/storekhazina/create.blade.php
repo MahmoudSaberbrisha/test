@@ -52,6 +52,14 @@
                 <a href="{{ route('admin.storekhazina.index') }}" class="btn btn-secondary">إلغاء</a>
             </div>
         </div>
+        <div class="row">
+    <div class="col-md-12 mb-3">
+        <label for="balance" class="form-label">الرصيد</label>
+        <input type="number" step="0.01" min="0" class="form-control form-control-3d" id="balance" name="balance" required
+            value="{{ old('balance', $khazina->balance) }}">
+    </div>
+</div>
+
     </form>
     <style>
         form {

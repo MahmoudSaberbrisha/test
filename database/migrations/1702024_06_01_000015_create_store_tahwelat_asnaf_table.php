@@ -21,7 +21,6 @@ class CreateStoreTahwelatAsnafTable extends Migration
             $table->collation = 'utf8_unicode_ci';
 
             $table->increments('id');
-            $table->unsignedInteger('rkm_fk')->nullable();
             $table->unsignedInteger('sanf_id')->nullable();
             $table->string('sanf_n', 50)->nullable();
             $table->unsignedInteger('sanf_code')->nullable();
@@ -31,10 +30,9 @@ class CreateStoreTahwelatAsnafTable extends Migration
             $table->unsignedInteger('to_storage')->nullable();
 
             // Foreign key constraints
-            $table->foreign('rkm_fk')->references('id')->on('store_tahwelat')->onDelete('cascade');
             $table->foreign('sanf_id')->references('id')->on('store_item')->onDelete('set null');
-            $table->foreign('from_storage')->references('id')->on('store_other_storage')->onDelete('set null');
-            $table->foreign('to_storage')->references('id')->on('store_other_storage')->onDelete('set null');
+            $table->foreign('from_storage')->references('id')->on('store_branch_settings')->onDelete('set null');
+            $table->foreign('to_storage')->references('id')->on('store_branch_settings')->onDelete('set null');
         });
     }
 

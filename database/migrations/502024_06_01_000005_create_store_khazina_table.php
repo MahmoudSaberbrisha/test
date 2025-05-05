@@ -24,6 +24,7 @@ class CreateStoreKhazinaTable extends Migration
             $table->unsignedInteger('main_branch_id_fk');
             $table->unsignedInteger('sub_branch_id_fk');
             $table->string('name', 15);
+            $table->decimal('balance', 15, 2)->default(0);
 
             // Foreign key constraints
             $table->foreign('main_branch_id_fk')->references('id')->on('store_branch_settings')->onDelete('cascade');

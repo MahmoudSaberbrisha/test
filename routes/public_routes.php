@@ -1,5 +1,6 @@
 <?php
 
+
 use App\Http\Controllers\Admin\Stocks\Inveentory\StoreInventoryTableController;
 use App\Http\Controllers\Admin\Stocks\Items\StoreItemController;
 use App\Http\Controllers\Admin\Stocks\Khazina\StoreKhazinaController;
@@ -187,7 +188,9 @@ Route::prefix('Warehouse-management')->group(function () {
     Route::get('/stocks-master', function () {
         return view('admin.stocks.stocks_master');
     })->name('stocks.master');
-    Route::get('storemasrofasnaffar3/available-quantity/{sanf_code}', [StoreMasrofAsnafFar3Controller::class, 'getAvailableQuantity']);
+    Route::get('storemasrofasnaffar3/available-quantity/{sanf_code}', [StoreMasrofAsnafFar3Controller::class, 'getAvailableQuantity'])->name('storemasrofasnaffar3.availableQuantity');
+
+    Route::get('storemasrofasnaffar3/sub-branches/{mainBranchId}', [StoreMasrofAsnafFar3Controller::class, 'getSubBranchesByMainBranch']);
 
     // Items routes
     Route::resource('storeitems', StoreItemController::class);
@@ -196,7 +199,10 @@ Route::prefix('Warehouse-management')->group(function () {
     Route::resource('storeinventorytable', StoreInventoryTableController::class);
 
     // Khazina routes
+
     Route::resource('storekhazina', StoreKhazinaController::class);
+
+    Route::get('storekhazina/by-sub-branch/{subBranchId}', [\App\Http\Controllers\Admin\Stocks\Khazina\StoreKhazinaController::class, 'getBoxesBySubBranch'])->name('storekhazina.bySubBranch');
 
     // Other routes
 
@@ -205,8 +211,9 @@ Route::prefix('Warehouse-management')->group(function () {
     Route::get('storeothersupplier/next-code', [StoreOtherSupplierController::class, 'getNextCode'])->name('storeothersupplier.nextCode');
     // Purchase routes
     Route::resource('storehadbackpurchase', StoreHadbackPurchaseController::class);
-    Route::resource('storepurchasesfatora', StorePurchasesFatoraController::class);
     Route::resource('storepurchasesothers', StorePurchasesOthersController::class);
+
+    Route::get('storepurchasesothers/get-balance/{box_id}', [StorePurchasesOthersController::class, 'getBalanceByBoxId'])->name('storepurchasesothers.getBalance');
 
 
     // Rasid routes

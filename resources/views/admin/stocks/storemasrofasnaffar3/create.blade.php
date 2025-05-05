@@ -47,8 +47,14 @@
             </div>
             <div class="col-md-6 mb-3">
                 <label for="sarf_to" class="form-label">الصرف إلى</label>
-                <input type="number" class="form-control" id="sarf_to" name="sarf_to" required
-                    value="{{ old('sarf_to') }}">
+                <select class="form-control" id="sarf_to" name="sarf_to" required>
+                    <option value="">اختر الفرع</option>
+                    @foreach ($allBranches as $branch)
+                        <option value="{{ $branch->id }}" {{ old('sarf_to') == $branch->id ? 'selected' : '' }}>
+                            {{ $branch->title }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
         </div>
         <div class="row">
@@ -66,8 +72,9 @@
             </div>
             <div class="col-md-6 mb-3">
                 <label for="available_amount" class="form-label">الكمية المتاحة</label>
-                <input type="number" class="form-control" id="available_amount" name="available_amount" required readonly
+                <input type="number" class="form-control" id="all_amount" name="available_amount" readonly
                     value="{{ old('available_amount') }}">
+                <div id="all_amount_debug" style="color: yellow; font-weight: bold; margin-top: 5px;"></div>
             </div>
         </div>
         <div class="row">
@@ -125,24 +132,77 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const sanfCodeInput = document.getElementById('sanf_code');
-            const availableAmountInput = document.getElementById('available_amount');
+            const availableAmountInput = document.getElementById('all_amount');
+            const availableAmountDebug = document.getElementById('all_amount_debug');
+            let fetchTimeout = null;
+
+            function fetchAvailableAmount(sanfCode, subBranchFk) {
+                if (!sanfCode || !subBranchFk) {
+                    availableAmountInput.value = '';
+                    availableAmountDebug.textContent = '';
+                    return;
+                }
+                let url =
+                    "{{ route('admin.storemasrofasnaffar3.availableQuantity', ['sanf_code' => ':sanf_code']) }}";
+                url = url.replace(':sanf_code', sanfCode);
+                url += '?sub_branch_fk=' + subBranchFk;
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            response.text().then(text => {
+                                console.error('Fetch error response text:', text);
+                                availableAmountDebug.textContent = 'Debug: fetch error - ' + text;
+                            });
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        availableAmountInput.value = data.all_amount ?? '';
+                        availableAmountDebug.textContent = 'Debug: ' + (data.all_amount ?? 'No data');
+                        console.log('Fetched available_amount:', data.all_amount);
+                    })
+                    .catch((error) => {
+                        console.error('Fetch error:', error);
+                        availableAmountInput.value = '';
+                        availableAmountDebug.textContent = 'Debug: fetch error - see console';
+                    });
+            }
 
             sanfCodeInput.addEventListener('change', function() {
                 const sanfCode = this.value;
-                if (!sanfCode) {
-                    availableAmountInput.value = '';
-                    return;
+                const subBranchFk = document.getElementById('sub_branch_fk').value;
+                if (fetchTimeout) {
+                    clearTimeout(fetchTimeout);
                 }
-                fetch(`/storemasrofasnaffar3/available-quantity/${sanfCode}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        availableAmountInput.value = data.available_amount ?? '';
-                    })
-                    .catch(() => {
-                        availableAmountInput.value = '';
-                    });
+                fetchTimeout = setTimeout(() => {
+                    fetchAvailableAmount(sanfCode, subBranchFk);
+                }, 300);
+            });
+
+            // Trigger fetch on page load if a sanfCode is preselected
+            if (sanfCodeInput.value) {
+                const subBranchFk = document.getElementById('sub_branch_fk').value;
+                if (subBranchFk) {
+                    fetchAvailableAmount(sanfCodeInput.value, subBranchFk);
+                }
+            }
+
+            const subBranchInput = document.getElementById('sub_branch_fk');
+            subBranchInput.addEventListener('change', function() {
+                const sanfCode = document.getElementById('sanf_code').value;
+                const subBranchFk = this.value;
+                if (fetchTimeout) {
+                    clearTimeout(fetchTimeout);
+                }
+                fetchTimeout = setTimeout(() => {
+                    fetchAvailableAmount(sanfCode, subBranchFk);
+                }, 300);
             });
         });
+    </script>
+
+
     </script>
     <style>
         form {

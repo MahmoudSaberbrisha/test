@@ -3,6 +3,7 @@
 namespace App\Models\Stocks\Setting;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Stocks\Khazina\StoreKhazina;
 
 class StoreBranchSetting extends Model
 {
@@ -13,13 +14,18 @@ class StoreBranchSetting extends Model
         'br_code',
         'from_id',
         'lat_map',
-        'long_map'
+        'long_map',
     ];
 
     public $timestamps = false;
 
-    public function parentBranch()
+    public function mainKhazinas()
     {
-        return $this->belongsTo(StoreBranchSetting::class, 'from_id');
+        return $this->hasMany(StoreKhazina::class, 'main_branch_id_fk');
+    }
+
+    public function subKhazinas()
+    {
+        return $this->hasMany(StoreKhazina::class, 'sub_branch_id_fk');
     }
 }
