@@ -51,6 +51,8 @@
                     <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">تاريخ</th>
                     <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">رقم القيد</th>
                     <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">البيان</th>
+                    <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">تعديل</th>
+                    <th class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">حذف</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -80,6 +82,23 @@
                         <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->entry_number }}
                         </td>
                         <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">{{ $entry->description }}
+                        </td>
+                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">
+                            <a
+                                href="{{ route(auth()->getDefaultDriver() . '.entries.edit', $entry->id) }}"
+                                class="text-blue-500 hover:underline"><i class="fas fa-edit"></i></a>
+                        </td>
+                        <td class="border border-gray-300 px-2 py-1 text-center w-auto max-w-xs">
+                            <form
+                                action="{{ route(auth()->getDefaultDriver() . '.entries.destroy', $entry->entry_number) }}"
+                                method="POST" onsubmit="return confirm('هل أنت متأكد من حذف هذا القيد؟');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600"
+                                    style="position: relative; top: 4px;">
+                                    حذف
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @endforeach

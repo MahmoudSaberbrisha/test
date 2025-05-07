@@ -212,6 +212,7 @@ Route::prefix('Warehouse-management')->group(function () {
     // Purchase routes
     Route::resource('storehadbackpurchase', StoreHadbackPurchaseController::class);
     Route::resource('storepurchasesothers', StorePurchasesOthersController::class);
+    Route::patch('storepurchasesothers/{id}/approve', [StorePurchasesOthersController::class, 'approve'])->name('storepurchasesothers.approve');
 
     Route::get('storepurchasesothers/get-balance/{box_id}', [StorePurchasesOthersController::class, 'getBalanceByBoxId'])->name('storepurchasesothers.getBalance');
 

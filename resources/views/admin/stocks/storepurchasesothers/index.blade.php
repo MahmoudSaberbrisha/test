@@ -48,6 +48,16 @@
                             @method('DELETE')
                             <button class="btn btn-sm btn-danger" type="submit">حذف</button>
                         </form>
+                        @if (!$purchase->approved)
+                            <form action="{{ route('admin.storepurchasesothers.approve', $purchase->id) }}" method="POST"
+                                class="d-inline" onsubmit="return confirm('هل أنت متأكد من الموافقة على هذا العنصر؟');">
+                                @csrf
+                                @method('PATCH')
+                                <button class="btn btn-sm btn-success" type="submit">موافقة</button>
+                            </form>
+                        @else
+                            <span class="badge bg-success">تمت الموافقة</span>
+                        @endif
                     </div>
                 </div>
             </div>

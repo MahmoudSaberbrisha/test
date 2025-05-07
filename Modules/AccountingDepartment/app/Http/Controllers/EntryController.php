@@ -91,9 +91,8 @@ class EntryController extends Controller
         // Fetch only sub-accounts (accounts with account_status = 'فرعي')
         $accounts = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_status', 'فرعي')->get();
 
-        // Get the last entry number from the database
-        $lastEntry = Entry::orderBy('id', 'desc')->first();
-        $lastEntryNumber = $lastEntry ? $lastEntry->entry_number : null;
+        // Get the highest existing entry_number from the database
+        $lastEntryNumber = Entry::max('entry_number');
 
         // Default prefix and number
         $prefix = 'EN';
@@ -125,6 +124,8 @@ class EntryController extends Controller
             $entry = Entry::create(array_merge($entryData, [
                 'date' => $request->input('date'),
                 'entry_number' => $request->input('entry_number'),
+                'username' => $request->input('username'),
+                'account_name2' => $request->input('account_name2'),
             ]));
 
             // Update the is_cost_center field in chart_of_accounts table for the selected account

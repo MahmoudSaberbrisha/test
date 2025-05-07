@@ -13,9 +13,14 @@
                         class="border input border-gray-300 rounded px-4 py-2 w-full" required>
                 </div>
                 <div class="col-span-1">
+                    <label for="account_name2" class="block text-gray-700">اسم محاسب</label>
+                    <input type="text" name="account_name2" id="account_name2" value="{{ auth()->user()->name ?? '' }}"
+                        class="border input border-gray-300 rounded px-4 py-2 w-full" readonly>
+                </div>
+                <div class="col-span-1">
                     <label for="entry-number" class="block text-gray-700">رقم القيد</label>
                     <input type="text" name="entry_number" id="entry_number" value="{{ $nextEntryNumber ?? '' }}"
-                        class="border input border-gray-300 rounded px-4 py-2 w-full" required>
+                        class="border input border-gray-300 rounded px-4 py-2 w-full" readonly required>
                 </div>
                 <div class="col-span-1">
                     <label for="entry-status" class="block text-gray-700">حالة القيد</label>
@@ -67,8 +72,8 @@
                                     class="border border-gray-300 rounded px-2 input py-3 w-full" required>
                             </td>
                             <td>
-                                <input type="text" name="entries[0][reference]" id="reference"
-                                    class="border border-gray-300 rounded input px-2 py-3 w-full" required>
+                                <input type="text" name="entries[0][reference]" id="reference_0"
+                                    class="border border-gray-300 rounded input px-2 py-3 w-full reference-input" required>
                             </td>
                             <td>
                                 <input type="text" name="entries[0][is_cost_center]" id="cost_center"
@@ -111,8 +116,8 @@
                                     required>
                             </td>
                             <td>
-                                <input type="text" name="entries[1][reference]" id="reference2"
-                                    class="border border-gray-300 rounded px-2 input py-3 w-full" required>
+                                <input type="text" name="entries[1][reference]" id="reference_1"
+                                    class="border border-gray-300 rounded px-2 input py-3 w-full reference-input" required>
                             </td>
                             <td>
                                 <input type="text" name="entries[1][is_cost_center]" id="cost_center2"
@@ -144,7 +149,8 @@
                             </td>
                             <td class="bg-red-100 border py-1 px-1 ">
                                 <input type="number" style="width: 120px" name="entries[1][debit]" id="debit"
-                                    value=0.00 class="border bg-red-100 border-gray-300 rounded input px-3 py-3 w-full debit-input"
+                                    value=0.00
+                                    class="border bg-red-100 border-gray-300 rounded input px-3 py-3 w-full debit-input"
                                     oninput="calculateDifference()" required>
                             </td>
 
@@ -222,7 +228,7 @@
                     <input type="text" style="width:350px" name="entries[${newIndex}][description]" class="border border-gray-300 rounded px-2 input py-3 w-full" required>
                 </td>
                 <td>
-                    <input type="text" name="entries[${newIndex}][reference]" class="border border-gray-300 rounded input px-2 py-3 w-full" required>
+                    <input type="text" name="entries[${newIndex}][reference]" id="reference_${newIndex}" class="border border-gray-300 rounded input px-2 py-3 w-full reference-input" required>
                 </td>
                 <td>
                     <input type="text" name="entries[${newIndex}][is_cost_center]" class="border border-gray-300 rounded input px-2 py-3 w-full" required>
@@ -245,6 +251,95 @@
             `;
 
             tableBody.insertBefore(newRow, dataRows[dataRows.length - 1]);
+
+            // Set the reference number for the new row
+            const referenceInputs = newRow.querySelectorAll('.reference-input');
+            referenceInputs.forEach(input => {
+                input.value = newIndex + 1;
+            });
+        }
+    </script>
+    <script>
+        let globalReferenceNumber = 1;
+
+        function setAllReferenceInputs(value) {
+            const referenceInputs = document.querySelectorAll('.reference-input');
+            referenceInputs.forEach(input => {
+                input.value = value;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setAllReferenceInputs(globalReferenceNumber);
+
+            // Add event listener to sync reference inputs on user input
+            const referenceInputs = document.querySelectorAll('.reference-input');
+            referenceInputs.forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const val = e.target.value;
+                    setAllReferenceInputs(val);
+                    globalReferenceNumber = parseInt(val) || globalReferenceNumber;
+                });
+            });
+        });
+
+        function addRow() {
+            const tableBody = document.getElementById('table-body');
+            // Count only data rows (exclude total and difference rows)
+            const dataRows = tableBody.querySelectorAll('tr:not(.bg-green-100):not(:last-child)');
+            const newIndex = dataRows.length;
+
+            const chartOfAccountOptions = `
+                <option value="">إختر الحساب</option>
+                    @foreach ($accounts as $account)
+                        @if ($account->parent_id !== null)
+                            <option value="{{ $account->id }}" data-name="{{ $account->account_name }}" data-number="{{ $account->account_number }}">{{ $account->account_name }}</option>
+                        @endif
+                    @endforeach
+            `;
+
+            const newRow = document.createElement('tr');
+
+            newRow.innerHTML = `
+                <td>
+                    <input type="text" style="width:350px" name="entries[${newIndex}][description]" class="border border-gray-300 rounded px-2 input py-3 w-full" required>
+                </td>
+                <td>
+                    <input type="text" name="entries[${newIndex}][reference]" id="reference_${newIndex}" class="border border-gray-300 rounded input px-2 py-3 w-full reference-input" required>
+                </td>
+                <td>
+                    <input type="text" name="entries[${newIndex}][is_cost_center]" class="border border-gray-300 rounded input px-2 py-3 w-full" required>
+                </td>
+                <td>
+                    <input type="hidden" name="entries[${newIndex}][account_name]" id="account_name_${newIndex}" value="">
+                    <select name="entries[${newIndex}][chart_of_account_id]" id="chart_of_account_id_${newIndex}" class="border border-gray-300 rounded px-2 py-3 input w-full account-select" data-index="${newIndex}" required onchange="updateAccountDetails(this)">
+                        ${chartOfAccountOptions}
+                    </select>
+                </td>
+                <td>
+                    <input type="text" name="entries[${newIndex}][account_number]" id="account_number_${newIndex}" value="" class="border border-gray-300 rounded px-2  input py-3 w-full" required readonly>
+                </td>
+                <td class="border py-1 px-1 ">
+                    <input type="number" name="entries[${newIndex}][credit]" value=0.00 class="border border-gray-300 rounded py-3 input px-4 w-full credit-input" style="width: 120px" oninput="calculateDifference()">
+                </td>
+                <td class="border py-1 px-1 bg-red-100">
+                    <input type="number" style="width: 120px" name="entries[${newIndex}][debit]" value=0.00 class="border border-gray-300 rounded input px-3 py-3 w-full debit-input" oninput="calculateDifference()" required>
+                </td>
+            `;
+
+            tableBody.insertBefore(newRow, dataRows[dataRows.length - 1]);
+
+            // Increment global reference number and set all reference inputs
+            globalReferenceNumber++;
+            setAllReferenceInputs(globalReferenceNumber);
+
+            // Add event listener to the new reference input for synchronization
+            const newReferenceInput = newRow.querySelector('.reference-input');
+            newReferenceInput.addEventListener('input', (e) => {
+                const val = e.target.value;
+                setAllReferenceInputs(val);
+                globalReferenceNumber = parseInt(val) || globalReferenceNumber;
+            });
         }
     </script>
 @endsection

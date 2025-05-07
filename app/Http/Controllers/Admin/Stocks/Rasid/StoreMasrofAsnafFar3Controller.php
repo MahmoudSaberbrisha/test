@@ -114,32 +114,40 @@ class StoreMasrofAsnafFar3Controller extends Controller
             'publisher_name' => 'nullable|string',
         ]);
 
+        // Check if source branch has enough quantity
+        $sourceStoreItem = StoreItem::where('sanf_code', $validated['sanf_code'])
+            ->where('sub_branch_id_fk', $validated['sub_branch_fk'])
+            ->first();
+
+        if (!$sourceStoreItem || $sourceStoreItem->all_amount < $validated['sanf_amount']) {
+            return redirect()->back()->withInput()->withErrors(['sanf_amount' => 'الكمية المتاحة في الفرع المرسل غير كافية']);
+        }
+
         $record = StoreMasrofAsnafFar3::create($validated);
         if ($record) {
             $record->save();
 
-            // Find the StoreItem by sanf_code
-            $storeItem = StoreItem::where('sanf_code', $validated['sanf_code'])->first();
-
-            // Check if StoreItem with same sanf_code and sub_branch_id_fk exists
+            // Add quantity to destination branch
             $existingStoreItem = StoreItem::where('sanf_code', $validated['sanf_code'])
                 ->where('sub_branch_id_fk', $validated['sarf_to'])
                 ->first();
 
             if ($existingStoreItem) {
-                // Add available_amount to existing all_amount
-                $existingStoreItem->all_amount += $validated['available_amount'];
+                $existingStoreItem->all_amount += $validated['sanf_amount'];
                 $existingStoreItem->save();
             } else {
-                // Create a new StoreItem record with the required data
                 $newStoreItem = new StoreItem();
-                $newStoreItem->name = $storeItem->name;
+                $newStoreItem->name = $sourceStoreItem->name;
                 $newStoreItem->sanf_code = $validated['sanf_code'];
-                $newStoreItem->all_amount = $validated['available_amount'];
+                $newStoreItem->all_amount = $validated['sanf_amount'];
                 $newStoreItem->sub_branch_id_fk = $validated['sarf_to'];
                 $newStoreItem->main_branch_id_fk = $validated['main_branch_fk'];
                 $newStoreItem->save();
             }
+
+            // Deduct quantity from source branch
+            $sourceStoreItem->all_amount -= $validated['sanf_amount'];
+            $sourceStoreItem->save();
         } else {
             return redirect()->back()->with('error', 'Failed to create masrof asnaf far3.');
         }

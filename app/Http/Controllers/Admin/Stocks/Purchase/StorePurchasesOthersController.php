@@ -81,22 +81,7 @@ class StorePurchasesOthersController extends StocksBaseController
         $purchase = StorePurchasesOthers::create($validated);
         $purchase->save();
 
-        // Deduct the total purchase cost from the balance of the selected box
-        $box = \App\Models\Stocks\Khazina\StoreKhazina::find($validated['box_id_fk']);
-        if ($box) {
-            $box->balance -= $validated['all_cost_buy'];
-            if ($box->balance < 0) {
-                $box->balance = 0; // Prevent negative balance
-            }
-            $box->save();
-        }
-
-        // Add the amount_buy to the all_amount field of the StoreItem
-        $item = \App\Models\Stocks\Items\StoreItem::where('sanf_code', $validated['product_code'])->first();
-        if ($item) {
-            $item->all_amount += $validated['amount_buy'];
-            $item->save();
-        }
+        // Do not perform balance and amount updates here; will be done on approval
 
         return redirect()->route($this->routeName . '.index')->with('success', 'Purchases others created successfully.');
     }
@@ -169,5 +154,44 @@ class StorePurchasesOthersController extends StocksBaseController
         $products = \App\Models\Stocks\Items\StoreItem::all();
 
         return view('admin.stocks.storepurchasesothers.edit', compact('purchase', 'publishers', 'branches', 'suppliers', 'boxes', 'products'));
+    }
+
+    /**
+     * Approve the specified purchase.
+     */
+    public function approve($id)
+    {
+        $purchase = StorePurchasesOthers::findOrFail($id);
+        $purchase->approved = true;
+        $purchase->save();
+
+        // Deduct the total purchase cost from the balance of the selected box
+        $box = \App\Models\Stocks\Khazina\StoreKhazina::find($purchase->box_id_fk);
+        if ($box) {
+            $box->balance -= $purchase->all_cost_buy;
+            if ($box->balance < 0) {
+                $box->balance = 0; // Prevent negative balance
+            }
+            $box->save();
+        }
+
+        // Deduct the total purchase cost from the treasury of the main branch
+        $treasury = \App\Models\Stocks\Khazina\StoreKhazina::where('main_branch_id_fk', $purchase->main_branch_id_fk)->first();
+        if ($treasury) {
+            $treasury->balance -= $purchase->all_cost_buy;
+            if ($treasury->balance < 0) {
+                $treasury->balance = 0; // Prevent negative balance
+            }
+            $treasury->save();
+        }
+
+        // Add the amount_buy to the all_amount field of the StoreItem
+        $item = \App\Models\Stocks\Items\StoreItem::where('sanf_code', $purchase->product_code)->first();
+        if ($item) {
+            $item->all_amount += $purchase->amount_buy;
+            $item->save();
+        }
+
+        return redirect()->route($this->routeName . '.index')->with('success', 'Purchase approved successfully.');
     }
 }

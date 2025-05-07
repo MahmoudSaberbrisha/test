@@ -116,11 +116,7 @@
                         'label' => 'مصروف أصناف فرع',
                         'image' => 'masrofasnaf.jpeg',
                     ],
-                    [
-                        'route' => auth()->getDefaultDriver() . '.storerasidayni.index',
-                        'label' => 'رصيد عيني',
-                        'image' => 'tahwel.jpeg',
-                    ],
+
 
                     [
                         'route' => auth()->getDefaultDriver() . '.storebranchsetting.index',
@@ -137,11 +133,7 @@
                         'label' => 'إعدادات الوحدات',
                         'image' => 'setting.jpeg',
                     ],
-                    [
-                        'route' => auth()->getDefaultDriver() . '.storetahwelatasnaf.index',
-                        'label' => 'تحويلات الأصناف',
-                        'image' => 'tahwel.jpeg',
-                    ],
+
                 ];
                 $colors = ['#4A90E2', '#5A9BD5', '#6BA9E7', '#7CB7F9', '#8DC5FF', '#9ED3FF'];
             @endphp

@@ -13,8 +13,14 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.storepurchasesothers.store') }}" method="POST" class="p-4 border rounded shadow-sm">
+    <form id="purchase-form" action="{{ route('admin.storepurchasesothers.store') }}" method="POST"
+        class="p-4 border rounded shadow-sm">
         @csrf
+
+        <div id="cost-warning" class="alert alert-danger" role="alert" style="display: none; margin-bottom: 15px;">
+            القيمة المطلوبة أكبر من القيمة الموجودة في رصيد الخزينة: <span id="available-balance"></span>
+        </div>
+
         <div class="row g-3">
             <div class="col-md-6">
                 <label for="main_branch_id_fk" class="form-label">رقم الفرع الرئيسي</label>
@@ -188,83 +194,44 @@
             </div>
         </div>
 
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const amountBuyInput = document.getElementById('amount_buy');
-                    const onePriceBuyInput = document.getElementById('one_price_buy');
-                    const allCostBuyInput = document.getElementById('all_cost_buy');
-                    const productNameSelect = document.getElementById('product_name');
-                    const productCodeInput = document.getElementById('product_code');
-                    const boxNameSelect = document.getElementById('box_name');
-                    const boxIdInput = document.getElementById('box_id_fk');
-                    const rasidMotahInput = document.getElementById('rasid_motah');
-                    const subBranchSelect = document.getElementById('sub_branch_id_fk');
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const amountBuyInput = document.getElementById('amount_buy');
+                const onePriceBuyInput = document.getElementById('one_price_buy');
+                const allCostBuyInput = document.getElementById('all_cost_buy');
+                const productNameSelect = document.getElementById('product_name');
+                const productCodeInput = document.getElementById('product_code');
+                const boxNameSelect = document.getElementById('box_name');
+                const boxIdInput = document.getElementById('box_id_fk');
+                const rasidMotahInput = document.getElementById('rasid_motah');
+                const subBranchSelect = document.getElementById('sub_branch_id_fk');
 
-                    // Use Laravel route helper to generate URL templates
-                    const getBalanceUrlTemplate =
-                        "{{ route('admin.storepurchasesothers.getBalance', ['box_id' => 'BOX_ID_PLACEHOLDER']) }}";
-                    const getBoxesBySubBranchUrlTemplate =
-                        "{{ route('admin.storekhazina.bySubBranch', ['subBranchId' => 'SUB_BRANCH_ID_PLACEHOLDER']) }}";
+                // Use Laravel route helper to generate URL templates
+                const getBalanceUrlTemplate =
+                    "{{ route('admin.storepurchasesothers.getBalance', ['box_id' => 'BOX_ID_PLACEHOLDER']) }}";
+                const getBoxesBySubBranchUrlTemplate =
+                    "{{ route('admin.storekhazina.bySubBranch', ['subBranchId' => 'SUB_BRANCH_ID_PLACEHOLDER']) }}";
 
-                    function calculateAllCostBuy() {
-                        const amountBuy = parseFloat(amountBuyInput.value.replace(',', '.')) || 0;
-                        const onePriceBuy = parseFloat(onePriceBuyInput.value.replace(',', '.')) || 0;
-                        const allCostBuy = amountBuy * onePriceBuy;
-                        allCostBuyInput.value = allCostBuy.toFixed(2);
-                    }
+                function calculateAllCostBuy() {
+                    const amountBuy = parseFloat(amountBuyInput.value.replace(',', '.')) || 0;
+                    const onePriceBuy = parseFloat(onePriceBuyInput.value.replace(',', '.')) || 0;
+                    const allCostBuy = amountBuy * onePriceBuy;
+                    allCostBuyInput.value = allCostBuy.toFixed(2);
+                }
 
-                    function updateBoxId() {
-                        var selectedOption = boxNameSelect.options[boxNameSelect.selectedIndex];
-                        var boxId = selectedOption.getAttribute('data-box-id') || '';
-                        boxIdInput.value = boxId;
-                        if (boxId) {
-                            const url = getBalanceUrlTemplate.replace('BOX_ID_PLACEHOLDER', boxId);
-                            console.log('Fetching balance from URL:', url);
-                            fetch(url, {
-                                    headers: {
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                        'Accept': 'application/json',
-                                    }
-                                })
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error('Network response was not ok');
-                                    }
-                                    return response.json();
-                                })
-                                .then(data => {
-                                    if (data.balance !== undefined) {
-                                        rasidMotahInput.value = data.balance;
-                                    } else {
-                                        rasidMotahInput.value = '';
-                                        alert('رصيد الخزنة غير موجود');
-                                    }
-                                })
-                                .catch(error => {
-                                    rasidMotahInput.value = '';
-                                    console.error('Error fetching balance:', error);
-                                    alert('حدث خطأ أثناء جلب رصيد الخزنة');
-                                });
-                        } else {
-                            rasidMotahInput.value = '';
-                        }
-                    }
-
-                    function updateBoxesBySubBranch(subBranchId) {
-                        if (!subBranchId) {
-                            boxNameSelect.innerHTML = '<option value="">اختر اسم الصندوق</option>';
-                            boxIdInput.value = '';
-                            rasidMotahInput.value = '';
-                            return;
-                        }
-                        const url = getBoxesBySubBranchUrlTemplate.replace('SUB_BRANCH_ID_PLACEHOLDER', subBranchId);
-                        console.log('Fetching boxes from URL:', url);
+                function updateBoxId() {
+                    var selectedOption = boxNameSelect.options[boxNameSelect.selectedIndex];
+                    var boxId = selectedOption.getAttribute('data-box-id') || '';
+                    boxIdInput.value = boxId;
+                    if (boxId) {
+                        const url = getBalanceUrlTemplate.replace('BOX_ID_PLACEHOLDER', boxId);
+                        console.log('Fetching balance from URL:', url);
                         fetch(url, {
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Accept': 'application/json',
-                            }
-                        })
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json',
+                                }
+                            })
                             .then(response => {
                                 if (!response.ok) {
                                     throw new Error('Network response was not ok');
@@ -272,52 +239,136 @@
                                 return response.json();
                             })
                             .then(data => {
-                                boxNameSelect.innerHTML = '<option value="">اختر اسم الصندوق</option>';
-                                if (data.length > 0) {
-                                    data.forEach(box => {
-                                        const option = document.createElement('option');
-                                        option.value = box.id;
-                                        option.textContent = box.name;
-                                        option.setAttribute('data-box-id', box.id);
-                                        boxNameSelect.appendChild(option);
-                                    });
-                                    // Select first box and update box id and balance
-                                    boxNameSelect.selectedIndex = 1;
-                                    updateBoxId();
+                                if (data.balance !== undefined) {
+                                    rasidMotahInput.value = data.balance;
                                 } else {
-                                    boxIdInput.value = '';
                                     rasidMotahInput.value = '';
+                                    alert('رصيد الخزنة غير موجود');
                                 }
                             })
                             .catch(error => {
-                                console.error('Error fetching boxes:', error);
-                                boxNameSelect.innerHTML = '<option value="">اختر اسم الصندوق</option>';
+                                rasidMotahInput.value = '';
+                                console.error('Error fetching balance:', error);
+                                alert('حدث خطأ أثناء جلب رصيد الخزنة');
+                            });
+                    } else {
+                        rasidMotahInput.value = '';
+                    }
+                }
+
+                function updateBoxesBySubBranch(subBranchId) {
+                    if (!subBranchId) {
+                        boxNameSelect.innerHTML = '<option value="">اختر اسم الصندوق</option>';
+                        boxIdInput.value = '';
+                        rasidMotahInput.value = '';
+                        return;
+                    }
+                    const url = getBoxesBySubBranchUrlTemplate.replace('SUB_BRANCH_ID_PLACEHOLDER', subBranchId);
+                    console.log('Fetching boxes from URL:', url);
+                    fetch(url, {
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            boxNameSelect.innerHTML = '<option value="">اختر اسم الصندوق</option>';
+                            if (data.length > 0) {
+                                data.forEach(box => {
+                                    const option = document.createElement('option');
+                                    option.value = box.id;
+                                    option.textContent = box.name;
+                                    option.setAttribute('data-box-id', box.id);
+                                    boxNameSelect.appendChild(option);
+                                });
+                                // Select first box and update box id and balance
+                                boxNameSelect.selectedIndex = 1;
+                                updateBoxId();
+                            } else {
                                 boxIdInput.value = '';
                                 rasidMotahInput.value = '';
-                            });
-                    }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching boxes:', error);
+                            boxNameSelect.innerHTML = '<option value="">اختر اسم الصندوق</option>';
+                            boxIdInput.value = '';
+                            rasidMotahInput.value = '';
+                        });
+                }
 
-                    function updateProductCode() {
-                        var selectedOption = productNameSelect.options[productNameSelect.selectedIndex];
-                        var productCode = selectedOption.getAttribute('data-product-code') || '';
-                        productCodeInput.value = productCode;
-                    }
+                function updateProductCode() {
+                    var selectedOption = productNameSelect.options[productNameSelect.selectedIndex];
+                    var productCode = selectedOption.getAttribute('data-product-code') || '';
+                    productCodeInput.value = productCode;
+                }
 
-                    amountBuyInput.addEventListener('input', calculateAllCostBuy);
-                    onePriceBuyInput.addEventListener('input', calculateAllCostBuy);
-                    productNameSelect.addEventListener('change', updateProductCode);
-                    boxNameSelect.addEventListener('change', updateBoxId);
-                    subBranchSelect.addEventListener('change', function() {
-                        updateBoxesBySubBranch(this.value);
-                    });
-
-                    // Initialize on page load
+                amountBuyInput.addEventListener('input', () => {
                     calculateAllCostBuy();
-                    updateBoxId();
-                    updateProductCode();
-                    updateBoxesBySubBranch(subBranchSelect.value);
                 });
-            </script>
+                onePriceBuyInput.addEventListener('input', () => {
+                    calculateAllCostBuy();
+                });
+                productNameSelect.addEventListener('change', updateProductCode);
+                boxNameSelect.addEventListener('change', () => {
+                    updateBoxId();
+                });
+                subBranchSelect.addEventListener('change', function() {
+                    updateBoxesBySubBranch(this.value);
+                });
+
+                // Initialize on page load
+                calculateAllCostBuy();
+                updateBoxId();
+                updateProductCode();
+                updateBoxesBySubBranch(subBranchSelect.value);
+
+                // Form submission validation
+                const form = document.getElementById('purchase-form');
+                const submitButton = form.querySelector('button[type="submit"]');
+
+                function validateForm() {
+                    const allCost = parseFloat(allCostBuyInput.value.replace(',', '.')) || 0;
+                    const balance = parseFloat(rasidMotahInput.value) || 0;
+                    const warningDiv = document.getElementById('cost-warning');
+                    const availableBalanceSpan = document.getElementById('available-balance');
+                    availableBalanceSpan.textContent = balance.toFixed(2);
+
+                    if (allCost > balance) {
+                        warningDiv.style.display = 'block';
+                        submitButton.disabled = true;
+                        return false;
+                    } else {
+                        warningDiv.style.display = 'none';
+                        submitButton.disabled = false;
+                        return true;
+                    }
+                }
+
+                form.addEventListener('submit', function(event) {
+                    if (!validateForm()) {
+                        event.preventDefault();
+                        const warningDiv = document.getElementById('cost-warning');
+                        warningDiv.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        return false; // Prevent form submission and page reload
+                    }
+                });
+
+                // Validate on input changes to enable/disable submit button dynamically
+                amountBuyInput.addEventListener('input', validateForm);
+                onePriceBuyInput.addEventListener('input', validateForm);
+                rasidMotahInput.addEventListener('input', validateForm);
+            });
+        </script>
 
         <div class="mt-4 text-center">
             <button type="submit" class="btn btn-primary">إضافة فاتورة مشتريات أخرى</button>
