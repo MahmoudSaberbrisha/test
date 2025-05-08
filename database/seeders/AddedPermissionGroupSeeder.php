@@ -46,6 +46,14 @@ class AddedPermissionGroupSeeder extends Seeder
                 'ar' => [ 'group_name' => 'التقارير والإحصائيات'],
                 'en' => [ 'group_name' => 'Reports & Statistics'],
             ],
+            [
+                'ar' => ['group_name' => 'إدارة المحاسبه '],
+                'en' => ['group_name' => 'Accounting Management'],
+            ],
+            [
+                'ar' => ['group_name' => 'إدارة المخازن'],
+                'en' => ['group_name' => 'Store Management'],
+            ],
         ];
 
         foreach ($groups as $key => $group) {

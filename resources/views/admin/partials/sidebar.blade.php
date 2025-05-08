@@ -601,6 +601,10 @@
                     </ul>
                 </li>
             @endif
+            @if (auth()->user()->can('View Account tree') ||
+                    auth()->user()->can('View Restrictions') ||
+                    auth()->user()->can('View Financial Reports'))
+@if (auth()->user()->can('View Account tree') || auth()->user()->can('View Restrictions') || auth()->user()->can('View Financial reports'))
             <li class="slide {{ request()->segment(2) == 'accounting-department' ? 'is-expanded' : '' }}">
                 <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
                         class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -628,7 +632,11 @@
 
                 </ul>
             </li>
+@endif
+            @endif
 
+            @if (auth()->user()->can('View Warhouse Management') || auth()->user()->can('View Warehouse Management'))
+@if (auth()->user()->can('View Warhouse Management') || auth()->user()->can('View Warehouse Management'))
             <li class="slide {{ request()->segment(2) == 'Warehouse-management' ? 'is-expanded' : '' }}">
                 <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
                         class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -649,6 +657,8 @@
 
                 </ul>
             </li>
+@endif
+            @endif
         </ul>
     </div>
 </aside>

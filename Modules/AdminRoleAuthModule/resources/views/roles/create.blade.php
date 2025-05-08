@@ -7,7 +7,7 @@
 @push('css')
     <style type="text/css">
         .no-dots {
-            list-style-type: none; 
+            list-style-type: none;
         }
 
         .group-span:before, .group-span:after {

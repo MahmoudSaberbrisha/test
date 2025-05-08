@@ -81,7 +81,7 @@
     "Role": "الصلاحية",
     "Active": "نشط",
     "Actions": "الإجراءات",
-    
+
     "Update Your Profile": "تحديث ملفك الشخصي",
     "It is not your profile to edit.": "إنه ليس ملفك الشخصي الذي يمكنك تعديله.",
     "User Info": "معلومات المستخدم",
@@ -105,11 +105,11 @@
     "Close": "إغلاق",
     "Edit Admin": "تعديل المشرف",
     "Leave password empty if you want to keep it.": "اترك كلمة المرور فارغة إذا كنت تريد الاحتفاظ بها.",
-    "Record successfully created." : "تم إنشاء السجل بنجاح.",
-    "Something went wrong." : "حدث خطأ ما.",
-    "Record successfully updated." : "تم تحديث السجل بنجاح.",
-    "You cannot delete your own account." : "لا يمكنك حذف حسابك الخاص.",
-    "Record successfully deleted." : "تم حذف السجل بنجاح.",
+    "Record successfully created.": "تم إنشاء السجل بنجاح.",
+    "Something went wrong.": "حدث خطأ ما.",
+    "Record successfully updated.": "تم تحديث السجل بنجاح.",
+    "You cannot delete your own account.": "لا يمكنك حذف حسابك الخاص.",
+    "Record successfully deleted.": "تم حذف السجل بنجاح.",
     "Edit": "تعديل",
     "Delete": "حذف",
     "You cannot deactivate your own account.": "لا يمكنك إلغاء تنشيط حسابك الخاص.",
@@ -213,8 +213,8 @@
     "File Manager": "إدارة الملفات",
 
     "Enter": "أدخل",
-    "View Firebase Settings":"عرض إعدادات Firebase",
-    "Edit Firebase Settings":"تعديل إعدادات Firebase",
+    "View Firebase Settings": "عرض إعدادات Firebase",
+    "Edit Firebase Settings": "تعديل إعدادات Firebase",
 
     "Regions Settings": "إعدادات المناطق",
     "Branches Settings": "إعدادات الفروع",
@@ -262,5 +262,21 @@
     "Nov": "نوفمبر",
     "Dec": "ديسمبر",
 
-    "Access is not authorized": "غير مصرح بالوصول"
+    "Access is not authorized": "غير مصرح بالوصول",
+    "View Account tree": "عرض شجرة الحسابات",
+    "Create Account tree": "إنشاء شجرة الحسابات",
+    "Edit Account tree": "تعديل شجرة الحسابات",
+    "Delete Account tree": "حذف شجرة الحسابات",
+    "View Restrictions": "عرض القيود",
+    "Create Restrictions": "إنشاء قيود",
+    "Edit Restrictions": "تعديل قيود",
+    "Delete Restrictions": "حذف قيود",
+    "View Financial reports": "عرض التقارير المالية",
+    "Create Financial reports": "إنشاء تقارير مالية",
+    "Edit Financial reports": "تعديل التقارير المالية",
+    "Delete Financial reports": "حذف التقارير المالية",
+    "View Warhouse Management": "عرض إدارة المستودعات",
+    "Create Warhouse Management": "إنشاء إدارة المستودعات",
+    "Edit Warhouse Management": "تعديل إدارة المستودعات",
+    "Delete Warhouse Management": "حذف إدارة المستودعات"
 }
