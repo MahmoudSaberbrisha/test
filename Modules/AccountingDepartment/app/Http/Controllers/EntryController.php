@@ -91,6 +91,9 @@ class EntryController extends Controller
         // Fetch only sub-accounts (accounts with account_status = 'فرعي')
         $accounts = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_status', 'فرعي')->get();
 
+        // Fetch all cost center branches
+        $costCenterBranches = \App\Models\CostCenterBranch::all();
+
         // Get the highest existing entry_number from the database
         $lastEntryNumber = Entry::max('entry_number');
 
@@ -110,7 +113,7 @@ class EntryController extends Controller
         // Format next entry number with leading zeros (e.g., EN001)
         $nextEntryNumber = $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
 
-        return view('accountingdepartment::entries.create', compact('accounts', 'nextEntryNumber'));
+        return view('accountingdepartment::entries.create', compact('accounts', 'nextEntryNumber', 'costCenterBranches'));
     }
 
     public function store(Request $request)

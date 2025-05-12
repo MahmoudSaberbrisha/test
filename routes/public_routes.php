@@ -78,6 +78,11 @@ Route::prefix('settings')->group(function () {
     //Experience Types
     Route::resource('experience-types', ExperienceTypeController::class)->except(['create', 'edit', 'show']);
     Route::post('experience-types/changeActive', [ExperienceTypeController::class, 'changeActive'])->name('experience-type-active');
+
+    // Cost Centers Settings
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::resource('admin/cost-centers', \App\Http\Controllers\Admin\CostCenterController::class);
+    });
 });
 
 Route::prefix('clients-management')->group(function () {
@@ -219,7 +224,6 @@ Route::prefix('Warehouse-management')->group(function () {
 
     // Rasid routes
     Route::resource('storemasrofasnaffar3', StoreMasrofAsnafFar3Controller::class);
-    Route::resource('storerasidayni', StoreRasidAyniController::class);
 
     // Setting routes
     Route::resource('storebranchsetting', StoreBranchSettingController::class);
@@ -227,5 +231,4 @@ Route::prefix('Warehouse-management')->group(function () {
     Route::resource('storeunitssetting', StoreUnitsSettingController::class);
 
     // Tahwelat routes
-    Route::resource('storetahwelatasnaf', StoreTahwelatAsnafController::class);
 });

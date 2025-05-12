@@ -604,61 +604,76 @@
             @if (auth()->user()->can('View Account tree') ||
                     auth()->user()->can('View Restrictions') ||
                     auth()->user()->can('View Financial Reports'))
-@if (auth()->user()->can('View Account tree') || auth()->user()->can('View Restrictions') || auth()->user()->can('View Financial reports'))
-            <li class="slide {{ request()->segment(2) == 'accounting-department' ? 'is-expanded' : '' }}">
-                <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
-                        class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                        viewBox="0 0 16 16">
-                        <path fill=""
-                            d="M7 2H5a3.5 3.5 0 1 0 0 7h2v3H2.5v2H7v2h2v-2h2a3.5 3.5 0 1 0 0-7H9V4h4.5V2H9V0H7zm2 7h2a1.5 1.5 0 0 1 0 3H9zM7 7H5a1.5 1.5 0 1 1 0-3h2z" />
-                    </svg><span class="side-menu__label">{{ __('Accounting Department') }}</span><i
-                        class="angle fe fe-chevron-down"></i></a>
-                <ul class="slide-menu">
+                @if (auth()->user()->can('View Account tree') ||
+                        auth()->user()->can('View Restrictions') ||
+                        auth()->user()->can('View Financial reports'))
+                    <li class="slide {{ request()->segment(2) == 'accounting-department' ? 'is-expanded' : '' }}">
+                        <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
+                                class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="16"
+                                height="16" viewBox="0 0 16 16">
+                                <path fill=""
+                                    d="M7 2H5a3.5 3.5 0 1 0 0 7h2v3H2.5v2H7v2h2v-2h2a3.5 3.5 0 1 0 0-7H9V4h4.5V2H9V0H7zm2 7h2a1.5 1.5 0 0 1 0 3H9zM7 7H5a1.5 1.5 0 1 1 0-3h2z" />
+                            </svg><span class="side-menu__label">{{ __('Accounting Department') }}</span><i
+                                class="angle fe fe-chevron-down"></i></a>
+                        <ul class="slide-menu">
 
-                    <li><a class="slide-item {{ request()->segment(3) == 'entries' ? 'active' : '' }}"
-                            href="{{ route(auth()->getDefaultDriver() . '.entries.index') }}">{{ __('Entries') }}</a>
-                    </li>
+                            <li><a class="slide-item {{ request()->segment(3) == 'entries' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.entries.index') }}">{{ __('Entries') }}</a>
+                            </li>
 
-                    {{-- <li><a class="slide-item {{ request()->segment(3) == 'chart-of-accounts' ? 'active' : '' }}"
+                            {{-- <li><a class="slide-item {{ request()->segment(3) == 'chart-of-accounts' ? 'active' : '' }}"
                             href="{{ route(auth()->getDefaultDriver() . '.accounts.chart') }}">{{ __('Accounts Chart') }}</a>
                     </li> --}}
 
-                    <li><a class="slide-item {{ request()->segment(3) == 'accounts' ? 'active' : '' }}"
-                            href="{{ route(auth()->getDefaultDriver() . '.accounts.index') }}">{{ __('Accounts') }}</a>
-                    </li>
-                    <li><a class="slide-item {{ request()->segment(3) == 'accounts' ? 'active' : '' }}"
-                            href="{{ route(auth()->getDefaultDriver() . '.master') }}">التقارير المالية
-                            والقوائم </a></li>
+                            <li><a class="slide-item {{ request()->segment(3) == 'accounts' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.accounts.index') }}">{{ __('Accounts') }}</a>
+                            </li>
+                            <li><a class="slide-item {{ request()->segment(3) == 'accounts' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.master') }}">التقارير المالية
+                                    والقوائم </a></li>
 
-                </ul>
-            </li>
-@endif
+                        </ul>
+                    </li>
+                @endif
             @endif
 
             @if (auth()->user()->can('View Warhouse Management') || auth()->user()->can('View Warehouse Management'))
-@if (auth()->user()->can('View Warhouse Management') || auth()->user()->can('View Warehouse Management'))
-            <li class="slide {{ request()->segment(2) == 'Warehouse-management' ? 'is-expanded' : '' }}">
-                <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
-                        class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                        viewBox="0 0 24 24">
-                        <path fill=""
-                            d="M12 2L2 7v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7L12 2zm0 2.18L19.74 7H4.26L12 4.18zM4 20v-9h16v9H4z" />
-                    </svg><span class="side-menu__label">{{ __('Warehouse management') }}</span><i
-                        class="angle fe fe-chevron-down"></i></a>
-                <ul class="slide-menu">
+                @if (auth()->user()->can('View Warhouse Management') || auth()->user()->can('View Warehouse Management'))
+                    <li class="slide {{ request()->segment(2) == 'Warehouse-management' ? 'is-expanded' : '' }}">
+                        <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);"><svg
+                                class="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="16"
+                                height="16" viewBox="0 0 24 24">
+                                <path fill=""
+                                    d="M12 2L2 7v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7L12 2zm0 2.18L19.74 7H4.26L12 4.18zM4 20v-9h16v9H4z" />
+                            </svg><span class="side-menu__label">{{ __('Warehouse management') }}</span><i
+                                class="angle fe fe-chevron-down"></i></a>
+                        <ul class="slide-menu">
 
-                    <li><a class="slide-item {{ request()->segment(3) == 'Control area' ? 'active' : '' }}"
-                            href="{{ route(auth()->getDefaultDriver() . '.stocks.master') }}">{{ __('Control area') }}</a>
+                            <li><a class="slide-item {{ request()->segment(3) == 'Control area' ? 'active' : '' }}"
+                                    href="{{ route(auth()->getDefaultDriver() . '.stocks.master') }}">{{ __('Control area') }}</a>
+                            </li>
+
+
+
+
+
+                        </ul>
                     </li>
-
-
-
-
-
-                </ul>
-            </li>
-@endif
+                @endif
             @endif
+        </ul>
+        <ul class="side-menu">
+            <li class="side-item side-item-category">مراكز التكلفة</li>
+            <li class="slide">
+                <a class="side-menu__item" href="{{ route(auth()->getDefaultDriver() . '.admin.cost-centers.index') }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M3 12h18M3 6h18M3 18h18" />
+                    </svg>
+                    <span class="side-menu__label">مراكز التكلفة</span>
+                </a>
+            </li>
         </ul>
     </div>
 </aside>

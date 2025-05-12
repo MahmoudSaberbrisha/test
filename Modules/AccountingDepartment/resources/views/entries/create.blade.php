@@ -76,8 +76,13 @@
                                     class="border border-gray-300 rounded input px-2 py-3 w-full reference-input" required>
                             </td>
                             <td>
-                                <input type="text" name="entries[0][is_cost_center]" id="cost_center"
-                                    class="border border-gray-300 rounded input px-2 py-3 w-full" required>
+                                <select name="entries[0][is_cost_center]" id="cost_center"
+                                    class="border border-gray-300 rounded px-2 py-3 w-full" required>
+                                    <option value="">اختر مركز التكلفة</option>
+                                    @foreach ($costCenterBranches as $branch)
+                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                    @endforeach
+                                </select>
                             </td>
                             <td>
                                 <input type="hidden" name="entries[0][account_name]" id="account_name_0" value="">
@@ -120,8 +125,13 @@
                                     class="border border-gray-300 rounded px-2 input py-3 w-full reference-input" required>
                             </td>
                             <td>
-                                <input type="text" name="entries[1][is_cost_center]" id="cost_center2"
+                                <select name="entries[1][is_cost_center]" id="cost_center2"
                                     class="border border-gray-300 rounded px-2 py-3 input w-full" required>
+                                    <option value="">اختر مركز التكلفة</option>
+                                    @foreach ($costCenterBranches as $branch)
+                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                    @endforeach
+                                </select>
                             </td>
                             <td>
                                 <input type="hidden" name="entries[1][account_name]" id="account_name_1"
@@ -221,6 +231,12 @@
                     @endforeach
             `;
 
+            const costCenterOptions = `
+                @foreach ($costCenterBranches as $branch)
+                    <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                @endforeach
+            `;
+
             const newRow = document.createElement('tr');
 
             newRow.innerHTML = `
@@ -231,84 +247,10 @@
                     <input type="text" name="entries[${newIndex}][reference]" id="reference_${newIndex}" class="border border-gray-300 rounded input px-2 py-3 w-full reference-input" required>
                 </td>
                 <td>
-                    <input type="text" name="entries[${newIndex}][is_cost_center]" class="border border-gray-300 rounded input px-2 py-3 w-full" required>
-                </td>
-                <td>
-                    <input type="hidden" name="entries[${newIndex}][account_name]" id="account_name_${newIndex}" value="">
-                    <select name="entries[${newIndex}][chart_of_account_id]" id="chart_of_account_id_${newIndex}" class="border border-gray-300 rounded px-2 py-3 input w-full account-select" data-index="${newIndex}" required onchange="updateAccountDetails(this)">
-                        ${chartOfAccountOptions}
+                    <select name="entries[${newIndex}][is_cost_center]" class="border border-gray-300 rounded px-2 py-3 w-full" required>
+                        <option value="">اختر مركز التكلفة</option>
+                        ${costCenterOptions}
                     </select>
-                </td>
-                <td>
-                    <input type="text" name="entries[${newIndex}][account_number]" id="account_number_${newIndex}" value="" class="border border-gray-300 rounded px-2  input py-3 w-full" required readonly>
-                </td>
-                <td class="border py-1 px-1 ">
-                    <input type="number" name="entries[${newIndex}][credit]" value=0.00 class="border border-gray-300 rounded py-3 input px-4 w-full credit-input" style="width: 120px" oninput="calculateDifference()">
-                </td>
-                <td class="border py-1 px-1 bg-red-100">
-                    <input type="number" style="width: 120px" name="entries[${newIndex}][debit]" value=0.00 class="border border-gray-300 rounded input px-3 py-3 w-full debit-input" oninput="calculateDifference()" required>
-                </td>
-            `;
-
-            tableBody.insertBefore(newRow, dataRows[dataRows.length - 1]);
-
-            // Set the reference number for the new row
-            const referenceInputs = newRow.querySelectorAll('.reference-input');
-            referenceInputs.forEach(input => {
-                input.value = newIndex + 1;
-            });
-        }
-    </script>
-    <script>
-        let globalReferenceNumber = 1;
-
-        function setAllReferenceInputs(value) {
-            const referenceInputs = document.querySelectorAll('.reference-input');
-            referenceInputs.forEach(input => {
-                input.value = value;
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            setAllReferenceInputs(globalReferenceNumber);
-
-            // Add event listener to sync reference inputs on user input
-            const referenceInputs = document.querySelectorAll('.reference-input');
-            referenceInputs.forEach(input => {
-                input.addEventListener('input', (e) => {
-                    const val = e.target.value;
-                    setAllReferenceInputs(val);
-                    globalReferenceNumber = parseInt(val) || globalReferenceNumber;
-                });
-            });
-        });
-
-        function addRow() {
-            const tableBody = document.getElementById('table-body');
-            // Count only data rows (exclude total and difference rows)
-            const dataRows = tableBody.querySelectorAll('tr:not(.bg-green-100):not(:last-child)');
-            const newIndex = dataRows.length;
-
-            const chartOfAccountOptions = `
-                <option value="">إختر الحساب</option>
-                    @foreach ($accounts as $account)
-                        @if ($account->parent_id !== null)
-                            <option value="{{ $account->id }}" data-name="{{ $account->account_name }}" data-number="{{ $account->account_number }}">{{ $account->account_name }}</option>
-                        @endif
-                    @endforeach
-            `;
-
-            const newRow = document.createElement('tr');
-
-            newRow.innerHTML = `
-                <td>
-                    <input type="text" style="width:350px" name="entries[${newIndex}][description]" class="border border-gray-300 rounded px-2 input py-3 w-full" required>
-                </td>
-                <td>
-                    <input type="text" name="entries[${newIndex}][reference]" id="reference_${newIndex}" class="border border-gray-300 rounded input px-2 py-3 w-full reference-input" required>
-                </td>
-                <td>
-                    <input type="text" name="entries[${newIndex}][is_cost_center]" class="border border-gray-300 rounded input px-2 py-3 w-full" required>
                 </td>
                 <td>
                     <input type="hidden" name="entries[${newIndex}][account_name]" id="account_name_${newIndex}" value="">
