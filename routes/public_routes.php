@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\Stocks\Other\StoreOtherSupplierController;
 use App\Http\Controllers\Admin\Stocks\Purchase\StoreHadbackPurchaseController;
 use App\Http\Controllers\Admin\Stocks\Purchase\StorePurchasesFatoraController;
 use App\Http\Controllers\Admin\Stocks\Purchase\StorePurchasesOthersController;
+use App\Http\Controllers\Admin\Stocks\Purchase\StoreRequestsController;
 use App\Http\Controllers\Admin\Stocks\Rasid\StoreMasrofAsnafFar3Controller;
 use App\Http\Controllers\Admin\Stocks\Rasid\StoreRasidAyniController;
 use App\Http\Controllers\Admin\Stocks\Setting\StoreBranchSettingController;
@@ -217,6 +218,13 @@ Route::prefix('Warehouse-management')->group(function () {
     // Purchase routes
     Route::resource('storehadbackpurchase', StoreHadbackPurchaseController::class);
     Route::resource('storepurchasesothers', StorePurchasesOthersController::class);
+    Route::resource('requests', StoreRequestsController::class);
+
+    Route::patch('storepurchasesothers/{id}/approve', [StorePurchasesOthersController::class, 'approve'])->name('storepurchasesothers.approve');
+    Route::patch('requests/{id}/approve', [StoreRequestsController::class, 'approve'])->name('requests.approve');
+
+    Route::get('storepurchasesothers/get-balance/{box_id}', [StorePurchasesOthersController::class, 'getBalanceByBoxId'])->name('storepurchasesothers.getBalance');
+    Route::get('requests/get-balance/{box_id}', [StoreRequestsController::class, 'getBalanceByBoxId'])->name('requests.getBalance');
     Route::patch('storepurchasesothers/{id}/approve', [StorePurchasesOthersController::class, 'approve'])->name('storepurchasesothers.approve');
 
     Route::get('storepurchasesothers/get-balance/{box_id}', [StorePurchasesOthersController::class, 'getBalanceByBoxId'])->name('storepurchasesothers.getBalance');

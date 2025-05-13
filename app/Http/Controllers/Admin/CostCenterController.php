@@ -44,7 +44,7 @@ class CostCenterController extends Controller
     public function edit(CostCenter $costCenter)
     {
         $costCenter->load('branches');
-        return view('admin.cost-centers.edit', compact('costCenter'));
+        return view('admin.cost_centers.edit', compact('costCenter'));
     }
 
     public function update(Request $request, CostCenter $costCenter)
@@ -77,12 +77,12 @@ class CostCenterController extends Controller
             }
         }
 
-        return redirect()->route('admin.cost_centers.index')->with('success', 'Cost Center updated successfully.');
+        return redirect()->route('admin.cost-centers.index')->with('success', 'Cost Center updated successfully.');
     }
 
     public function destroy(CostCenter $costCenter)
     {
         $costCenter->delete();
-        return redirect()->route('admin.cost_centers.index')->with('success', 'Cost Center deleted successfully.');
+        return redirect()->route('admin.cost-centers.index')->with('success', 'Cost Center deleted successfully.');
     }
 }

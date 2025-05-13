@@ -110,6 +110,11 @@
                         'label' => 'مشتريات ',
                         'image' => 'moshtriat.jpeg',
                     ],
+                    [
+                        'route' => auth()->getDefaultDriver() . '.requests.index',
+                        'label' => 'طلبات ',
+                        'image' => 'moshtriat.jpeg',
+                    ],
 
                     [
                         'route' => auth()->getDefaultDriver() . '.storemasrofasnaffar3.index',

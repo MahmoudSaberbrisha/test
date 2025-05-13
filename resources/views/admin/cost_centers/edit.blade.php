@@ -14,7 +14,7 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.cost_centers.update', $costCenter->id) }}" method="POST">
+        <form action="{{ route(auth()->getDefaultDriver() .'.admin.cost-centers.update', $costCenter->id) }}" method="POST">
             @csrf
             @method('PUT')
 
