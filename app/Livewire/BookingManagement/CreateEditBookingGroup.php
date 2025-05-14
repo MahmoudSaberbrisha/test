@@ -16,21 +16,21 @@ use App\RepositoryInterface\EmployeeRepositoryInterface;
 
 class CreateEditBookingGroup extends Component
 {
-    
+
     protected $listeners = ['refreshSupplierDropdown' => 'refreshSupplierDropdown'];
 
-    private 
-        $currencyRepository, 
-        $salesAreaRepository, 
-        $clientTypeRepository, 
-        $paymentMethodRepository, 
+    private
+        $currencyRepository,
+        $salesAreaRepository,
+        $clientTypeRepository,
+        $paymentMethodRepository,
         $bookingGroupRepository,
         $clientRepository,
         $bookingRepository,
         $employeeRepository,
         $supplierRepository;
 
-    public 
+    public
         $group,
         $tax = 0,
         $is_taxed = 0,
@@ -43,7 +43,7 @@ class CreateEditBookingGroup extends Component
         $final_total = 0,
         $total = 0,
         $client_type_id = null,
-        $currencies = [], 
+        $currencies = [],
         $clientTypes = [],
         $paymentMethods = [],
         $inputs = [],
@@ -116,10 +116,10 @@ class CreateEditBookingGroup extends Component
                 $this->getBookingData();
                 foreach ($bookingGroup->booking_group_members as $key => $members) {
                     $this->inputs[$members->client_type_id] = [
-                        'members_count' => $members->members_count, 
-                        'client_type_id' => $members->client_type_id, 
-                        'discount_type' => $members->discount_type, 
-                        'discount_value' => $members->discount_value, 
+                        'members_count' => $members->members_count,
+                        'client_type_id' => $members->client_type_id,
+                        'discount_type' => $members->discount_type,
+                        'discount_value' => $members->discount_value,
                         'member_price' => $members->member_price,
                         'member_total_price' => $members->member_total_price
                     ];
@@ -169,10 +169,10 @@ class CreateEditBookingGroup extends Component
                 $this->inputs[$this->client_type_id]['members_count']++;
             } else {
                 $this->inputs[$this->client_type_id] = [
-                    'members_count' => 1, 
-                    'client_type_id' => $this->client_type_id, 
-                    'discount_type' => $client_type->discount_type, 
-                    'discount_value' => $client_type->discount_value, 
+                    'members_count' => 1,
+                    'client_type_id' => $this->client_type_id,
+                    'discount_type' => $client_type->discount_type,
+                    'discount_value' => $client_type->discount_value,
                     'member_price' => 0.00,
                     'member_total_price' => 0.00
                 ];
@@ -182,7 +182,7 @@ class CreateEditBookingGroup extends Component
                 $this->fill([
                     'paymentInputs' => collect([['payment_method_id' => '', 'paid' => 0.00]]),
                 ]);
-        } elseif (!$this->client_type_id) {       
+        } elseif (!$this->client_type_id) {
             return $this->alertMessage( __('Choose type first.'), 'error');
         } elseif (!$this->hour_member_price) {
             if ($this->booking_type == 'group')
@@ -332,10 +332,10 @@ class CreateEditBookingGroup extends Component
             $this->paymentInputs = $this->paymentInputs->map(function ($item, $index) use ($key, $count) {
                 $isLast = $index === ($count - 1);
                 if ($key == $index) {
-                    $item['paid'] = $this->remain; 
+                    $item['paid'] = $this->remain;
                 }
                 if ($key === null && !$isLast) {
-                    return null; 
+                    return null;
                 }
                 return $item;
             })->filter();
@@ -343,6 +343,24 @@ class CreateEditBookingGroup extends Component
             return $this->alertMessage(__('The amount paid exceeded the required amount.'), 'error');
         }
         $this->remain = $remain;
+
+        // Check if any payment input has paid value == 1, then call processBookingRevenueEntry
+        foreach ($this->paymentInputs as $paymentInput) {
+            if (isset($paymentInput['paid']) && floatval($paymentInput['paid']) == 1.0) {
+                $this->processBookingRevenueEntry();
+                break;
+            }
+        }
+    }
+
+    private function processBookingRevenueEntry()
+    {
+        $accountNumber2 = '41';
+        $account2 = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_number', $accountNumber2)->first();
+
+        if (!$account2) {
+            toastr()->error('حساب إيرادات الحجوزات غير موجود');
+        }
     }
 
     public function checkPaymentMethod($index)
@@ -352,7 +370,7 @@ class CreateEditBookingGroup extends Component
         if ($exists) {
             $this->paymentInputs = $this->paymentInputs->map(function ($item, $key) use ($index) {
                 if ($key == $index) {
-                    $item['payment_method_id'] = ''; 
+                    $item['payment_method_id'] = '';
                 }
                 return $item;
             });

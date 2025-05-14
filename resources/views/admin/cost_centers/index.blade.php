@@ -11,12 +11,14 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
+        <h2>مراكز التكلفة</h2>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>الاسم</th>
                     <th>الوصف</th>
                     <th>الأفرع</th>
+                    <th>الرصيد الكلي</th>
                     <th>الإجراءات</th>
                 </tr>
             </thead>
@@ -33,6 +35,9 @@
                             </ul>
                         </td>
                         <td>
+                            {{ number_format($costCenterBalances[$costCenter->name] ?? 0, 2) }}
+                        </td>
+                        <td>
                             <a href="{{ route(auth()->getDefaultDriver() . '.admin.cost-centers.edit', $costCenter->id) }}"
                                 class="btn btn-sm btn-warning">تعديل</a>
                             <form
@@ -44,6 +49,26 @@
                                     onclick="return confirm('هل أنت متأكد من الحذف؟')">حذف</button>
                             </form>
                         </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <h2>الحسابات التي لها مركز تكلفة</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>اسم الحساب</th>
+                    <th>اسم مركز التكلفة</th>
+                    <th>الرصيد</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($accounts as $account)
+                    <tr>
+                        <td>{{ $account->name }}</td>
+                        <td>{{ $account->cost_center_name ?? 'غير محدد' }}</td>
+                        <td>{{ number_format($account->balance, 2) }}</td>
                     </tr>
                 @endforeach
             </tbody>

@@ -43,42 +43,59 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-4">
-                <label for="product_code" class="form-label">كود المنتج</label>
-                <input type="text" class="form-control form-control-3d" id="product_code" name="product_code" required
-                    value="{{ old('product_code') }}" readonly>
-            </div>
-            <div class="col-md-4">
-                <label for="product_name" class="form-label">اسم المنتج</label>
-                <select class="form-select form-control-3d" id="product_name" name="product_name" required>
-                    <option value="">اختر المنتج</option>
-                    @foreach ($products as $product)
-                        <option value="{{ $product->name }}" data-product-code="{{ $product->sanf_code }}"
-                            {{ old('product_name') == $product->name ? 'selected' : '' }}>
-                            {{ $product->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label for="amount_buy" class="form-label">كمية الشراء</label>
-                <input type="number" step="0.01" class="form-control form-control-3d" id="amount_buy" name="amount_buy"
-                    required value="{{ old('amount_buy') }}">
-            </div>
-            <div class="col-md-4">
-                <label for="all_cost_buy" class="form-label">التكلفة الكلية للشراء</label>
-                <input type="text" class="form-control form-control-3d" id="all_cost_buy" name="all_cost_buy" required
-                    value="{{ old('all_cost_buy') }}" readonly>
-            </div>
-            <div class="col-md-4">
-                <label for="one_price_sell" class="form-label">سعر البيع الواحد</label>
-                <input type="number" step="0.01" class="form-control form-control-3d" id="one_price_sell"
-                    name="one_price_sell" required value="{{ old('one_price_sell') }}">
-            </div>
-            <div class="col-md-4">
-                <label for="one_price_buy" class="form-label">سعر الشراء الواحد</label>
-                <input type="number" step="0.01" class="form-control form-control-3d" id="one_price_buy"
-                    name="one_price_buy" required value="{{ old('one_price_buy') }}">
+            <div class="col-12">
+                <label class="form-label">المنتجات</label>
+                <table class="table table-bordered" id="products-table" style="background-color: white; color: black;">
+                    <thead>
+                        <tr>
+                            <th>اسم المنتج</th>
+                            <th>كود المنتج</th>
+                            <th>كمية الشراء</th>
+                            <th>سعر الشراء الواحد</th>
+                            <th>التكلفة الكلية للشراء</th>
+                            <th>سعر البيع الواحد</th>
+                            <th>إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="product-row">
+                            <td>
+                                <select class="form-select form-control-3d product-name" name="product_name[]" required>
+                                    <option value="">اختر المنتج</option>
+                                    @foreach ($products as $product)
+                                        <option value="{{ $product->name }}" data-product-code="{{ $product->sanf_code }}">
+                                            {{ $product->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" class="form-control form-control-3d product-code"
+                                    name="product_code[]" readonly required>
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" class="form-control form-control-3d amount-buy"
+                                    name="amount_buy[]" required>
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" class="form-control form-control-3d one-price-buy"
+                                    name="one_price_buy[]" required>
+                            </td>
+                            <td>
+                                <input type="text" class="form-control form-control-3d all-cost-buy"
+                                    name="all_cost_buy[]" readonly required>
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" class="form-control form-control-3d one-price-sell"
+                                    name="one_price_sell[]" required>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm remove-product-row">حذف</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-primary btn-sm" id="add-product-row">إضافة منتج</button>
             </div>
             <div class="col-md-4">
                 <label for="rasid_motah" class="form-label">رصيد متاح</label>
@@ -103,8 +120,8 @@
             </div>
             <div class="col-md-4">
                 <label for="had_back" class="form-label">مرتجع</label>
-                <input type="number" step="0.01" class="form-control form-control-3d" id="had_back"
-                    name="had_back" required value="{{ old('had_back') }}">
+                <input type="number" step="0.01" class="form-control form-control-3d" id="had_back" name="had_back"
+                    required value="{{ old('had_back') }}">
             </div>
             <div class="col-md-4">
                 <label for="had_back_amount" class="form-label">مبلغ المرتجع</label>
@@ -126,6 +143,323 @@
                 <input type="date" class="form-control form-control-3d" id="fatora_print_date"
                     name="fatora_print_date" value="{{ old('fatora_print_date') }}">
             </div>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const boxNameSelect = document.getElementById('box_name');
+                const boxIdInput = document.getElementById('box_id_fk');
+                const rasidMotahInput = document.getElementById('rasid_motah');
+                const subBranchSelect = document.getElementById('sub_branch_id_fk');
+
+                // Use Laravel route helper to generate URL templates
+                const getBalanceUrlTemplate =
+                    "{{ route('admin.requests.getBalance', ['box_id' => 'BOX_ID_PLACEHOLDER']) }}";
+                const getBoxesBySubBranchUrlTemplate =
+                    "{{ route('admin.storekhazina.bySubBranch', ['subBranchId' => 'SUB_BRANCH_ID_PLACEHOLDER']) }}";
+
+                function updateBoxId() {
+                    var selectedOption = boxNameSelect.options[boxNameSelect.selectedIndex];
+                    var boxId = selectedOption.getAttribute('data-box-id') || '';
+                    boxIdInput.value = boxId;
+                    if (boxId) {
+                        const url = getBalanceUrlTemplate.replace('BOX_ID_PLACEHOLDER', boxId);
+                        console.log('Fetching balance from URL:', url);
+                        fetch(url, {
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json',
+                                }
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data.balance !== undefined) {
+                                    rasidMotahInput.value = data.balance;
+                                } else {
+                                    rasidMotahInput.value = '';
+                                    alert('رصيد الخزنة غير موجود');
+                                }
+                            })
+                            .catch(error => {
+                                rasidMotahInput.value = '';
+                                console.error('Error fetching balance:', error);
+                                alert('حدث خطأ أثناء جلب رصيد الخزنة');
+                            });
+                    } else {
+                        rasidMotahInput.value = '';
+                    }
+                }
+
+                function updateBoxesBySubBranch(subBranchId) {
+                    if (!subBranchId) {
+                        boxNameSelect.innerHTML = '<option value="">اختر اسم الصندوق</option>';
+                        boxIdInput.value = '';
+                        rasidMotahInput.value = '';
+                        return;
+                    }
+                    const url = getBoxesBySubBranchUrlTemplate.replace('SUB_BRANCH_ID_PLACEHOLDER', subBranchId);
+                    console.log('Fetching boxes from URL:', url);
+                    fetch(url, {
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            boxNameSelect.innerHTML = '<option value="">اختر اسم الصندوق</option>';
+                            if (data.length > 0) {
+                                data.forEach(box => {
+                                    const option = document.createElement('option');
+                                    option.value = box.id;
+                                    option.textContent = box.name;
+                                    option.setAttribute('data-box-id', box.id);
+                                    boxNameSelect.appendChild(option);
+                                });
+                                // Select first box and update box id and balance
+                                boxNameSelect.selectedIndex = 1;
+                                updateBoxId();
+                            } else {
+                                boxIdInput.value = '';
+                                rasidMotahInput.value = '';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching boxes:', error);
+                            boxNameSelect.innerHTML = '<option value="">اختر اسم الصندوق</option>';
+                            boxIdInput.value = '';
+                            rasidMotahInput.value = '';
+                        });
+                }
+
+                // New functions for product rows
+                function calculateRowCost(row) {
+                    const amountBuyInput = row.querySelector('.amount-buy');
+                    const onePriceBuyInput = row.querySelector('.one-price-buy');
+                    const allCostBuyInput = row.querySelector('.all-cost-buy');
+
+                    const amountBuy = parseFloat(amountBuyInput.value.replace(',', '.')) || 0;
+                    const onePriceBuy = parseFloat(onePriceBuyInput.value.replace(',', '.')) || 0;
+                    const allCostBuy = amountBuy * onePriceBuy;
+                    allCostBuyInput.value = allCostBuy.toFixed(2);
+                }
+
+                function updateProductCode(row) {
+                    const productNameSelect = row.querySelector('.product-name');
+                    const productCodeInput = row.querySelector('.product-code');
+                    const selectedOption = productNameSelect.options[productNameSelect.selectedIndex];
+                    const productCode = selectedOption ? selectedOption.getAttribute('data-product-code') : '';
+                    productCodeInput.value = productCode || '';
+                }
+
+                function validateForm() {
+                    const warningDiv = document.getElementById('cost-warning');
+                    const availableBalanceSpan = document.getElementById('available-balance');
+                    const rasidMotahInput = document.getElementById('rasid_motah');
+                    const submitButton = document.querySelector('button[type="submit"]');
+
+                    const balance = parseFloat(rasidMotahInput.value) || 0;
+                    let totalCost = 0;
+
+                    document.querySelectorAll('#products-table tbody tr.product-row').forEach(row => {
+                        const allCostBuyInput = row.querySelector('.all-cost-buy');
+                        const cost = parseFloat(allCostBuyInput.value.replace(',', '.')) || 0;
+                        totalCost += cost;
+                    });
+
+                    availableBalanceSpan.textContent = balance.toFixed(2);
+
+                    if (totalCost > balance) {
+                        warningDiv.style.display = 'block';
+                        submitButton.disabled = true;
+                        return false;
+                    } else {
+                        warningDiv.style.display = 'none';
+                        submitButton.disabled = false;
+                        return true;
+                    }
+                }
+
+                function addProductRow() {
+                    const tableBody = document.querySelector('#products-table tbody');
+                    const newRow = document.createElement('tr');
+                    newRow.classList.add('product-row');
+                    newRow.innerHTML = `
+                        <td>
+                            <select class="form-select form-control-3d product-name" name="product_name[]" required>
+                                <option value="">اختر المنتج</option>
+                                @foreach ($products as $product)
+                                    <option value="{{ $product->name }}" data-product-code="{{ $product->sanf_code }}">
+                                        {{ $product->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control form-control-3d product-code" name="product_code[]" readonly required>
+                        </td>
+                        <td>
+                            <input type="number" step="0.01" class="form-control form-control-3d amount-buy" name="amount_buy[]" required>
+                        </td>
+                        <td>
+                            <input type="number" step="0.01" class="form-control form-control-3d one-price-buy" name="one_price_buy[]" required>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control form-control-3d all-cost-buy" name="all_cost_buy[]" readonly required>
+                        </td>
+                        <td>
+                            <input type="number" step="0.01" class="form-control form-control-3d one-price-sell" name="one_price_sell[]" required>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm remove-product-row">حذف</button>
+                        </td>
+                    `;
+
+                    tableBody.appendChild(newRow);
+
+                    // Attach event listeners to new row inputs
+                    const productNameSelect = newRow.querySelector('.product-name');
+                    const amountBuyInput = newRow.querySelector('.amount-buy');
+                    const onePriceBuyInput = newRow.querySelector('.one-price-buy');
+                    const removeButton = newRow.querySelector('.remove-product-row');
+
+                    productNameSelect.addEventListener('change', () => {
+                        updateProductCode(newRow);
+                    });
+                    amountBuyInput.addEventListener('input', () => {
+                        calculateRowCost(newRow);
+                        validateForm();
+                    });
+                    onePriceBuyInput.addEventListener('input', () => {
+                        calculateRowCost(newRow);
+                        validateForm();
+                    });
+                    removeButton.addEventListener('click', () => {
+                        newRow.remove();
+                        validateForm();
+                    });
+                }
+
+                // Initialize existing row event listeners
+                document.querySelectorAll('#products-table tbody tr.product-row').forEach(row => {
+                    const productNameSelect = row.querySelector('.product-name');
+                    const amountBuyInput = row.querySelector('.amount-buy');
+                    const onePriceBuyInput = row.querySelector('.one-price-buy');
+                    const removeButton = row.querySelector('.remove-product-row');
+
+                    productNameSelect.addEventListener('change', () => {
+                        updateProductCode(row);
+                    });
+                    amountBuyInput.addEventListener('input', () => {
+                        calculateRowCost(row);
+                        validateForm();
+                    });
+                    onePriceBuyInput.addEventListener('input', () => {
+                        calculateRowCost(row);
+                        validateForm();
+                    });
+                    removeButton.addEventListener('click', () => {
+                        row.remove();
+                        validateForm();
+                    });
+
+                    // Initialize values
+                    updateProductCode(row);
+                    calculateRowCost(row);
+                });
+
+                // Add product row button
+                document.getElementById('add-product-row').addEventListener('click', () => {
+                    addProductRow();
+                });
+
+                // Box and sub-branch related existing functions
+                boxNameSelect.addEventListener('change', () => {
+                    updateBoxId();
+                    validateForm();
+                });
+                subBranchSelect.addEventListener('change', function() {
+                    updateBoxesBySubBranch(this.value);
+                });
+
+                // Initialize on page load
+                updateBoxId();
+                updateBoxesBySubBranch(subBranchSelect.value);
+                validateForm();
+
+                // Form submission validation
+                const form = document.getElementById('request-form');
+                form.addEventListener('submit', function(event) {
+                    if (!validateForm()) {
+                        event.preventDefault();
+                        const warningDiv = document.getElementById('cost-warning');
+                        warningDiv.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        return false; // Prevent form submission and page reload
+                    }
+                });
+
+                // Validate on input changes to enable/disable submit button dynamically
+                rasidMotahInput.addEventListener('input', validateForm);
+            });
+        </script>
+        <div class="col-md-4">
+            <label for="rasid_motah" class="form-label">رصيد متاح</label>
+            <input type="number" step="0.01" class="form-control form-control-3d" id="rasid_motah"
+                name="rasid_motah" required value="{{ old('rasid_motah') }}">
+        </div>
+        <div class="col-md-4">
+            <label for="date_s" class="form-label">التاريخ (س)</label>
+            <input type="date" class="form-control form-control-3d" id="date_s" name="date_s" required
+                value="{{ old('date_s') }}">
+        </div>
+        <div class="col-md-4">
+            <label for="publisher" class="form-label">الناشر</label>
+            <select class="form-select form-control-3d" id="publisher" name="publisher" required>
+                <option value="">اختر الناشر</option>
+                @foreach ($publishers as $publisher)
+                    <option value="{{ $publisher->id }}" {{ old('publisher') == $publisher->id ? 'selected' : '' }}>
+                        {{ $publisher->name ?? ($publisher->email ?? $publisher->id) }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="had_back" class="form-label">مرتجع</label>
+            <input type="number" step="0.01" class="form-control form-control-3d" id="had_back" name="had_back"
+                required value="{{ old('had_back') }}">
+        </div>
+        <div class="col-md-4">
+            <label for="had_back_amount" class="form-label">مبلغ المرتجع</label>
+            <input type="number" step="0.01" class="form-control form-control-3d" id="had_back_amount"
+                name="had_back_amount" required value="{{ old('had_back_amount') }}">
+        </div>
+        <div class="col-md-4">
+            <label for="fatora_code" class="form-label">كود الفاتورة</label>
+            <input type="number" class="form-control form-control-3d" id="fatora_code" name="fatora_code" required
+                value="{{ old('fatora_code', $nextFatoraCode ?? '') }}">
+        </div>
+        <div class="col-md-4">
+            <label for="fatora_date" class="form-label">تاريخ الفاتورة</label>
+            <input type="date" class="form-control form-control-3d" id="fatora_date" name="fatora_date"
+                value="{{ old('fatora_date') }}">
+        </div>
+        <div class="col-md-4">
+            <label for="fatora_print_date" class="form-label">تاريخ طباعة الفاتورة</label>
+            <input type="date" class="form-control form-control-3d" id="fatora_print_date" name="fatora_print_date"
+                value="{{ old('fatora_print_date') }}">
+        </div>
         </div>
 
         <div class="row g-3 mt-3">

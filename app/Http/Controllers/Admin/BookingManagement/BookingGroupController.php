@@ -88,9 +88,16 @@ class BookingGroupController extends Controller implements HasMiddleware
     private function processBookingRevenueEntry()
     {
         $accountNumber = '42';
-        $accountNumber2 = '41';
         $account = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_number', $accountNumber)->first();
+
+        $accountNumber2 = '42';
         $account2 = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_number', $accountNumber2)->first();
+
+        $accountNumber3 = '42';
+        $account3 = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_number', $accountNumber3)->first();
+
+        $accountNumber4 = '42';
+        $account4 = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_number', $accountNumber4)->first();
 
         if (!$account) {
             toastr()->error('حساب إيرادات الحجوزات غير موجود');
@@ -140,76 +147,73 @@ class BookingGroupController extends Controller implements HasMiddleware
             }
 
             // Only update and save if credit value has changed or new entry
-            if (!$entry->exists || $entry->credit != $group->discounted) {
+            if ((!$entry->exists || $entry->credit != $group->paid) && $group->booking_group_payments->contains('payment_method_id', 3)) {
                 $entry->chart_of_account_id = $account->id;
                 $entry->account_number = $account->account_number;
                 $entry->account_name = $account->account_name;
                 $entry->debit = 0;
-                $entry->credit = $group->discounted;
+                $entry->credit = $group->paid;
                 $entry->date = now();
-                $entry->description = 'ايرادات الحجوزات - مدفوعات الحجز رقم ' . $group->id;
+                $entry->description = 'ايرادات الحجوزات -كاش مدفوعات الحجز رقم ' . $group->id;
+                $entry->created_by = \Illuminate\Support\Facades\Auth::id();
+                $entry->approved = 1;
+                $entry->save();
+            } elseif ((!$entry->exists || $entry->credit != $group->paid) && $group->booking_group_payments->contains('payment_method_id', 2)) {
+                $entry->chart_of_account_id = $account->id;
+                $entry->account_number = $account->account_number;
+                $entry->account_name = $account->account_name;
+                $entry->debit = 0;
+                $entry->credit = $group->paid;
+                $entry->date = now();
+                $entry->description = 'ايرادات الحجوزات -فيزا مدفوعات الحجز رقم ' . $group->id;
+                $entry->created_by = \Illuminate\Support\Facades\Auth::id();
+                $entry->approved = 1;
+                $entry->save();
+            } elseif ((!$entry->exists || $entry->credit != $group->paid) && $group->booking_group_payments->contains('payment_method_id', 1)) {
+                $entry->chart_of_account_id = $account->id;
+                $entry->account_number = $account->account_number;
+                $entry->account_name = $account->account_name;
+                $entry->debit = 0;
+                $entry->credit = $group->paid;
+                $entry->date = now();
+                $entry->description = 'ايرادات الحجوزات -انستا باي مدفوعات الحجز رقم ' . $group->id;
                 $entry->created_by = \Illuminate\Support\Facades\Auth::id();
                 $entry->approved = 1;
                 $entry->save();
             }
-        }
 
-        if (!$account2) {
-            toastr()->error('حساب إيرادات الحجوزات غير موجود');
-            return;
-        }
 
-        $bookingGroups2 = \App\Models\BookingGroup::all()->filter(function ($group2) {
-            return $group2->paid > 0;
-        });
 
-        if ($bookingGroups2->isEmpty()) {
-            toastr()->error('لا يوجد مبالغ مدفوعة لإضافتها');
-            return;
-        }
-
-        $existingDescriptions2 = \Modules\AccountingDepartment\Models\Entry::where('description', 'like', 'ايرادات الحجوزات - مدفوعات الحجز رقم %')
-            ->pluck('description')
-            ->toArray();
-
-        $existingGroupIds2 = [];
-        foreach ($existingDescriptions2 as $desc) {
-            if (preg_match('/مدفوعات الحجز رقم (\d+)/u', $desc, $matches)) {
-                $existingGroupIds2[] = intval($matches[1]);
-            }
-        }
-
-        // Remove filtering out existing entries, process all booking groups with paid > 0
-        if ($bookingGroups2->isEmpty()) {
-            toastr()->error('لا يوجد مبالغ مدفوعة لإضافتها');
-            return;
-        }
-
-        $lastEntryNumber2 = \Modules\AccountingDepartment\Models\Entry::orderBy('id', 'desc')->value('entry_number');
-        $newEntryNumbers = 1;
-        if ($lastEntryNumber2 !== null && is_numeric($lastEntryNumber2)) {
-            $newEntryNumbers = intval($lastEntryNumber2) + 1;
-        }
-
-        foreach ($bookingGroups2 as $group2) {
-            // Find existing entry for this booking group by description
-            $entry = \Modules\AccountingDepartment\Models\Entry::where('description', 'ايرادات الحجوزات - مدفوعات الحجز رقم ' . $group->id)->first();
-
-            if (!$entry) {
-                $entry = new \Modules\AccountingDepartment\Models\Entry();
-                $entry->entry_number = (string)$newEntryNumbers;
-                $newEntryNumbers++;
-            }
-
-            // Only update and save if credit value has changed or new entry
-            if (!$entry->exists || $entry->credit != $group2->paid) {
-                $entry->chart_of_account_id = $account->id;
-                $entry->account_number = $account->account_number;
-                $entry->account_name = $account->account_name;
-                $entry->debit = 0;
-                $entry->credit = $group2->paid;
+            if ((!$entry->exists || $entry->credit != $group->paid) && $group->booking_group_payments->contains('payment_method_id', 3)) {
+                $entry->chart_of_account_id = $account2->id;
+                $entry->account_number = $account2->account_number;
+                $entry->account_name = $account2->account_name;
+                $entry->debit = $group->paid;
+                $entry->credit = 0;
                 $entry->date = now();
-                $entry->description = 'ايرادات البطيخ - مدفوعات الحجز رقم ' . $group->id;
+                $entry->description = 'ايرادات الحجوزات -كاش مدفوعات الحجز رقم ' . $group->id;
+                $entry->created_by = \Illuminate\Support\Facades\Auth::id();
+                $entry->approved = 1;
+                $entry->save();
+            } elseif ((!$entry->exists || $entry->credit != $group->paid) && $group->booking_group_payments->contains('payment_method_id', 2)) {
+                $entry->chart_of_account_id = $account3->id;
+                $entry->account_number = $account3->account_number;
+                $entry->account_name = $account3->account_name;
+                $entry->debit = $group->paid;
+                $entry->credit = 0;
+                $entry->date = now();
+                $entry->description = 'ايرادات الحجوزات -فيزا مدفوعات الحجز رقم ' . $group->id;
+                $entry->created_by = \Illuminate\Support\Facades\Auth::id();
+                $entry->approved = 1;
+                $entry->save();
+            } elseif ((!$entry->exists || $entry->credit != $group->paid) && $group->booking_group_payments->contains('payment_method_id', 1)) {
+                $entry->chart_of_account_id = $account4->id;
+                $entry->account_number = $account4->account_number;
+                $entry->account_name = $account4->account_name;
+                $entry->debit = $group->paid;
+                $entry->credit = 0;
+                $entry->date = now();
+                $entry->description = 'ايرادات الحجوزات -انستا باي مدفوعات الحجز رقم ' . $group->id;
                 $entry->created_by = \Illuminate\Support\Facades\Auth::id();
                 $entry->approved = 1;
                 $entry->save();

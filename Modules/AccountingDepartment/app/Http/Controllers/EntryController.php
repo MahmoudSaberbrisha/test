@@ -27,6 +27,19 @@ class EntryController extends Controller
             ->orderBy('entry_number', 'desc')
             ->get();
 
+        // Add cost center name to each entry if available
+        $entries->transform(function ($entry) {
+            $entry->cost_center_name = null;
+            if ($entry->chartOfAccount && !empty($entry->chartOfAccount->account_number)) {
+                // Assuming cost center is linked by account_number in CostCenter model
+                $costCenter = \App\Models\CostCenter::where('name', $entry->chartOfAccount->account_name)->first();
+                if ($costCenter) {
+                    $entry->cost_center_name = $costCenter->name;
+                }
+            }
+            return $entry;
+        });
+
         // Re-key entries by entry_number to ensure one entry per number
         $uniqueEntries = $entries->unique('entry_number')->values();
 

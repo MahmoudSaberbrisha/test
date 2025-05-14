@@ -4,6 +4,7 @@ namespace Modules\AccountingDepartment\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AccountingDepartmentController extends Controller
 {
@@ -83,17 +84,51 @@ class AccountingDepartmentController extends Controller
      */
     public function costCentersReport()
     {
-        // Assuming cost centers are accounts with a 'cost_center' attribute set to true
-        $costCenters = \Modules\AccountingDepartment\Models\ChartOfAccount::where('is_cost_center', true)
-            ->with('entries')
+        $costCenters = \App\Models\CostCenter::with('branches')->get();
+
+        // Build a map of cost center numbers to names with trimmed keys
+        $costCenterNumberNameMap = $costCenters->mapWithKeys(function ($costCenter) {
+            return [trim($costCenter->account_number) => $costCenter->name];
+        })->toArray();
+
+        // Calculate total balance per cost center from entries (sum of credit)
+        $costCenterBalances = \Modules\AccountingDepartment\Models\Entry::selectRaw('cost_center, SUM(credit) as total_credit')
+            ->whereNotNull('cost_center')
+            ->where('cost_center', '!=', '')
+            ->groupBy('cost_center')
             ->get()
-            ->map(function ($costCenter) {
-                $total_debit = $costCenter->entries->sum('debit');
-                $total_credit = $costCenter->entries->sum('credit');
-            $costCenter->balance =  $total_credit - $total_debit;
-                return $costCenter;
+            ->mapWithKeys(function ($item) {
+                return [trim($item->cost_center) => $item->total_credit];
             });
-        return view('accountingdepartment::cost_centers_report', compact('costCenters'));
+
+        // Fetch accounts with balances and cost center names
+        $accounts = \App\Models\Account::orderBy('id', 'desc')->get()->map(function ($account) use ($costCenterNumberNameMap) {
+            $entries = \Modules\AccountingDepartment\Models\Entry::where('account_number', $account->code)
+                ->whereNotNull('cost_center')
+                ->where('cost_center', '!=', '')
+                ->get();
+
+            if ($entries->isEmpty()) {
+                return null;
+            }
+
+            $total_debit = $entries->sum('debit') ?? 0;
+            $total_credit = $entries->sum('credit') ?? 0;
+            $account->balance = $total_credit - $total_debit;
+
+            // Map the cost center number to the actual name with trimming
+            $costCenterNumber = trim($entries->first()->cost_center ?? '');
+
+            // Debug: log the cost center number and mapping
+            Log::info("Cost center number: " . $costCenterNumber);
+            Log::info("Mapped name: " . ($costCenterNumberNameMap[$costCenterNumber] ?? 'Not found'));
+
+            $account->cost_center_name = $costCenterNumberNameMap[$costCenterNumber] ?? $costCenterNumber ?? 'غير محدد';
+
+            return $account;
+        })->filter();
+
+        return view('accountingdepartment::cost_centers_report', compact('costCenters', 'costCenterBalances', 'accounts'));
     }
 
     /**
@@ -118,17 +153,17 @@ class AccountingDepartmentController extends Controller
                 $account->total_debit = $total_debit;
                 $account->total_credit = $total_credit;
 
-            // Calculate previous balance before last entry
-            $lastEntry = $account->entries->sortByDesc('date')->first();
-            if ($lastEntry) {
-                $previous_debit = $total_debit - $lastEntry->debit;
-                $previous_credit = $total_credit - $lastEntry->credit;
-                $account->previous_balance = $previous_credit - $previous_debit;
-            } else {
-                $account->previous_balance = $total_credit - $total_debit;
-            }
+                // Calculate previous balance before last entry
+                $lastEntry = $account->entries->sortByDesc('date')->first();
+                if ($lastEntry) {
+                    $previous_debit = $total_debit - $lastEntry->debit;
+                    $previous_credit = $total_credit - $lastEntry->credit;
+                    $account->previous_balance = $previous_credit - $previous_debit;
+                } else {
+                    $account->previous_balance = $total_credit - $total_debit;
+                }
 
-            return $account;
+                return $account;
             });
 
         // dd($accounts);

@@ -21,9 +21,16 @@ class Account extends Model implements TranslatableContract
 
     public $fillable = ['active', 'icon', 'code', 'account_type_id', 'parent_id', 'is_payment'];
 
-    protected static function boot() {
+    protected static function boot()
+    {
         parent::boot();
         static::addGlobalScope(new RecordOrderScope('accounts.id', 'DESC'));
     }
 
+    // Removed costCenter relation because accounts table has no cost_center_id column
+
+    public function entries()
+    {
+        return $this->hasMany(\Modules\AccountingDepartment\Models\Entry::class, 'account_id');
+    }
 }

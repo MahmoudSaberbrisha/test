@@ -12,7 +12,39 @@ class CostCenterController extends Controller
     public function index()
     {
         $costCenters = CostCenter::with('branches')->get();
-        return view('admin.cost_centers.index', compact('costCenters'));
+
+        // Calculate total balance per cost center from entries (sum of credit only as requested)
+        $costCenterBalances = \Modules\AccountingDepartment\Models\Entry::selectRaw('cost_center, SUM(credit) as total_credit')
+            ->whereNotNull('cost_center')
+            ->where('cost_center', '!=', '')
+            ->groupBy('cost_center')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [$item->cost_center => $item->total_credit];
+            });
+
+        // Fetch accounts with balances and cost center names
+        $accounts = \App\Models\Account::orderBy('id', 'desc')->get()->map(function ($account) {
+            $entries = \Modules\AccountingDepartment\Models\Entry::where('account_number', $account->code)
+                ->whereNotNull('cost_center')
+                ->where('cost_center', '!=', '')
+                ->get();
+
+            if ($entries->isEmpty()) {
+                return null;
+            }
+
+            $total_debit = $entries->sum('debit') ?? 0;
+            $total_credit = $entries->sum('credit') ?? 0;
+            $account->balance = $total_credit - $total_debit;
+
+            // Get the cost center name from the first entry's cost_center string
+            $account->cost_center_name = $entries->first()->cost_center ?? 'غير محدد';
+
+            return $account;
+        })->filter();
+
+        return view('admin.cost_centers.index', compact('costCenters', 'costCenterBalances', 'accounts'));
     }
 
     public function create()

@@ -16,7 +16,7 @@
                         @foreach ($costCenters as $costCenter)
                             <tr class="border-b">
                                 <td class="py-2 px-4">{{ $costCenter->account_number }}</td>
-                                <td class="py-2 px-4">{{ $costCenter->account_name }}</td>
+                                <td class="py-2 px-4">{{ $costCenter->name }}</td>
                                 <td class="py-2 px-4">{{ number_format($costCenter->balance, 2) }}</td>
                             </tr>
                         @endforeach
@@ -26,5 +26,25 @@
         @else
             <p class="text-gray-700">لا توجد بيانات لعرضها.</p>
         @endif
+
+        <h2>الحسابات التي لها مركز تكلفة</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>اسم الحساب</th>
+                    <th>اسم مركز التكلفة</th>
+                    <th>الرصيد</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($accounts as $account)
+                    <tr>
+                        <td>{{ $account->name }}</td>
+                        <td>{{ $account->cost_center_name ?? 'غير محدد' }}</td>
+                        <td>{{ number_format($account->balance, 2) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 @endsection
