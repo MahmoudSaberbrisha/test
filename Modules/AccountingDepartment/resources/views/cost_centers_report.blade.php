@@ -1,7 +1,7 @@
 @extends('accounting-department::master')
 @section('coco')
     <div class="container mx-auto p-4">
-        <h1 class="text-2xl font-bold mb-4">تقرير مراكز التكلفة</h1>
+        {{-- <h1 class="text-2xl font-bold mb-4">تقرير مراكز التكلفة</h1>
         @if ($costCenters->count() > 0)
             <div class="overflow-x-auto max-h-[600px] overflow-y-auto border rounded">
                 <table class="min-w-full bg-white">
@@ -25,7 +25,7 @@
             </div>
         @else
             <p class="text-gray-700">لا توجد بيانات لعرضها.</p>
-        @endif
+        @endif --}}
 
         <h2>الحسابات التي لها مركز تكلفة</h2>
         <table class="table table-bordered">

@@ -79,6 +79,13 @@
                             </tr>
                         @endforeach
                     </tbody>
+                    <tfoot>
+                        <tr class="bg-gray-100 font-bold">
+                            <td colspan="8" class="border border-gray-300 px-3 py-2 text-right">المجموع الكلي</td>
+                            <td id="total-debit" class="border border-gray-300 px-3 py-2 text-left">0</td>
+                            <td id="total-credit" class="border border-gray-300 px-3 py-2 text-left">0</td>
+                        </tr>
+                    </tfoot>
                 </table>
                 <div class="mt-4">
                     <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">تحديث الكل</button>
@@ -86,4 +93,34 @@
             </form>
         </div>
     </div>
+    <script>
+        function calculateTotals() {
+            let totalDebit = 0;
+            let totalCredit = 0;
+
+            document.querySelectorAll('input[name$="[debit]"]').forEach(input => {
+                const val = parseFloat(input.value);
+                if (!isNaN(val)) {
+                    totalDebit += val;
+                }
+            });
+
+            document.querySelectorAll('input[name$="[credit]"]').forEach(input => {
+                const val = parseFloat(input.value);
+                if (!isNaN(val)) {
+                    totalCredit += val;
+                }
+            });
+
+            document.getElementById('total-debit').textContent = totalDebit.toFixed(2);
+            document.getElementById('total-credit').textContent = totalCredit.toFixed(2);
+        }
+
+        document.querySelectorAll('input[name$="[debit]"], input[name$="[credit]"]').forEach(input => {
+            input.addEventListener('input', calculateTotals);
+        });
+
+        // Initial calculation on page load
+        calculateTotals();
+    </script>
 @endsection

@@ -77,7 +77,7 @@
                             </td>
                             <td>
                                 <select name="entries[0][is_cost_center]" id="cost_center"
-                                    class="border border-gray-300 rounded px-2 py-3 w-full" required>
+                                    class="border border-gray-300 rounded px-2 py-3 w-full" >
                                     <option value="">اختر مركز التكلفة</option>
                                     @foreach ($costCenterBranches as $branch)
                                         <option value="{{ $branch->id }}">{{ $branch->name }}</option>
@@ -102,13 +102,13 @@
                                     class="border border-gray-300 rounded px-2  input py-3 w-full" required readonly>
                             </td>
                             <td class="border py-1 px-1 ">
-                                <input type="number" name="entries[0][credit]" id="credit" value=0.00
+                                <input type="decimal" name="entries[0][credit]" id="credit" value=0.00
                                     style="width:120px"
                                     class="border  border-gray-300 rounded py-3 input px-4 w-full credit-input"
                                     oninput="calculateDifference()">
                             </td>
                             <td class="border bg-red-100 border-gray-300">
-                                <input type="number" name="entries[0][debit]" id="debit" value=0.00
+                                <input type="decimal" name="entries[0][debit]" id="debit" value=0.00
                                     style="width:120px" class="border border-gray-300 rounded px-2 input py-3 debit-input"
                                     oninput="calculateDifference()" required>
                             </td>
@@ -126,7 +126,7 @@
                             </td>
                             <td>
                                 <select name="entries[1][is_cost_center]" id="cost_center2"
-                                    class="border border-gray-300 rounded px-2 py-3 input w-full" required>
+                                    class="border border-gray-300 rounded px-2 py-3 input w-full" >
                                     <option value="">اختر مركز التكلفة</option>
                                     @foreach ($costCenterBranches as $branch)
                                         <option value="{{ $branch->id }}">{{ $branch->name }}</option>
@@ -153,12 +153,12 @@
                                     readonly>
                             </td>
                             <td class="border py-1 px-1 ">
-                                <input type="number" name="entries[1][credit]" id="credit" value=0.00
+                                <input type="decimal" name="entries[1][credit]" id="credit" value=0.00
                                     class="border border-gray-300 rounded py-3 input px-4 w-full credit-input"
                                     style="width: 120px" oninput="calculateDifference()">
                             </td>
                             <td class="bg-red-100 border py-1 px-1 ">
-                                <input type="number" style="width: 120px" name="entries[1][debit]" id="debit"
+                                <input type="decimal" style="width: 120px" name="entries[1][debit]" id="debit"
                                     value=0.00
                                     class="border bg-red-100 border-gray-300 rounded input px-3 py-3 w-full debit-input"
                                     oninput="calculateDifference()" required>
@@ -247,7 +247,7 @@
                     <input type="text" name="entries[${newIndex}][reference]" id="reference_${newIndex}" class="border border-gray-300 rounded input px-2 py-3 w-full reference-input" required>
                 </td>
                 <td>
-                    <select name="entries[${newIndex}][is_cost_center]" class="border border-gray-300 rounded px-2 py-3 w-full" required>
+                    <select name="entries[${newIndex}][is_cost_center]" class="border border-gray-300 rounded px-2 py-3 w-full" >
                         <option value="">اختر مركز التكلفة</option>
                         ${costCenterOptions}
                     </select>
@@ -262,10 +262,10 @@
                     <input type="text" name="entries[${newIndex}][account_number]" id="account_number_${newIndex}" value="" class="border border-gray-300 rounded px-2  input py-3 w-full" required readonly>
                 </td>
                 <td class="border py-1 px-1 ">
-                    <input type="number" name="entries[${newIndex}][credit]" value=0.00 class="border border-gray-300 rounded py-3 input px-4 w-full credit-input" style="width: 120px" oninput="calculateDifference()">
+                    <input type="decimal" name="entries[${newIndex}][credit]" value=0.00 class="border border-gray-300 rounded py-3 input px-4 w-full credit-input" style="width: 120px" oninput="calculateDifference()">
                 </td>
                 <td class="border py-1 px-1 bg-red-100">
-                    <input type="number" style="width: 120px" name="entries[${newIndex}][debit]" value=0.00 class="border border-gray-300 rounded input px-3 py-3 w-full debit-input" oninput="calculateDifference()" required>
+                    <input type="decimal" style="width: 120px" name="entries[${newIndex}][debit]" value=0.00 class="border border-gray-300 rounded input px-3 py-3 w-full debit-input" oninput="calculateDifference()" required>
                 </td>
             `;
 
