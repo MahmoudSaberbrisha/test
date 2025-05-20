@@ -120,7 +120,7 @@ class BookingGroupController extends Controller implements HasMiddleware
         }
 
         foreach ($bookingGroups as $group) {
-            // كاش
+
             $cashAmount = $group->booking_group_payments->where('payment_method_id', 3)->sum('paid');
             if ($cashAmount > 0) {
                 $desc = 'ايرادات الحجوزات -كاش مدفوعات الحجز رقم ' . $group->id;
@@ -128,7 +128,7 @@ class BookingGroupController extends Controller implements HasMiddleware
                 if ($exists) {
                     continue;
                 }
-                // قيد أول: من حساب الكاش إلى حساب الإيرادات
+
                 $entry1 = new \Modules\AccountingDepartment\Models\Entry();
                 $entry1->entry_number = (string)$newEntryNumber++;
                 $entry1->chart_of_account_id = $account2->id;
@@ -142,7 +142,7 @@ class BookingGroupController extends Controller implements HasMiddleware
                 $entry1->approved = 1;
                 $entry1->save();
 
-                // قيد ثاني: إلى حساب الإيرادات
+
                 $entry2 = new \Modules\AccountingDepartment\Models\Entry();
                 $entry2->entry_number = (string)$newEntryNumber++;
                 $entry2->chart_of_account_id = $account->id;
@@ -164,7 +164,7 @@ class BookingGroupController extends Controller implements HasMiddleware
                 if ($exists) {
                     continue;
                 }
-                // قيد أول: من حساب الفيزا إلى حساب الإيرادات
+
                 $entry1 = new \Modules\AccountingDepartment\Models\Entry();
                 $entry1->entry_number = (string)$newEntryNumber++;
                 $entry1->chart_of_account_id = $account3->id;
@@ -178,7 +178,7 @@ class BookingGroupController extends Controller implements HasMiddleware
                 $entry1->approved = 1;
                 $entry1->save();
 
-                // قيد ثاني: إلى حساب الإيرادات
+
                 $entry2 = new \Modules\AccountingDepartment\Models\Entry();
                 $entry2->entry_number = (string)$newEntryNumber++;
                 $entry2->chart_of_account_id = $account->id;
@@ -200,7 +200,7 @@ class BookingGroupController extends Controller implements HasMiddleware
                 if ($exists) {
                     continue;
                 }
-                // قيد أول: من حساب انستا باي إلى حساب الإيرادات
+
                 $entry1 = new \Modules\AccountingDepartment\Models\Entry();
                 $entry1->entry_number = (string)$newEntryNumber++;
                 $entry1->chart_of_account_id = $account4->id;
@@ -214,7 +214,7 @@ class BookingGroupController extends Controller implements HasMiddleware
                 $entry1->approved = 1;
                 $entry1->save();
 
-                // قيد ثاني: إلى حساب الإيرادات
+
                 $entry2 = new \Modules\AccountingDepartment\Models\Entry();
                 $entry2->entry_number = (string)$newEntryNumber++;
                 $entry2->chart_of_account_id = $account->id;
