@@ -121,7 +121,8 @@ class BookingGroupController extends Controller implements HasMiddleware
 
         foreach ($bookingGroups as $group) {
             // كاش
-            if ($group->booking_group_payments->contains('payment_method_id', 3)) {
+            $cashAmount = $group->booking_group_payments->where('payment_method_id', 3)->sum('paid');
+            if ($cashAmount > 0) {
                 $desc = 'ايرادات الحجوزات -كاش مدفوعات الحجز رقم ' . $group->id;
                 $exists = \Modules\AccountingDepartment\Models\Entry::where('description', $desc)->exists();
                 if ($exists) {
@@ -133,7 +134,7 @@ class BookingGroupController extends Controller implements HasMiddleware
                 $entry1->chart_of_account_id = $account2->id;
                 $entry1->account_number = $account2->account_number;
                 $entry1->account_name = $account2->account_name;
-                $entry1->debit = $group->paid;
+                $entry1->debit = $cashAmount;
                 $entry1->credit = 0;
                 $entry1->date = now();
                 $entry1->description = $desc . ' (مدين)';
@@ -148,7 +149,7 @@ class BookingGroupController extends Controller implements HasMiddleware
                 $entry2->account_number = $account->account_number;
                 $entry2->account_name = $account->account_name;
                 $entry2->debit = 0;
-                $entry2->credit = $group->paid;
+                $entry2->credit = $cashAmount;
                 $entry2->date = now();
                 $entry2->description = $desc . ' (دائن)';
                 $entry2->created_by = \Illuminate\Support\Facades\Auth::id();
@@ -156,7 +157,8 @@ class BookingGroupController extends Controller implements HasMiddleware
                 $entry2->save();
             }
             // فيزا
-            if ($group->booking_group_payments->contains('payment_method_id', 2)) {
+            $visaAmount = $group->booking_group_payments->where('payment_method_id', 2)->sum('paid');
+            if ($visaAmount > 0) {
                 $desc = 'ايرادات الحجوزات -فيزا مدفوعات الحجز رقم ' . $group->id;
                 $exists = \Modules\AccountingDepartment\Models\Entry::where('description', $desc)->exists();
                 if ($exists) {
@@ -168,7 +170,7 @@ class BookingGroupController extends Controller implements HasMiddleware
                 $entry1->chart_of_account_id = $account3->id;
                 $entry1->account_number = $account3->account_number;
                 $entry1->account_name = $account3->account_name;
-                $entry1->debit = $group->paid;
+                $entry1->debit = $visaAmount;
                 $entry1->credit = 0;
                 $entry1->date = now();
                 $entry1->description = $desc . ' (مدين)';
@@ -183,7 +185,7 @@ class BookingGroupController extends Controller implements HasMiddleware
                 $entry2->account_number = $account->account_number;
                 $entry2->account_name = $account->account_name;
                 $entry2->debit = 0;
-                $entry2->credit = $group->paid;
+                $entry2->credit = $visaAmount;
                 $entry2->date = now();
                 $entry2->description = $desc . ' (دائن)';
                 $entry2->created_by = \Illuminate\Support\Facades\Auth::id();
@@ -191,7 +193,8 @@ class BookingGroupController extends Controller implements HasMiddleware
                 $entry2->save();
             }
             // انستا باي
-            if ($group->booking_group_payments->contains('payment_method_id', 1)) {
+            $instaPayAmount = $group->booking_group_payments->where('payment_method_id', 1)->sum('paid');
+            if ($instaPayAmount > 0) {
                 $desc = 'ايرادات الحجوزات -انستا باي مدفوعات الحجز رقم ' . $group->id;
                 $exists = \Modules\AccountingDepartment\Models\Entry::where('description', $desc)->exists();
                 if ($exists) {
@@ -203,7 +206,7 @@ class BookingGroupController extends Controller implements HasMiddleware
                 $entry1->chart_of_account_id = $account4->id;
                 $entry1->account_number = $account4->account_number;
                 $entry1->account_name = $account4->account_name;
-                $entry1->debit = $group->paid;
+                $entry1->debit = $instaPayAmount;
                 $entry1->credit = 0;
                 $entry1->date = now();
                 $entry1->description = $desc . ' (مدين)';
@@ -218,7 +221,7 @@ class BookingGroupController extends Controller implements HasMiddleware
                 $entry2->account_number = $account->account_number;
                 $entry2->account_name = $account->account_name;
                 $entry2->debit = 0;
-                $entry2->credit = $group->paid;
+                $entry2->credit = $instaPayAmount;
                 $entry2->date = now();
                 $entry2->description = $desc . ' (دائن)';
                 $entry2->created_by = \Illuminate\Support\Facades\Auth::id();
@@ -240,6 +243,7 @@ class BookingGroupController extends Controller implements HasMiddleware
     {
         try {
             $this->dataRepository->update($booking_group, $request->validated());
+            $this->processBookingRevenueEntry();
             session()->forget('bookingId');
             toastr()->success(__('Record successfully updated.'));
         } catch (\Exception $e) {
