@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Modules\AccountingDepartment\Models\ChartOfAccount;
 use Modules\AccountingDepartment\Models\Entry;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\EntriesImport;
+
+use Modules\AccountingDepartment\Exports\EntriesExport;
 
 class EntryController extends Controller
 {
@@ -53,6 +57,11 @@ class EntryController extends Controller
         );
 
         return view('accountingdepartment::entries.index', ['entries' => $paginatedEntries]);
+    }
+
+    public function export()
+    {
+        return Excel::download(new EntriesExport, 'entries.xlsx');
     }
 
     public function reviewedEntries()
@@ -215,5 +224,18 @@ class EntryController extends Controller
         $entries = $query->get();
 
         return view('accountingdepartment::account-movement', compact('entries', 'accounts'));
+    }
+
+
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        Excel::import(new EntriesImport, $request->file('file'));
+
+        return redirect()->route('admin.entries.index')->with('success', 'Entries imported successfully.');
     }
 }

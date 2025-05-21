@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Modules\AdminRoleAuthModule\Http\Middleware\CheckFeatureFlags;
 
 class RouteServiceProvider extends ServiceProvider

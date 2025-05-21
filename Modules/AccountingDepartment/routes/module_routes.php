@@ -20,11 +20,14 @@ Route::prefix('admin/accounting-department')->group(function () {
 
     Route::put('entries/update-multiple', [EntryController::class, 'updateMultiple'])->name('entries.updateMultiple');
 
+    Route::get('entries/export', [EntryController::class, 'export'])->name('admin.entries.export');
     Route::resource('entries', EntryController::class);
-    Route::get('account-movement', [EntryController::class, 'accountMovement'])->name('account.movement');
+    // Route::get('entries/export', [EntryController::class, 'export'])->name('admin.entries.export');
+    Route::post('entries/import', [EntryController::class, 'import'])->name('admin.entries.import');
+    Route::get('account-movement', [EntryController::class, 'accountMovement'])->name('admin.account.movement');
 
     // Custom account routes must come before the resource route
-    Route::get('accounts/balances', [ChartOfAccountController::class, 'balances'])->name('accounts.balances');
+    Route::get('accounts/balances', [ChartOfAccountController::class, 'balances'])->name('admin.accounts.balances');
     Route::get('accounts/statement/{account}', [ChartOfAccountController::class, 'statement'])->name('accounts.statement');
     Route::get('accounts/print/{account}', [ChartOfAccountController::class, 'print'])->name('accounts.print');
 

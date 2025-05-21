@@ -24,6 +24,20 @@
                 عرض التالي
             </button>
         </div>
+
+        <div class="mt-4 flex gap-4">
+            <form action="{{ route('admin.admin.entries.import') }}" method="POST" enctype="multipart/form-data"
+                class="flex items-center gap-2" dir="ltr">
+                @csrf
+                <input type="file" name="file" accept=".xlsx,.xls,.csv" required
+                    class="border border-gray-300 rounded px-2 py-1 text-sm">
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">استيراد</button>
+            </form>
+            <form action="{{ route('admin.admin.entries.export') }}" method="GET" class="flex items-center gap-2"
+                dir="ltr">
+                <button type="submit" class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">تصدير</button>
+            </form>
+        </div>
     </div>
 
     <script>
