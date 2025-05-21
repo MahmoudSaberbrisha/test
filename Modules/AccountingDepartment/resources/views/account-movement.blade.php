@@ -61,7 +61,7 @@
                                 <th class="py-2 px-4">البيان</th>
                                   <th class="py-2 px-4">الدائن</th>
                                 <th class="py-2 px-4">المدين</th>
-                              
+
                                 <th class="py-2 px-4">الرصيد</th>
                             </tr>
                         </thead>

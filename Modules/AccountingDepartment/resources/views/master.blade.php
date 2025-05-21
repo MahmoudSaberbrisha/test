@@ -377,7 +377,7 @@
         <div  style="padding-right:60px !important;">
             <div class="flex flex-wrap justify-center space-x-4 mx-auto w-full"
                 style="justify-content: center !important; ">
-                <a href="{{ route(auth()->getDefaultDriver() . '.account.movement') }}"
+                <a href="{{ route(auth()->getDefaultDriver() . '.admin.account.movement') }}"
                     class="bg-green-600 text-white px-4 py-2 rounded sm:w-auto"
                     style="margin-left: 60px;margin-right: 60px">حركة حساب</a>
                 <a href="{{ route(auth()->getDefaultDriver() . '.revenues.expenses') }}"
@@ -389,9 +389,9 @@
                 <a href="{{ route(auth()->getDefaultDriver() . '.financial.balance') }}"
                     class="bg-yellow-500 text-white px-4 py-2 rounded sm:w-auto" style="margin-left: 60px">الميزان
                     المالي</a>
-                <a href="{{ route(auth()->getDefaultDriver() . '.cost.centers.report') }}"
+                {{-- <a href="{{ route(auth()->getDefaultDriver() . '.cost.centers.report') }}"
                     class="bg-yellow-500 text-white px-4 py-2 rounded sm:w-auto" style="margin-left: 60px;">تقرير مراكز
-                    التكلفة</a>
+                    التكلفة</a> --}}
             </div>
 <div class="py-4">
             @yield('coco')

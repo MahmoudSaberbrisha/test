@@ -86,49 +86,33 @@ class AccountingDepartmentController extends Controller
     {
         $costCenters = \App\Models\CostCenter::with('branches')->get();
 
-        // Build a map of cost center numbers to names with trimmed keys
-        $costCenterNumberNameMap = $costCenters->mapWithKeys(function ($costCenter) {
-            return [trim($costCenter->account_number) => $costCenter->name];
-        })->toArray();
+        // For each cost center, get related entries by matching cost_center field with cost center account_number
+        $costCenters->transform(function ($costCenter) {
+            $entries = \Modules\AccountingDepartment\Models\Entry::where('cost_center', $costCenter->account_number)->get();
 
-        // Calculate total balance per cost center from entries (sum of credit)
-        $costCenterBalances = \Modules\AccountingDepartment\Models\Entry::selectRaw('cost_center, SUM(credit) as total_credit')
-            ->whereNotNull('cost_center')
-            ->where('cost_center', '!=', '')
-            ->groupBy('cost_center')
-            ->get()
-            ->mapWithKeys(function ($item) {
-                return [trim($item->cost_center) => $item->total_credit];
+            // Group entries by account_number to get account names and balances
+            $accounts = $entries->groupBy('account_number')->map(function ($group) {
+                $accountName = $group->first()->account_name ?? 'غير محدد';
+                $totalDebit = $group->sum('debit');
+                $totalCredit = $group->sum('credit');
+                $balance = $totalCredit - $totalDebit;
+                return (object)[
+                    'account_number' => $group->first()->account_number,
+                    'account_name' => $accountName,
+                    'balance' => $balance,
+                ];
             });
 
-        // Fetch accounts with balances and cost center names
-        $accounts = \App\Models\Account::orderBy('id', 'desc')->get()->map(function ($account) use ($costCenterNumberNameMap) {
-            $entries = \Modules\AccountingDepartment\Models\Entry::where('account_number', $account->code)
-                ->whereNotNull('cost_center')
-                ->where('cost_center', '!=', '')
-                ->get();
+            // Calculate total balance for the cost center
+            $totalBalance = $accounts->sum('balance');
 
-            if ($entries->isEmpty()) {
-                return null;
-            }
+            $costCenter->accounts = $accounts;
+            $costCenter->balance = $totalBalance;
 
-            $total_debit = $entries->sum('debit') ?? 0;
-            $total_credit = $entries->sum('credit') ?? 0;
-            $account->balance = $total_credit - $total_debit;
+            return $costCenter;
+        });
 
-            // Map the cost center number to the actual name with trimming
-            $costCenterNumber = trim($entries->first()->cost_center ?? '');
-
-            // Debug: log the cost center number and mapping
-            Log::info("Cost center number: " . $costCenterNumber);
-            Log::info("Mapped name: " . ($costCenterNumberNameMap[$costCenterNumber] ?? 'Not found'));
-
-            $account->cost_center_name = $costCenterNumberNameMap[$costCenterNumber] ?? $costCenterNumber ?? 'غير محدد';
-
-            return $account;
-        })->filter();
-
-        return view('accountingdepartment::cost_centers_report', compact('costCenters', 'costCenterBalances', 'accounts'));
+        return view('accountingdepartment::cost_centers_report', compact('costCenters'));
     }
 
     /**

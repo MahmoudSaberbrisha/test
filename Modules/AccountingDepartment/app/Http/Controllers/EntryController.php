@@ -59,6 +59,24 @@ class EntryController extends Controller
         return view('accountingdepartment::entries.index', ['entries' => $paginatedEntries]);
     }
 
+    public function import(Request $request)
+    {
+        $request->validate([
+            'import_file' => 'required|file|mimes:xlsx,xls',
+        ]);
+
+        try {
+            \Illuminate\Support\Facades\Log::info('Import started');
+            $file = $request->file('import_file');
+            \Maatwebsite\Excel\Facades\Excel::import(new \Modules\AccountingDepartment\Imports\EntriesImport, $file);
+            \Illuminate\Support\Facades\Log::info('Import finished');
+            return redirect()->back()->with('success', 'تم استيراد البيانات بنجاح.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Import error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'حدث خطأ أثناء استيراد البيانات: ' . $e->getMessage());
+        }
+    }
+
     public function export()
     {
         return Excel::download(new EntriesExport, 'entries.xlsx');
@@ -114,7 +132,7 @@ class EntryController extends Controller
         $accounts = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_status', 'فرعي')->get();
 
         // Fetch all cost center branches
-        $costCenterBranches = \App\Models\CostCenterBranch::all();
+        $costCenterBranches = \App\Models\CostCenter::all();
 
         // Get the highest existing entry_number from the database
         $lastEntryNumber = Entry::max('entry_number');
@@ -224,18 +242,5 @@ class EntryController extends Controller
         $entries = $query->get();
 
         return view('accountingdepartment::account-movement', compact('entries', 'accounts'));
-    }
-
-
-
-    public function import(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|file|mimes:xlsx,xls,csv',
-        ]);
-
-        Excel::import(new EntriesImport, $request->file('file'));
-
-        return redirect()->route('admin.entries.index')->with('success', 'Entries imported successfully.');
     }
 }

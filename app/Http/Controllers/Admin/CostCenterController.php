@@ -14,13 +14,14 @@ class CostCenterController extends Controller
         $costCenters = CostCenter::with('branches')->get();
 
         // Calculate total balance per cost center from entries (sum of credit only as requested)
-        $costCenterBalances = \Modules\AccountingDepartment\Models\Entry::selectRaw('cost_center, SUM(credit) as total_credit')
+        $costCenterBalances = \Modules\AccountingDepartment\Models\Entry::selectRaw('cost_center, SUM(debit) as total_debit, SUM(credit) as total_credit')
             ->whereNotNull('cost_center')
             ->where('cost_center', '!=', '')
             ->groupBy('cost_center')
             ->get()
             ->mapWithKeys(function ($item) {
-                return [$item->cost_center => $item->total_credit];
+            $balance = ($item->total_debit ?? 0) - ($item->total_credit ?? 0);
+            return [$item->cost_center => $balance];
             });
 
         // Fetch accounts with balances and cost center names
@@ -109,7 +110,7 @@ class CostCenterController extends Controller
             }
         }
 
-        return redirect()->route('admin.cost-centers.index')->with('success', 'Cost Center updated successfully.');
+        return redirect()->route('admin.admin.cost-centers.index')->with('success', 'Cost Center updated successfully.');
     }
 
     public function destroy(CostCenter $costCenter)

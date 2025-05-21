@@ -16,8 +16,7 @@ class EntriesExport implements FromCollection, WithHeadings, WithMapping
      */
     public function collection()
     {
-        return Entry::where('approved', true)
-            ->get();
+        return Entry::all();
     }
 
     /**
