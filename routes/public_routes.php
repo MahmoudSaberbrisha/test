@@ -103,6 +103,10 @@ Route::prefix('booking-management')->group(function () {
     Route::get('bookings/get-groups/{id}', [BookingController::class, 'getGroups'])->name('get-groups');
     Route::get('bookings/print-reservation-data-pdf/{id}', [BookingController::class, 'printPdf'])->name('print-reservation-data-pdf');
     Route::get('bookings/print-reservation-data-excel/{id}', [BookingController::class, 'printExcel'])->name('print-reservation-data-excel');
+
+    Route::get('bookings/print-cruise-statement-pdf/{id}', [BookingController::class, 'printPdf'])->name('print-cruise-statement-pdf');
+    Route::get('bookings/print-cruise-statement-excel/{id}', [BookingController::class, 'printExcel'])->name('print-cruise-statement-excel');
+
     //Booking Groups
     Route::resource('booking-groups', BookingGroupController::class);
     Route::post('booking-groups/changeActive', [BookingGroupController::class, 'changeActive'])->name('booking-group-active');

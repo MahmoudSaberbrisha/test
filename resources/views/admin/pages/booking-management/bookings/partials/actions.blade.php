@@ -18,3 +18,6 @@
         return false;
     }
 </script>
+
+<a class="btn-sm-dark" target="_blank" href="{{ route(auth()->getDefaultDriver() . '.print-cruise-statement-pdf', $id) }}" data-placement="top" title="{{ __('Cruise Statement PDF') }}"> <i class="fas fa-file-pdf text-danger"></i> </a>
+<a class="btn-sm-dark" target="_blank" href="{{ route(auth()->getDefaultDriver().'.print-cruise-statement-excel', $id) }}" data-placement="top" title="{{ __('Cruise Statement EXCEL') }}"> <i class="fas fa-file-csv text-info"></i> </a>

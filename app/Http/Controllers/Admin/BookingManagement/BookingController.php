@@ -276,4 +276,770 @@ class BookingController extends Controller implements HasMiddleware
             'reservation_data.xlsx'
         );
     }
+
+    public function cruiseStatementPdf($id)
+    {
+        $booking = $this->dataRepository->findById($id);
+
+        $aggregatedClientTypes = [];
+        foreach ($booking->booking_groups as $group) {
+            foreach ($group->booking_group_members as $member) {
+                $clientTypeId = $member->client_type_id;
+                if (!isset($aggregatedClientTypes[$clientTypeId])) {
+                    $aggregatedClientTypes[$clientTypeId] = [
+                        'name' => $member->client_type->name,
+                        'count' => 0,
+                    ];
+                }
+                $aggregatedClientTypes[$clientTypeId]['count'] += $member->members_count;
+            }
+        }
+
+        $currencyTotals = [];
+        foreach ($booking->booking_groups as $group) {
+            $currencyId = $group->currency_id;
+            $currencySymbol = $group->currency_symbol;
+
+            if (!isset($currencyTotals[$currencyId])) {
+                $currencyTotals[$currencyId] = [
+                    'symbol' => $currencySymbol,
+                    'discount' => 0,
+                    'price' => 0,
+                    'paid' => 0,
+                    'total' => 0
+                ];
+            }
+            $currencyTotals[$currencyId]['discount'] += $group->discounted;
+            $currencyTotals[$currencyId]['paid'] += $group->paid;
+            $currencyTotals[$currencyId]['total'] += $group->total;
+            $currencyTotals[$currencyId]['price'] += $group->price;
+        }
+
+        $paymentMethodTotals = [];
+        $paymentMethodByCurrency = [];
+        foreach ($booking->booking_groups as $group) {
+            foreach ($group->booking_group_payments as $payment) {
+                $methodId = $payment->payment_method_id;
+                $methodName = $payment->payment_method->name;
+                $currencyId = $group->currency_id;
+                $currencySymbol = $group->currency_symbol;
+
+                if (!isset($paymentMethodTotals[$methodId])) {
+                    $paymentMethodTotals[$methodId] = [
+                        'name' => $methodName,
+                        'total' => 0
+                    ];
+                }
+                $paymentMethodTotals[$methodId]['total'] += $payment->paid;
+
+                if (!isset($paymentMethodByCurrency[$currencyId]['methods'][$methodId])) {
+                    $paymentMethodByCurrency[$currencyId]['methods'][$methodId] = [
+                        'name' => $methodName,
+                        'total' => 0,
+                        'symbol' => $currencySymbol
+                    ];
+                }
+                $paymentMethodByCurrency[$currencyId]['methods'][$methodId]['total'] += $payment->paid;
+                $paymentMethodByCurrency[$currencyId]['symbol'] = $currencySymbol;
+            }
+        }
+
+        $servicesWithParents = [];
+        $servicesWithoutParents = [];
+        foreach ($booking->booking_groups as $group) {
+            foreach ($group->booking_group_services as $service) {
+                $parentId = $service->extra_service->parent_id;
+                $serviceName = $service->extra_service->name;
+                $currencyId = $service->currency_id;
+                $currencySymbol = $service->currency->symbol;
+
+                if ($parentId) {
+                    if (!isset($servicesWithParents[$parentId])) {
+                        $servicesWithParents[$parentId] = [
+                            'parent_name' => $service->extra_service->parent->name,
+                            'services' => [],
+                            'currencies' => [],
+                            'payment_methods' => []
+                        ];
+                    }
+
+                    if (!isset($servicesWithParents[$parentId]['services'][$serviceName])) {
+                        $servicesWithParents[$parentId]['services'][$serviceName] = 0;
+                    }
+                    $servicesWithParents[$parentId]['services'][$serviceName] += $service->services_count;
+
+                    if (!isset($servicesWithParents[$parentId]['currencies'][$currencyId])) {
+                        $servicesWithParents[$parentId]['currencies'][$currencyId] = [
+                            'symbol' => $currencySymbol,
+                            'paid' => 0
+                        ];
+                    }
+                    $servicesWithParents[$parentId]['currencies'][$currencyId]['paid'] += $service->paid;
+
+                    foreach ($service->payments as $payment) {
+                        $methodId = $payment->payment_method_id;
+                        $methodName = $payment->payment_method->name;
+
+                        if (!isset($servicesWithParents[$parentId]['payment_methods'][$methodId])) {
+                            $servicesWithParents[$parentId]['payment_methods'][$methodId] = [
+                                'name' => $methodName,
+                                'amounts' => []
+                            ];
+                        }
+
+                        if (!isset($servicesWithParents[$parentId]['payment_methods'][$methodId]['amounts'][$currencyId])) {
+                            $servicesWithParents[$parentId]['payment_methods'][$methodId]['amounts'][$currencyId] = [
+                                'symbol' => $currencySymbol,
+                                'amount' => 0
+                            ];
+                        }
+
+                        $servicesWithParents[$parentId]['payment_methods'][$methodId]['amounts'][$currencyId]['amount'] += $payment->paid;
+                    }
+                } else {
+                    if (!isset($servicesWithoutParents[$serviceName])) {
+                        $servicesWithoutParents[$serviceName] = [
+                            'total_count' => 0,
+                            'currencies' => [],
+                            'payment_methods' => []
+                        ];
+                    }
+
+                    $servicesWithoutParents[$serviceName]['total_count'] += $service->services_count;
+
+                    if (!isset($servicesWithoutParents[$serviceName]['currencies'][$currencyId])) {
+                        $servicesWithoutParents[$serviceName]['currencies'][$currencyId] = [
+                            'symbol' => $currencySymbol,
+                            'unit_price' => $service->price,
+                            'paid' => 0
+                        ];
+                    }
+                    $servicesWithoutParents[$serviceName]['currencies'][$currencyId]['paid'] += $service->paid;
+
+                    foreach ($service->payments as $payment) {
+                        $methodId = $payment->payment_method_id;
+                        $methodName = $payment->payment_method->name;
+
+                        if (!isset($servicesWithoutParents[$serviceName]['payment_methods'][$methodId])) {
+                            $servicesWithoutParents[$serviceName]['payment_methods'][$methodId] = [
+                                'name' => $methodName,
+                                'amounts' => []
+                            ];
+                        }
+
+                        if (!isset($servicesWithoutParents[$serviceName]['payment_methods'][$methodId]['amounts'][$currencyId])) {
+                            $servicesWithoutParents[$serviceName]['payment_methods'][$methodId]['amounts'][$currencyId] = [
+                                'symbol' => $currencySymbol,
+                                'amount' => 0
+                            ];
+                        }
+
+                        $servicesWithoutParents[$serviceName]['payment_methods'][$methodId]['amounts'][$currencyId]['amount'] += $payment->paid;
+                    }
+                }
+            }
+        }
+
+        $combinedTotals = [];
+        $combinedPaymentMethods = [];
+
+        foreach ($currencyTotals as $currencyId => $currency) {
+            $combinedTotals[$currencyId] = [
+                'symbol' => $currency['symbol'],
+                'total' => $currency['paid']
+            ];
+        }
+
+        foreach ($servicesWithParents as $parentData) {
+            foreach ($parentData['currencies'] as $currencyId => $currency) {
+                if (!isset($combinedTotals[$currencyId])) {
+                    $combinedTotals[$currencyId] = [
+                        'symbol' => $currency['symbol'],
+                        'total' => 0
+                    ];
+                }
+                $combinedTotals[$currencyId]['total'] += $currency['paid'];
+            }
+        }
+
+        foreach ($servicesWithoutParents as $serviceData) {
+            foreach ($serviceData['currencies'] as $currencyId => $currency) {
+                if (!isset($combinedTotals[$currencyId])) {
+                    $combinedTotals[$currencyId] = [
+                        'symbol' => $currency['symbol'],
+                        'total' => 0
+                    ];
+                }
+                $combinedTotals[$currencyId]['total'] += $currency['paid'];
+            }
+        }
+
+        foreach ($paymentMethodByCurrency as $currencyId => $currencyData) {
+            foreach ($currencyData['methods'] as $methodId => $method) {
+                if (!isset($combinedPaymentMethods[$methodId])) {
+                    $combinedPaymentMethods[$methodId] = [
+                        'name' => $method['name'],
+                        'amounts' => []
+                    ];
+                }
+                if (!isset($combinedPaymentMethods[$methodId]['amounts'][$currencyId])) {
+                    $combinedPaymentMethods[$methodId]['amounts'][$currencyId] = [
+                        'symbol' => $currencyData['symbol'],
+                        'amount' => 0
+                    ];
+                }
+                $combinedPaymentMethods[$methodId]['amounts'][$currencyId]['amount'] += $method['total'];
+            }
+        }
+
+        foreach ($servicesWithParents as $parentData) {
+            foreach ($parentData['payment_methods'] as $methodId => $method) {
+                if (!isset($combinedPaymentMethods[$methodId])) {
+                    $combinedPaymentMethods[$methodId] = [
+                        'name' => $method['name'],
+                        'amounts' => []
+                    ];
+                }
+                foreach ($method['amounts'] as $currencyId => $amount) {
+                    if (!isset($combinedPaymentMethods[$methodId]['amounts'][$currencyId])) {
+                        $combinedPaymentMethods[$methodId]['amounts'][$currencyId] = [
+                            'symbol' => $amount['symbol'],
+                            'amount' => 0
+                        ];
+                    }
+                    $combinedPaymentMethods[$methodId]['amounts'][$currencyId]['amount'] += $amount['amount'];
+                }
+            }
+        }
+
+        foreach ($servicesWithoutParents as $serviceData) {
+            foreach ($serviceData['payment_methods'] as $methodId => $method) {
+                if (!isset($combinedPaymentMethods[$methodId])) {
+                    $combinedPaymentMethods[$methodId] = [
+                        'name' => $method['name'],
+                        'amounts' => []
+                    ];
+                }
+                foreach ($method['amounts'] as $currencyId => $amount) {
+                    if (!isset($combinedPaymentMethods[$methodId]['amounts'][$currencyId])) {
+                        $combinedPaymentMethods[$methodId]['amounts'][$currencyId] = [
+                            'symbol' => $amount['symbol'],
+                            'amount' => 0
+                        ];
+                    }
+                    $combinedPaymentMethods[$methodId]['amounts'][$currencyId]['amount'] += $amount['amount'];
+                }
+            }
+        }
+
+        $pdfService = new PdfService();
+        return $pdfService->generatePdf(
+            'admin.pages.booking-management.bookings.print-cruise-statement-data',
+            compact('booking', 'aggregatedClientTypes', 'currencyTotals', 'paymentMethodTotals', 'paymentMethodByCurrency', 'servicesWithParents', 'servicesWithoutParents', 'combinedTotals', 'combinedPaymentMethods'),
+            __('Cruise Statement'),
+            'A4'
+        );
+    }
+
+    public function cruiseStatementExcel($id)
+    {
+        $booking = $this->dataRepository->findById($id);
+
+        $aggregatedClientTypes = [];
+        foreach ($booking->booking_groups as $group) {
+            foreach ($group->booking_group_members as $member) {
+                $clientTypeId = $member->client_type_id;
+                if (!isset($aggregatedClientTypes[$clientTypeId])) {
+                    $aggregatedClientTypes[$clientTypeId] = [
+                        'name' => $member->client_type->name,
+                        'count' => 0,
+                    ];
+                }
+                $aggregatedClientTypes[$clientTypeId]['count'] += $member->members_count;
+            }
+        }
+
+        $currencyTotals = [];
+        foreach ($booking->booking_groups as $group) {
+            $currencyId = $group->currency_id;
+            $currencySymbol = $group->currency_symbol;
+
+            if (!isset($currencyTotals[$currencyId])) {
+                $currencyTotals[$currencyId] = [
+                    'symbol' => $currencySymbol,
+                    'discount' => 0,
+                    'price' => 0,
+                    'paid' => 0,
+                    'total' => 0
+                ];
+            }
+            $currencyTotals[$currencyId]['discount'] += $group->discounted;
+            $currencyTotals[$currencyId]['paid'] += $group->paid;
+            $currencyTotals[$currencyId]['total'] += $group->total;
+            $currencyTotals[$currencyId]['price'] += $group->price;
+        }
+
+        $paymentMethodTotals = [];
+        $paymentMethodByCurrency = [];
+        foreach ($booking->booking_groups as $group) {
+            foreach ($group->booking_group_payments as $payment) {
+                $methodId = $payment->payment_method_id;
+                $methodName = $payment->payment_method->name;
+                $currencyId = $group->currency_id;
+                $currencySymbol = $group->currency_symbol;
+
+                if (!isset($paymentMethodTotals[$methodId])) {
+                    $paymentMethodTotals[$methodId] = [
+                        'name' => $methodName,
+                        'total' => 0
+                    ];
+                }
+                $paymentMethodTotals[$methodId]['total'] += $payment->paid;
+
+                if (!isset($paymentMethodByCurrency[$currencyId]['methods'][$methodId])) {
+                    $paymentMethodByCurrency[$currencyId]['methods'][$methodId] = [
+                        'name' => $methodName,
+                        'total' => 0,
+                        'symbol' => $currencySymbol
+                    ];
+                }
+                $paymentMethodByCurrency[$currencyId]['methods'][$methodId]['total'] += $payment->paid;
+                $paymentMethodByCurrency[$currencyId]['symbol'] = $currencySymbol;
+            }
+        }
+
+        $servicesWithParents = [];
+        $servicesWithoutParents = [];
+        foreach ($booking->booking_groups as $group) {
+            foreach ($group->booking_group_services as $service) {
+                $parentId = $service->extra_service->parent_id;
+                $serviceName = $service->extra_service->name;
+                $currencyId = $service->currency_id;
+                $currencySymbol = $service->currency->symbol;
+
+                if ($parentId) {
+                    if (!isset($servicesWithParents[$parentId])) {
+                        $servicesWithParents[$parentId] = [
+                            'parent_name' => $service->extra_service->parent->name,
+                            'services' => [],
+                            'currencies' => [],
+                            'payment_methods' => []
+                        ];
+                    }
+
+                    if (!isset($servicesWithParents[$parentId]['services'][$serviceName])) {
+                        $servicesWithParents[$parentId]['services'][$serviceName] = 0;
+                    }
+                    $servicesWithParents[$parentId]['services'][$serviceName] += $service->services_count;
+
+                    if (!isset($servicesWithParents[$parentId]['currencies'][$currencyId])) {
+                        $servicesWithParents[$parentId]['currencies'][$currencyId] = [
+                            'symbol' => $currencySymbol,
+                            'paid' => 0
+                        ];
+                    }
+                    $servicesWithParents[$parentId]['currencies'][$currencyId]['paid'] += $service->paid;
+
+                    foreach ($service->payments as $payment) {
+                        $methodId = $payment->payment_method_id;
+                        $methodName = $payment->payment_method->name;
+
+                        if (!isset($servicesWithParents[$parentId]['payment_methods'][$methodId])) {
+                            $servicesWithParents[$parentId]['payment_methods'][$methodId] = [
+                                'name' => $methodName,
+                                'amounts' => []
+                            ];
+                        }
+
+                        if (!isset($servicesWithParents[$parentId]['payment_methods'][$methodId]['amounts'][$currencyId])) {
+                            $servicesWithParents[$parentId]['payment_methods'][$methodId]['amounts'][$currencyId] = [
+                                'symbol' => $currencySymbol,
+                                'amount' => 0
+                            ];
+                        }
+
+                        $servicesWithParents[$parentId]['payment_methods'][$methodId]['amounts'][$currencyId]['amount'] += $payment->paid;
+                    }
+                } else {
+                    if (!isset($servicesWithoutParents[$serviceName])) {
+                        $servicesWithoutParents[$serviceName] = [
+                            'total_count' => 0,
+                            'currencies' => [],
+                            'payment_methods' => []
+                        ];
+                    }
+
+                    $servicesWithoutParents[$serviceName]['total_count'] += $service->services_count;
+
+                    if (!isset($servicesWithoutParents[$serviceName]['currencies'][$currencyId])) {
+                        $servicesWithoutParents[$serviceName]['currencies'][$currencyId] = [
+                            'symbol' => $currencySymbol,
+                            'unit_price' => $service->price,
+                            'paid' => 0
+                        ];
+                    }
+                    $servicesWithoutParents[$serviceName]['currencies'][$currencyId]['paid'] += $service->paid;
+
+                    foreach ($service->payments as $payment) {
+                        $methodId = $payment->payment_method_id;
+                        $methodName = $payment->payment_method->name;
+
+                        if (!isset($servicesWithoutParents[$serviceName]['payment_methods'][$methodId])) {
+                            $servicesWithoutParents[$serviceName]['payment_methods'][$methodId] = [
+                                'name' => $methodName,
+                                'amounts' => []
+                            ];
+                        }
+
+                        if (!isset($servicesWithoutParents[$serviceName]['payment_methods'][$methodId]['amounts'][$currencyId])) {
+                            $servicesWithoutParents[$serviceName]['payment_methods'][$methodId]['amounts'][$currencyId] = [
+                                'symbol' => $currencySymbol,
+                                'amount' => 0
+                            ];
+                        }
+
+                        $servicesWithoutParents[$serviceName]['payment_methods'][$methodId]['amounts'][$currencyId]['amount'] += $payment->paid;
+                    }
+                }
+            }
+        }
+
+        $combinedTotals = [];
+        $combinedPaymentMethods = [];
+
+        foreach ($currencyTotals as $currencyId => $currency) {
+            $combinedTotals[$currencyId] = [
+                'symbol' => $currency['symbol'],
+                'total' => $currency['paid']
+            ];
+        }
+
+        foreach ($servicesWithParents as $parentData) {
+            foreach ($parentData['currencies'] as $currencyId => $currency) {
+                if (!isset($combinedTotals[$currencyId])) {
+                    $combinedTotals[$currencyId] = [
+                        'symbol' => $currency['symbol'],
+                        'total' => 0
+                    ];
+                }
+                $combinedTotals[$currencyId]['total'] += $currency['paid'];
+            }
+        }
+
+        foreach ($servicesWithoutParents as $serviceData) {
+            foreach ($serviceData['currencies'] as $currencyId => $currency) {
+                if (!isset($combinedTotals[$currencyId])) {
+                    $combinedTotals[$currencyId] = [
+                        'symbol' => $currency['symbol'],
+                        'total' => 0
+                    ];
+                }
+                $combinedTotals[$currencyId]['total'] += $currency['paid'];
+            }
+        }
+
+        foreach ($paymentMethodByCurrency as $currencyId => $currencyData) {
+            foreach ($currencyData['methods'] as $methodId => $method) {
+                if (!isset($combinedPaymentMethods[$methodId])) {
+                    $combinedPaymentMethods[$methodId] = [
+                        'name' => $method['name'],
+                        'amounts' => []
+                    ];
+                }
+                if (!isset($combinedPaymentMethods[$methodId]['amounts'][$currencyId])) {
+                    $combinedPaymentMethods[$methodId]['amounts'][$currencyId] = [
+                        'symbol' => $currencyData['symbol'],
+                        'amount' => 0
+                    ];
+                }
+                $combinedPaymentMethods[$methodId]['amounts'][$currencyId]['amount'] += $method['total'];
+            }
+        }
+
+        foreach ($servicesWithParents as $parentData) {
+            foreach ($parentData['payment_methods'] as $methodId => $method) {
+                if (!isset($combinedPaymentMethods[$methodId])) {
+                    $combinedPaymentMethods[$methodId] = [
+                        'name' => $method['name'],
+                        'amounts' => []
+                    ];
+                }
+                foreach ($method['amounts'] as $currencyId => $amount) {
+                    if (!isset($combinedPaymentMethods[$methodId]['amounts'][$currencyId])) {
+                        $combinedPaymentMethods[$methodId]['amounts'][$currencyId] = [
+                            'symbol' => $amount['symbol'],
+                            'amount' => 0
+                        ];
+                    }
+                    $combinedPaymentMethods[$methodId]['amounts'][$currencyId]['amount'] += $amount['amount'];
+                }
+            }
+        }
+
+        foreach ($servicesWithoutParents as $serviceData) {
+            foreach ($serviceData['payment_methods'] as $methodId => $method) {
+                if (!isset($combinedPaymentMethods[$methodId])) {
+                    $combinedPaymentMethods[$methodId] = [
+                        'name' => $method['name'],
+                        'amounts' => []
+                    ];
+                }
+                foreach ($method['amounts'] as $currencyId => $amount) {
+                    if (!isset($combinedPaymentMethods[$methodId]['amounts'][$currencyId])) {
+                        $combinedPaymentMethods[$methodId]['amounts'][$currencyId] = [
+                            'symbol' => $amount['symbol'],
+                            'amount' => 0
+                        ];
+                    }
+                    $combinedPaymentMethods[$methodId]['amounts'][$currencyId]['amount'] += $amount['amount'];
+                }
+            }
+        }
+
+        $tables = [];
+
+        $summaryHeadings = [
+            __('Booking Date'),
+            __('Boat Name'),
+            __('Booking Type'),
+            __('Price Person / Hour')
+        ];
+
+        $pricePerHour = [];
+        foreach ($booking->booking_groups as $group) {
+            $pricePerHour[] = $group->hour_member_price . $group->currency_symbol;
+        }
+
+        $summaryData = [
+            [
+                $booking->booking_date->format('Y-m-d'),
+                $booking->sailing_boat->name,
+                $booking->type->name . ' - ' . __($booking->booking_type) . ' - ' . $booking->branch->name . ' ( ' . $booking->start_time->format('H:i') . ' )',
+                implode(', ', $pricePerHour)
+            ]
+        ];
+
+        $tables = [];
+
+        $summaryHeadings = [
+            __('Booking Date'),
+            __('Boat Name'),
+            __('Booking Type'),
+            __('Price Person / Hour')
+        ];
+
+        $pricePerHour = [];
+        foreach ($booking->booking_groups as $group) {
+            $pricePerHour[] = $group->hour_member_price . $group->currency_symbol;
+        }
+
+        $summaryData = [
+            [
+                $booking->booking_date->format('Y-m-d'),
+                $booking->sailing_boat->name,
+                $booking->type->name . ' - ' . __($booking->booking_type) . ' - ' . $booking->branch->name . ' ( ' . $booking->start_time->format('H:i') . ' )',
+                implode(', ', $pricePerHour)
+            ]
+        ];
+
+        $tables[] = [
+            'title' => __('Cruise Statement'),
+            'headings' => $summaryHeadings,
+            'data' => $summaryData,
+        ];
+
+        $statementHeadings = [
+            __('Client Type'),
+            __('Count')
+        ];
+
+        $statementData = [];
+
+        $totalMembers = 0;
+        foreach ($aggregatedClientTypes as $clientType) {
+            $totalMembers += $clientType['count'];
+        }
+
+        $statementData[] = [
+            __('Total Members'),
+            $totalMembers
+        ];
+
+        foreach ($aggregatedClientTypes as $clientType) {
+            $statementData[] = [
+                $clientType['name'],
+                $clientType['count']
+            ];
+        }
+
+        $statementData[] = [('Total'), ''];
+        foreach ($currencyTotals as $currency) {
+            $statementData[] = [
+                '',
+                number_format($currency['price'], 2) . $currency['symbol']
+            ];
+        }
+
+        $statementData[] = [('Discounted'), ''];
+        foreach ($currencyTotals as $currency) {
+            $statementData[] = [
+                '',
+                number_format($currency['discount'], 2) . $currency['symbol']
+            ];
+        }
+
+        $statementData[] = [('Paid'), ''];
+        foreach ($currencyTotals as $currency) {
+            $statementData[] = [
+                '',
+                number_format($currency['paid'], 2) . $currency['symbol']
+            ];
+        }
+
+        foreach ($paymentMethodTotals as $methodId => $method) {
+            $statementData[] = [$method['name'], ''];
+            foreach ($paymentMethodByCurrency as $currencyData) {
+                if (isset($currencyData['methods'][$methodId])) {
+                    $statementData[] = [
+                        '',
+                        number_format($currencyData['methods'][$methodId]['total'], 2) . $currencyData['symbol']
+                    ];
+                }
+            }
+        }
+
+        $tables[] = [
+            'title' => __('Cruise Statements'),
+            'headings' => $statementHeadings,
+            'data' => $statementData,
+        ];
+
+        $servicesHeadings = [
+            __('Type'),
+            __('Count')
+        ];
+
+        $servicesData = [];
+
+        foreach ($servicesWithParents as $parentData) {
+            $servicesData[] = [
+                'is_merged' => true,
+                'value' => $parentData['parent_name']
+            ];
+
+            foreach ($parentData['services'] as $serviceName => $count) {
+                $servicesData[] = [
+                    $serviceName,
+                    $count
+                ];
+            }
+
+            $servicesData[] = [('Paid'), ''];
+            foreach ($parentData['currencies'] as $currency) {
+                $servicesData[] = [
+                    '',
+                    number_format($currency['paid'], 2) . $currency['symbol']
+                ];
+            }
+
+            foreach ($parentData['payment_methods'] as $methodId => $method) {
+                $servicesData[] = [
+                    'value' => $method['name']
+                ];
+                foreach ($method['amounts'] as $currency) {
+                    $servicesData[] = [
+                        '',
+                        number_format($currency['amount'], 2) . $currency['symbol']
+                    ];
+                }
+            }
+
+            $servicesData[] = ['', ''];
+            $servicesData[] = ['', ''];
+        }
+
+        foreach ($servicesWithoutParents as $serviceName => $serviceData) {
+            $servicesData[] = [
+                'is_merged' => true,
+                'value' => $serviceName
+            ];
+            $servicesData[] = [
+                __('Count'),
+                $serviceData['total_count']
+            ];
+
+            $servicesData[] = [('Unit Price'), ''];
+            foreach ($serviceData['currencies'] as $currency) {
+                $servicesData[] = [
+                    '',
+                    number_format($currency['unit_price'], 2) . $currency['symbol']
+                ];
+            }
+
+            $servicesData[] = [('Paid'), ''];
+            foreach ($serviceData['currencies'] as $currency) {
+                $servicesData[] = [
+                    '',
+                    number_format($currency['paid'], 2) . $currency['symbol']
+                ];
+            }
+
+            foreach ($serviceData['payment_methods'] as $methodId => $method) {
+                $servicesData[] = [
+                    'value' => $method['name']
+                ];
+                foreach ($method['amounts'] as $currency) {
+                    $servicesData[] = [
+                        '',
+                        number_format($currency['amount'], 2) . $currency['symbol']
+                    ];
+                }
+            }
+
+            $servicesData[] = ['', ''];
+            $servicesData[] = ['', ''];
+        }
+
+        $tables[] = [
+            'title' => __('Extra Services'),
+            'headings' => $servicesHeadings,
+            'data' => $servicesData,
+        ];
+
+        $totalsHeadings = [
+            __('Type'),
+            __('Value')
+        ];
+
+        $totalsData = [];
+
+        $totalsData[] = [('Total'), ''];
+        foreach ($combinedTotals as $currency) {
+            $totalsData[] = [
+                '',
+                number_format($currency['total'], 2) . $currency['symbol']
+            ];
+        }
+
+        foreach ($combinedPaymentMethods as $methodId => $method) {
+            $totalsData[] = [$method['name'], ''];
+            foreach ($method['amounts'] as $currencyId => $amount) {
+                $totalsData[] = [
+                    '',
+                    number_format($amount['amount'], 2) . $amount['symbol']
+                ];
+            }
+        }
+
+        $tables[] = [
+            'title' => __('Total'),
+            'headings' => $totalsHeadings,
+            'data' => $totalsData,
+        ];
+
+        return Excel::download(
+            new MultiTableExport($tables, __('Cruise Statement')),
+            'cruise_statement.xlsx'
+        );
+    }
 }

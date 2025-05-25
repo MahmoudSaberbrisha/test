@@ -534,5 +534,13 @@
     "Reservation Data PDF": "بيانات حجوزات الرحلات PDF",
     "Reservation Data EXCEL": "بيانات حجوزات الرحلات EXCEL",
     "Details": "التفاصيل",
-    "Warehouse management": "إدارة المخازن"
+    "Warehouse management": "إدارة المخازن",
+
+    "Unit Price": "سعر الوحدة",
+    "private": "خاص",
+    "group": "مجمع",
+    "Cruise Statements": "بيان رحلة",
+    "Cruise Statement EXCEL": "بيان تسليم رحلات بحر EXCEL",
+    "Cruise Statement PDF": "بيان تسليم رحلات بحر PDF",
+    "Cruise Statement": "بيان تسليم رحلات بحر"
 }
