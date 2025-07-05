@@ -25,55 +25,63 @@ class DashboardController extends Controller
         $data['active_sailing_boats'] = SailingBoat::where('active', 1)->count();
         $data['active_extra_services'] = ExtraService::where('active', 1)->count();
         
-        $data['calendarEvents'] = BookingGroup::with([
-                "client",
-                "booking_group_members",
-                "booking_group_payments",
-                "booking_group_services",
-                "booking" => function ($query) {
+        $bookings = Booking::with([
+                'booking_groups' => function($query) {
                     $query->with([
-                        'booking_groups',
-                        'branch'=> function ($query) {
-                            $query->withTranslation(); 
-                        },
-                        'sailing_boat'=> function ($query) {
-                            $query->withTranslation(); 
-                        },
-                        'type'=> function ($query) {
+                        "client",
+                        "booking_group_members",
+                        "booking_group_payments",
+                        "booking_group_services",
+                        "client_supplier",
+                        "currency" => function ($query) {
                             $query->withTranslation(); 
                         }
-                    ]); 
+                    ]);
                 },
-                "client_supplier",
-                "currency" => function ($query) {
+                'branch' => function ($query) {
+                    $query->withTranslation(); 
+                },
+                'sailing_boat' => function ($query) {
+                    $query->withTranslation(); 
+                },
+                'type' => function ($query) {
                     $query->withTranslation(); 
                 }
             ])
-            ->get()
-            ->map(function ($bookingGroup) {
-                $now = Carbon::now();
-                $start = Carbon::parse($bookingGroup->booking->booking_date->format('Y-m-d') . ' ' . $bookingGroup->booking->start_time->format('H:i:s'));
-                $end = Carbon::parse($bookingGroup->booking->booking_date->format('Y-m-d') . ' ' . $bookingGroup->booking->end_time->format('H:i:s'));
+            ->whereHas('booking_groups')
+            ->get();
 
-                if ($bookingGroup->active == 0) {
-                    $color = 'red';
-                } elseif ($now->between($start, $end)) {
-                    $color = 'green';
-                } elseif ($now->greaterThan($end)) {
-                    $color = 'orange';
-                } else {
-                    $color = '#007bff';
-                }
+        $data['calendarEvents'] = $bookings->map(function ($booking) {
+            $now = Carbon::now();
+            $start = Carbon::parse($booking->booking_date->format('Y-m-d') . ' ' . $booking->start_time->format('H:i:s'));
+            $end = Carbon::parse($booking->booking_date->format('Y-m-d') . ' ' . $booking->end_time->format('H:i:s'));
 
-                return [
-                    'id' => $bookingGroup->id,
-                    'title' => '<i class="fas fa-sailboat" title="'.__('Click for details').'" style="cursor: pointer;"></i> '.__(BOOKING_TYPES[$bookingGroup->booking->booking_type]).' #' . $bookingGroup->booking->sailing_boat->name,
-                    'start' => $start,
-                    'end' => $end,
-                    'color' => $color,
-                    'bookingGroup' => $bookingGroup,
-                ];
+            $hasInactiveGroups = $booking->booking_groups->contains('active', 0);
+            if ($hasInactiveGroups) {
+                $color = 'red';
+            } elseif ($now->between($start, $end)) {
+                $color = 'green';
+            } elseif ($now->greaterThan($end)) {
+                $color = 'orange';
+            } else {
+                $color = '#007bff';
+            }
+
+            $totalMembers = $booking->booking_groups->sum(function($group) {
+                return $group->booking_group_members->sum('members_count');
             });
+
+            return [
+                'id' => $booking->id,
+                'title' => '<i class="fas fa-sailboat" title="'.__('Click for details').'" style="cursor: pointer;"></i> '.__(BOOKING_TYPES[$booking->booking_type]).' #' . $booking->sailing_boat->name,
+                'start' => $start,
+                'end' => $end,
+                'color' => $color,
+                'booking' => $booking,
+                'totalMembers' => $totalMembers,
+                'isGrouped' => $booking->booking_groups->count() > 1
+            ];
+        });
 
         $currentYear = Carbon::now()->year;
         $lastYear = Carbon::now()->subYear()->year;

@@ -86,7 +86,7 @@
 
     <div class="container">
         <div class="header">
-            <img width="100px" src="{{ $settings['site_logo']->getProcessedValue()??'' }}" alt="{{$settings['site_name']->value??config('app.name')}}">
+            <img width="100px" src="{{ url('seed_images/logo.png')}}" alt="{{$settings['site_name']->value??config('app.name')}}">
             <h2>{{$settings['site_name']->value??config('app.name')}}</h2>
             <p style="font-size: 18px;">{{$title}}</p>
         </div>
@@ -166,6 +166,13 @@
             <p><strong>{{__('Notes')}}:</strong> {{$data->notes}}</p>
             @endif
             <p>{{$data->out_marina?__('Out Marina'):''}}</p>
+        </div>
+        <div class="footer">
+            
+            <p> لا يسمح بشرب المشروبات الكحوليه </p>
+            <p>ممنوع تبادل الادوار الالعاب</p>
+            <p>المبلغ المدفوع لا يسترد</p>
+            <P>لا يسمح بجلب مكبرات الصوت والسماعات الا بتصريح </p>
         </div>
         <div class="footer">
             <p>{{__('Thank you for choosing our services. We wish you a pleasant journey!')}}</p>

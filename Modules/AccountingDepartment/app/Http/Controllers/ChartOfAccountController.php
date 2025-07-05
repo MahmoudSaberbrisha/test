@@ -77,14 +77,14 @@ class ChartOfAccountController extends Controller
         $accounts = ChartOfAccount::with('entries')->get()->map(function ($account) {
             $total_debit = $account->entries->sum('debit');
             $total_credit = $account->entries->sum('credit');
-            $account->balance = $total_credit - $total_debit;
+            $account->balance = $total_debit -$total_credit ;
 
             // Calculate previous balance before last entry
             $lastEntry = $account->entries->sortByDesc('date')->first();
             if ($lastEntry) {
                 $previous_debit = $total_debit - $lastEntry->debit;
                 $previous_credit = $total_credit - $lastEntry->credit;
-                $account->previous_balance = $previous_credit - $previous_debit;
+                $account->previous_balance =  $previous_debit-$previous_credit ;
             } else {
                 $account->previous_balance = $account->balance;
             }
@@ -131,7 +131,7 @@ class ChartOfAccountController extends Controller
         // Calculate balance like in balances() method
         $total_debit = $account->entries->sum('debit');
         $total_credit = $account->entries->sum('credit');
-        $account->balance = $total_credit - $total_debit;
+        $account->balance = $total_debit-$total_credit;
 
         $accounts = ChartOfAccount::getTree();
         return view('accountingdepartment::accounts.print', compact('account', 'transactions', 'accounts'));

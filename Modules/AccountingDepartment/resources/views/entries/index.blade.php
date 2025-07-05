@@ -5,6 +5,19 @@
     <script src="{{ asset('assets') }}/script.js"></script>
 
     <div class="mb-4" dir="rtl">
+        <div class="flex justify-between mb-2">
+            <div class="text-lg font-semibold">
+                <span class="mr-4">إجمالي الدائن: <strong>{{ number_format($totalCredit, 2) }}</strong></span>
+                <span>إجمالي المدين: <strong>{{ number_format($totalDebit, 2) }}</strong></span>
+            </div>
+        </div>
+        <div class="flex justify-between mb-2">
+            <div class="text-lg font-semibold text-blue-700">
+                <span class="mr-4">إجمالي الدائن (ايرادات):
+                    <strong>{{ number_format($totalCreditRevenues, 2) }}</strong></span>
+                <span>إجمالي المدين (ايرادات): <strong>{{ number_format($totalDebitRevenues, 2) }}</strong></span>
+            </div>
+        </div>
         <form method="GET" action="" class="flex items-center gap-4">
             <label for="per_page" class="text-sm font-medium text-gray-700">عدد العناصر:</label>
             <select name="per_page" id="per_page" class="border border-gray-300 rounded-md px-3 py-1 text-sm"

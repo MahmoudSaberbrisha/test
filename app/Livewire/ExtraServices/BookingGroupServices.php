@@ -19,7 +19,7 @@ class BookingGroupServices extends Component
 {
     private $extraServiceRepository, $paymentMethodRepository, $bookingRepository, $extraServicesRepository, $currencyRepository;
 
-    public 
+    public
         $booking_group_id,
         $bookingGroups = [],
         $paymentMethods = [],
@@ -35,8 +35,8 @@ class BookingGroupServices extends Component
         $this->extraServiceRepository = app(ExtraServicesInterface::class);
         $this->currencyRepository = app(CurrencyRepositoryInterface::class);
         $this->paymentMethodRepository = App::make('PaymentMethodCrudRepository');
-        $this->bookingRepository = app(BookingRepositoryInterface::class); 
-        $this->bookingGroupRepository = app(BookingGroupRepositoryInterface::class); 
+        $this->bookingRepository = app(BookingRepositoryInterface::class);
+        $this->bookingGroupRepository = app(BookingGroupRepositoryInterface::class);
     }
 
     public function mount($booking_group_id = null)
@@ -77,7 +77,7 @@ class BookingGroupServices extends Component
                 'payments' => [],
             ];
         }
-        if(session()->has('print_pdf')) {
+        if (session()->has('print_pdf')) {
             $this->booking_group_id = $booking_group_id;
         }
     }
@@ -185,7 +185,7 @@ class BookingGroupServices extends Component
     public function checkPaymentMethod($serviceIndex, $paymentIndex)
     {
         $existingMethods = array_column(
-            array_filter($this->services[$serviceIndex]['payments'], fn($p, $i) => $i !== $paymentIndex, ARRAY_FILTER_USE_BOTH), 
+            array_filter($this->services[$serviceIndex]['payments'], fn($p, $i) => $i !== $paymentIndex, ARRAY_FILTER_USE_BOTH),
             'method'
         );
 

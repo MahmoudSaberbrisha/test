@@ -9,15 +9,13 @@ class DBBranchesRepository implements CrudRepositoryInterface
 {
     public function getAll()
     {
-        if(feature('regions-branches-feature'))
+        if (feature('regions-branches-feature'))
             return Branch::withTranslation()
                 ->with(['region' => function ($query) {
-                    $query->withTranslation(); 
+                    $query->withTranslation();
                 }])
-                ->select(['id', 'active', 'region_id'])
                 ->get();
         return Branch::withTranslation()
-            ->select(['id', 'active'])
             ->get();
     }
 
@@ -29,14 +27,14 @@ class DBBranchesRepository implements CrudRepositoryInterface
                 'name' => $request['name']
             ]
         ];
-        if(feature('regions-branches-feature'))
+        if (feature('regions-branches-feature'))
             $data['region_id'] = $request['region_id'];
         return Branch::create($data);
     }
 
     public function findById($id, $locale = null)
     {
-        if(feature('regions-branches-feature'))
+        if (feature('regions-branches-feature'))
             return Branch::withTranslation($locale)->with('region')->findOrFail($id);
         return Branch::withTranslation($locale)->findOrFail($id);
     }
@@ -45,7 +43,7 @@ class DBBranchesRepository implements CrudRepositoryInterface
     {
         $branch = $this->findById($id, $request['locale']);
         $branch->translateOrNew($request['locale'])->name = $request['name'];
-        if(feature('regions-branches-feature'))
+        if (feature('regions-branches-feature'))
             $branch->region_id = $request['region_id'];
         return $branch->save();
     }
@@ -60,20 +58,20 @@ class DBBranchesRepository implements CrudRepositoryInterface
     {
         $branch = $this->findById($id);
         if (!$branch)
-            return response()->json( array('type' => 'error', 'text' => __('Something went wrong during the process.')) );
+            return response()->json(array('type' => 'error', 'text' => __('Something went wrong during the process.')));
         $branch->active = ($value == 'true') ? 1 : 0;
         $branch->save();
-        if ($value == 'true') 
-            return response()->json( array('type' => 'success', 'text' => __('Record activated successfully.')) );
-        return response()->json( array('type' => 'success', 'text' => __('Record deactivated successfully.')) );
+        if ($value == 'true')
+            return response()->json(array('type' => 'success', 'text' => __('Record activated successfully.')));
+        return response()->json(array('type' => 'success', 'text' => __('Record deactivated successfully.')));
     }
 
     public function getActiveRecords()
     {
-        if(feature('regions-branches-feature'))
+        if (feature('regions-branches-feature'))
             return Branch::withTranslation()
                 ->with(['region' => function ($query) {
-                    $query->withTranslation(); 
+                    $query->withTranslation();
                 }])
                 ->where('active', 1)
                 ->get();
@@ -81,5 +79,4 @@ class DBBranchesRepository implements CrudRepositoryInterface
             ->select(['id', 'active'])
             ->get();
     }
-
 }

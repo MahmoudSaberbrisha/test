@@ -47,20 +47,64 @@ class BookingController extends Controller implements HasMiddleware
      */
     public function index(Request $request)
     {
-        if( $request->ajax() ) {
-            $types = $this->dataRepository->getAll();
-            return DataTables::of($types)
+        $admin = auth()->guard('admin')->user();
+
+        $query = Booking::with([
+            'booking_groups',
+            'branch' => function ($query) {
+                $query->withTranslation();
+            },
+            'sailing_boat' => function ($query) {
+                $query->withTranslation();
+            },
+            'type' => function ($query) {
+                $query->withTranslation();
+            },
+        ]);
+
+        if ($admin->branch_id) {
+            $query->where('branch_id', $admin->branch_id);
+        }
+
+        // Calculate total paid sum for all booking group payments, filtered by branch if applicable
+        $totalPaid = \App\Models\BookingGroupPayment::query()
+            ->when($admin->branch_id, function ($q) use ($admin) {
+                $q->whereHas('booking_group', function ($q2) use ($admin) {
+                    $q2->whereHas('booking', function ($q3) use ($admin) {
+                        $q3->where('branch_id', $admin->branch_id);
+                    });
+                });
+            })
+            ->sum('paid');
+
+        if ($request->ajax()) {
+            return DataTables::of($query->get())
                 ->addColumn('booking_type', function ($row) {
                     return __(BOOKING_TYPES[$row->booking_type]);
+                })
+                ->addColumn('total_paid', function ($row) {
+                    return $row->booking_groups->sum(function ($group) {
+                        return $group->booking_group_payments->sum('paid');
+                    });
                 })
                 ->addColumn('expand', 'admin.pages.booking-management.bookings.partials.expand')
                 ->addColumn('actions', 'admin.pages.booking-management.bookings.partials.actions')
                 ->rawColumns(['actions', 'expand'])
                 ->make(true);
         }
+
         $boats = $this->boatRepository->getActiveRecords();
         $types = $this->typeRepository->getActiveRecords();
-        return view('admin.pages.booking-management.bookings.index', compact('boats', 'types'));
+
+        if ($admin->branch_id) {
+            $boats = $boats->filter(function($boat) use ($admin) {
+                return $boat->branch_id == $admin->branch_id;
+            });
+        }
+
+        $types = $this->typeRepository->getActiveRecords();
+
+        return view('admin.pages.booking-management.bookings.index', compact('boats', 'types', 'totalPaid'));
     }
 
     public function getGroups($bookingId)
@@ -84,8 +128,8 @@ class BookingController extends Controller implements HasMiddleware
             toastr()->error(__('Something went wrong.'));
         }
         if ($request->save == 'continue')
-            return redirect()->route(auth()->getDefaultDriver().'.booking-groups.create');
-        return redirect()->route(auth()->getDefaultDriver().'.bookings.index');
+            return redirect()->route(auth()->getDefaultDriver() . '.booking-groups.create');
+        return redirect()->route(auth()->getDefaultDriver() . '.bookings.index');
     }
 
     /**
@@ -102,8 +146,8 @@ class BookingController extends Controller implements HasMiddleware
             toastr()->error(__('Something went wrong.'));
         }
         if ($request->save == 'continue')
-            return redirect()->route(auth()->getDefaultDriver().'.booking-groups.create');
-        return redirect()->route(auth()->getDefaultDriver().'.bookings.index');
+            return redirect()->route(auth()->getDefaultDriver() . '.booking-groups.create');
+        return redirect()->route(auth()->getDefaultDriver() . '.bookings.index');
     }
 
     /**
@@ -126,10 +170,10 @@ class BookingController extends Controller implements HasMiddleware
         $booking = $this->dataRepository->findById($id);
         if ($booking) {
             session()->put('bookingId', $id);
-            return redirect()->route(auth()->getDefaultDriver().'.booking-groups.create');
+            return redirect()->route(auth()->getDefaultDriver() . '.booking-groups.create');
         } else {
             toastr()->success(__('No such booking.'));
-            return redirect()->route(auth()->getDefaultDriver().'.bookings.index');
+            return redirect()->route(auth()->getDefaultDriver() . '.bookings.index');
         }
     }
 
@@ -140,6 +184,17 @@ class BookingController extends Controller implements HasMiddleware
         foreach ($booking->booking_groups as $group) {
             foreach ($group->booking_group_members as $member) {
                 $clientTypes->put($member->client_type_id, $member->client_type);
+            }
+        }
+
+        // Calculate total members for each client type
+        $totalClientTypeCounts = [];
+        foreach ($clientTypes as $type) {
+            $totalClientTypeCounts[$type->id] = 0;
+            foreach ($booking->booking_groups as $group) {
+                $totalClientTypeCounts[$type->id] += $group->booking_group_members
+                    ->where('client_type_id', $type->id)
+                    ->sum('members_count');
             }
         }
 
@@ -167,8 +222,30 @@ class BookingController extends Controller implements HasMiddleware
             }
         }
 
+        // Calculate totals for payments
+        $totalPayments = [];
+        foreach ($paymentMethods as $method) {
+            $totalPayments[$method->id] = 0;
+            foreach ($booking->booking_groups as $group) {
+                $totalPayments[$method->id] += $paymentAmounts[$group->id][$method->id] ?? 0;
+            }
+        }
+
         $pdfService = new PdfService();
-        return $pdfService->generatePdf('admin.pages.booking-management.bookings.print-reservation-data', compact('booking', 'clientTypes', 'clientTypeCounts', 'paymentAmounts', 'paymentMethods'), __('Reservation Data'), 'A4-L');
+        return $pdfService->generatePdf(
+            'admin.pages.booking-management.bookings.print-reservation-data',
+            compact(
+                'booking',
+                'clientTypes',
+                'clientTypeCounts',
+                'paymentAmounts',
+                'paymentMethods',
+                'totalClientTypeCounts',
+                'totalPayments'
+            ),
+            __('Reservation Data'),
+            'A4-L'
+        );
     }
 
     public function printExcel($id)
@@ -276,7 +353,6 @@ class BookingController extends Controller implements HasMiddleware
             'reservation_data.xlsx'
         );
     }
-
     public function cruiseStatementPdf($id)
     {
         $booking = $this->dataRepository->findById($id);
@@ -346,99 +422,101 @@ class BookingController extends Controller implements HasMiddleware
 
         $servicesWithParents = [];
         $servicesWithoutParents = [];
-        foreach ($booking->booking_groups as $group) {
-            foreach ($group->booking_group_services as $service) {
-                $parentId = $service->extra_service->parent_id;
-                $serviceName = $service->extra_service->name;
-                $currencyId = $service->currency_id;
-                $currencySymbol = $service->currency->symbol;
+foreach ($booking->booking_groups as $group) {
+    foreach ($group->booking_group_services as $service) {
+        if ($service->extra_service) {
+            $parentId = $service->extra_service->parent_id;
+            $serviceName = $service->extra_service->name;
+            $currencyId = $service->currency_id;
+            $currencySymbol = $service->currency->symbol;
 
-                if ($parentId) {
-                    if (!isset($servicesWithParents[$parentId])) {
-                        $servicesWithParents[$parentId] = [
-                            'parent_name' => $service->extra_service->parent->name,
-                            'services' => [],
-                            'currencies' => [],
-                            'payment_methods' => []
+            if ($parentId) {
+                if (!isset($servicesWithParents[$parentId])) {
+                    $servicesWithParents[$parentId] = [
+                        'parent_name' => $service->extra_service->parent->name,
+                        'services' => [],
+                        'currencies' => [],
+                        'payment_methods' => []
+                    ];
+                }
+
+                if (!isset($servicesWithParents[$parentId]['services'][$serviceName])) {
+                    $servicesWithParents[$parentId]['services'][$serviceName] = 0;
+                }
+                $servicesWithParents[$parentId]['services'][$serviceName] += $service->services_count;
+
+                if (!isset($servicesWithParents[$parentId]['currencies'][$currencyId])) {
+                    $servicesWithParents[$parentId]['currencies'][$currencyId] = [
+                        'symbol' => $currencySymbol,
+                        'paid' => 0
+                    ];
+                }
+                $servicesWithParents[$parentId]['currencies'][$currencyId]['paid'] += $service->paid;
+
+                foreach ($service->payments as $payment) {
+                    $methodId = $payment->payment_method_id;
+                    $methodName = $payment->payment_method->name;
+
+                    if (!isset($servicesWithParents[$parentId]['payment_methods'][$methodId])) {
+                        $servicesWithParents[$parentId]['payment_methods'][$methodId] = [
+                            'name' => $methodName,
+                            'amounts' => []
                         ];
                     }
 
-                    if (!isset($servicesWithParents[$parentId]['services'][$serviceName])) {
-                        $servicesWithParents[$parentId]['services'][$serviceName] = 0;
-                    }
-                    $servicesWithParents[$parentId]['services'][$serviceName] += $service->services_count;
-
-                    if (!isset($servicesWithParents[$parentId]['currencies'][$currencyId])) {
-                        $servicesWithParents[$parentId]['currencies'][$currencyId] = [
+                    if (!isset($servicesWithParents[$parentId]['payment_methods'][$methodId]['amounts'][$currencyId])) {
+                        $servicesWithParents[$parentId]['payment_methods'][$methodId]['amounts'][$currencyId] = [
                             'symbol' => $currencySymbol,
-                            'paid' => 0
-                        ];
-                    }
-                    $servicesWithParents[$parentId]['currencies'][$currencyId]['paid'] += $service->paid;
-
-                    foreach ($service->payments as $payment) {
-                        $methodId = $payment->payment_method_id;
-                        $methodName = $payment->payment_method->name;
-
-                        if (!isset($servicesWithParents[$parentId]['payment_methods'][$methodId])) {
-                            $servicesWithParents[$parentId]['payment_methods'][$methodId] = [
-                                'name' => $methodName,
-                                'amounts' => []
-                            ];
-                        }
-
-                        if (!isset($servicesWithParents[$parentId]['payment_methods'][$methodId]['amounts'][$currencyId])) {
-                            $servicesWithParents[$parentId]['payment_methods'][$methodId]['amounts'][$currencyId] = [
-                                'symbol' => $currencySymbol,
-                                'amount' => 0
-                            ];
-                        }
-
-                        $servicesWithParents[$parentId]['payment_methods'][$methodId]['amounts'][$currencyId]['amount'] += $payment->paid;
-                    }
-                } else {
-                    if (!isset($servicesWithoutParents[$serviceName])) {
-                        $servicesWithoutParents[$serviceName] = [
-                            'total_count' => 0,
-                            'currencies' => [],
-                            'payment_methods' => []
+                            'amount' => 0
                         ];
                     }
 
-                    $servicesWithoutParents[$serviceName]['total_count'] += $service->services_count;
+                    $servicesWithParents[$parentId]['payment_methods'][$methodId]['amounts'][$currencyId]['amount'] += $payment->paid;
+                }
+            } else {
+                if (!isset($servicesWithoutParents[$serviceName])) {
+                    $servicesWithoutParents[$serviceName] = [
+                        'total_count' => 0,
+                        'currencies' => [],
+                        'payment_methods' => []
+                    ];
+                }
 
-                    if (!isset($servicesWithoutParents[$serviceName]['currencies'][$currencyId])) {
-                        $servicesWithoutParents[$serviceName]['currencies'][$currencyId] = [
+                $servicesWithoutParents[$serviceName]['total_count'] += $service->services_count;
+
+                if (!isset($servicesWithoutParents[$serviceName]['currencies'][$currencyId])) {
+                    $servicesWithoutParents[$serviceName]['currencies'][$currencyId] = [
+                        'symbol' => $currencySymbol,
+                        'unit_price' => $service->price,
+                        'paid' => 0
+                    ];
+                }
+                $servicesWithoutParents[$serviceName]['currencies'][$currencyId]['paid'] += $service->paid;
+
+                foreach ($service->payments as $payment) {
+                    $methodId = $payment->payment_method_id;
+                    $methodName = $payment->payment_method->name;
+
+                    if (!isset($servicesWithoutParents[$serviceName]['payment_methods'][$methodId])) {
+                        $servicesWithoutParents[$serviceName]['payment_methods'][$methodId] = [
+                            'name' => $methodName,
+                            'amounts' => []
+                        ];
+                    }
+
+                    if (!isset($servicesWithoutParents[$serviceName]['payment_methods'][$methodId]['amounts'][$currencyId])) {
+                        $servicesWithoutParents[$serviceName]['payment_methods'][$methodId]['amounts'][$currencyId] = [
                             'symbol' => $currencySymbol,
-                            'unit_price' => $service->price,
-                            'paid' => 0
+                            'amount' => 0
                         ];
                     }
-                    $servicesWithoutParents[$serviceName]['currencies'][$currencyId]['paid'] += $service->paid;
 
-                    foreach ($service->payments as $payment) {
-                        $methodId = $payment->payment_method_id;
-                        $methodName = $payment->payment_method->name;
-
-                        if (!isset($servicesWithoutParents[$serviceName]['payment_methods'][$methodId])) {
-                            $servicesWithoutParents[$serviceName]['payment_methods'][$methodId] = [
-                                'name' => $methodName,
-                                'amounts' => []
-                            ];
-                        }
-
-                        if (!isset($servicesWithoutParents[$serviceName]['payment_methods'][$methodId]['amounts'][$currencyId])) {
-                            $servicesWithoutParents[$serviceName]['payment_methods'][$methodId]['amounts'][$currencyId] = [
-                                'symbol' => $currencySymbol,
-                                'amount' => 0
-                            ];
-                        }
-
-                        $servicesWithoutParents[$serviceName]['payment_methods'][$methodId]['amounts'][$currencyId]['amount'] += $payment->paid;
-                    }
+                    $servicesWithoutParents[$serviceName]['payment_methods'][$methodId]['amounts'][$currencyId]['amount'] += $payment->paid;
                 }
             }
         }
+    }
+}
 
         $combinedTotals = [];
         $combinedPaymentMethods = [];

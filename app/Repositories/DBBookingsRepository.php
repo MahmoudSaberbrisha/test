@@ -22,14 +22,14 @@ class DBBookingsRepository implements BookingRepositoryInterface
     {
         return Booking::with([
             'booking_groups',
-        	'branch'=> function ($query) {
-                $query->withTranslation(); 
+            'branch' => function ($query) {
+                $query->withTranslation();
             },
-        	'sailing_boat'=> function ($query) {
-                $query->withTranslation(); 
+            'sailing_boat' => function ($query) {
+                $query->withTranslation();
             },
-            'type'=> function ($query) {
-                $query->withTranslation(); 
+            'type' => function ($query) {
+                $query->withTranslation();
             },
         ])->get();
     }
@@ -44,6 +44,7 @@ class DBBookingsRepository implements BookingRepositoryInterface
         $data['start_time'] = $request['start_time'];
         $data['end_time'] = $request['end_time'];
         $data['total_hours'] = $request['total_hours'];
+        unset($data['id']); // Ensure id is not set to avoid duplicate key error
         return Booking::create($data);
     }
 
@@ -51,14 +52,14 @@ class DBBookingsRepository implements BookingRepositoryInterface
     {
         return Booking::with([
             'booking_groups',
-        	'branch'=> function ($query) {
-                $query->withTranslation(); 
+            'branch' => function ($query) {
+                $query->withTranslation();
             },
-            'sailing_boat'=> function ($query) {
-                $query->withTranslation(); 
+            'sailing_boat' => function ($query) {
+                $query->withTranslation();
             },
-            'type'=> function ($query) {
-                $query->withTranslation(); 
+            'type' => function ($query) {
+                $query->withTranslation();
             },
         ])->find($id);
     }
@@ -87,22 +88,21 @@ class DBBookingsRepository implements BookingRepositoryInterface
     {
         return Booking::with([
             'booking_groups',
-            'branch'=> function ($query) {
-                $query->withTranslation(); 
+            'branch' => function ($query) {
+                $query->withTranslation();
             },
-            'sailing_boat'=> function ($query) {
-                $query->withTranslation(); 
+            'sailing_boat' => function ($query) {
+                $query->withTranslation();
             },
-            'type'=> function ($query) {
-                $query->withTranslation(); 
+            'type' => function ($query) {
+                $query->withTranslation();
             },
         ])
-        ->where('booking_type', 'group')
-        ->orWhere(function ($q) {
-            $q->where('booking_type' ,'private')
-                ->whereDoesntHave('booking_groups');
-        })
-        ->get();
+            ->where('booking_type', 'group')
+            ->orWhere(function ($q) {
+                $q->where('booking_type', 'private')
+                    ->whereDoesntHave('booking_groups');
+            })
+            ->get();
     }
-
 }

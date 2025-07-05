@@ -90,9 +90,9 @@
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    @if (feature('regions-branches-feature') || feature('branches-feature'))
+                                    <!--@if (feature('regions-branches-feature') || feature('branches-feature'))-->
                                         <livewire:adminroleauthmodule::region-branch :region_id='$admin->region_id' :branch_id='$admin->branch_id'/>
-                                    @endif
+                                    <!--@endif-->
                                 </div>
                                 @include('adminroleauthmodule::includes.save-buttons')
                             </div>

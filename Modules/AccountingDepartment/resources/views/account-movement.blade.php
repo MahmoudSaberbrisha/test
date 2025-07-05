@@ -1,7 +1,7 @@
 @extends('accounting-department::master')
 @section('coco')
     <div class="container p-4" style="margin:50px">
-        <form method="GET" action="{{ route(auth()->getDefaultDriver() . '.account.movement') }}" class="mb-4">
+        <form method="GET" action="{{ route(auth()->getDefaultDriver() . '.admin.account.movement') }}" class="mb-4">
             <div class="flex flex-wrap justify-between items-center mb-4 space-x-4 space-x-reverse">
                 <div class="flex space-x-4 space-x-reverse" style="flex-wrap: nowrap; overflow-x: auto;">
                     <div class="w-full sm:w-auto" style="flex: 1 1 auto; min-width: 150px;">
@@ -59,7 +59,7 @@
                                 <th class="py-2 px-4">رقم القيد</th>
                                 <th class="py-2 px-4">رقم المرجع</th>
                                 <th class="py-2 px-4">البيان</th>
-                                  <th class="py-2 px-4">الدائن</th>
+                                <th class="py-2 px-4">الدائن</th>
                                 <th class="py-2 px-4">المدين</th>
 
                                 <th class="py-2 px-4">الرصيد</th>
@@ -76,7 +76,7 @@
                                     <td class="py-2 px-4">{{ $entry->description }}</td>
                                     <td class="py-2 px-4">{{ number_format($entry->credit, 2) }}</td>
                                     <td class="py-2 px-4">{{ number_format($entry->debit, 2) }}</td>
-                                    <td class="py-2 px-4">{{ number_format($entry->credit - $entry->debit, 2) }}</td>
+                                    <td class="py-2 px-4">{{ number_format( $entry->debit-$entry->credit , 2) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -90,7 +90,7 @@
             @php
                 $totalDebit = $entries->sum('debit');
                 $totalCredit = $entries->sum('credit');
-                $totalDifference = $totalCredit - $totalDebit;
+                $totalDifference =$totalDebit- $totalCredit ;
             @endphp
             <div class="bg-yellow-500 text-white p-2 rounded mt-4">
                 <div class="flex justify-between">

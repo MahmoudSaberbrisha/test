@@ -73,7 +73,7 @@ class AccountingDepartmentController extends Controller
         $accounts = \Modules\AccountingDepartment\Models\ChartOfAccount::with('entries')->get()->map(function ($account) {
             $total_debit = $account->entries->sum('debit');
             $total_credit = $account->entries->sum('credit');
-            $account->balance = $total_credit - $total_debit;
+            $account->balance = $total_debit-$total_credit;
             return $account;
         });
         return view('accountingdepartment::financial_balance', compact('accounts'));
@@ -95,7 +95,7 @@ class AccountingDepartmentController extends Controller
                 $accountName = $group->first()->account_name ?? 'غير محدد';
                 $totalDebit = $group->sum('debit');
                 $totalCredit = $group->sum('credit');
-                $balance = $totalCredit - $totalDebit;
+                $balance = $totalDebit-$totalCredit ;
                 return (object)[
                     'account_number' => $group->first()->account_number,
                     'account_name' => $accountName,
@@ -142,9 +142,9 @@ class AccountingDepartmentController extends Controller
                 if ($lastEntry) {
                     $previous_debit = $total_debit - $lastEntry->debit;
                     $previous_credit = $total_credit - $lastEntry->credit;
-                    $account->previous_balance = $previous_credit - $previous_debit;
+                    $account->previous_balance = $previous_debit -$previous_credit ;
                 } else {
-                    $account->previous_balance = $total_credit - $total_debit;
+                    $account->previous_balance = $total_debit- $total_credit;
                 }
 
                 return $account;

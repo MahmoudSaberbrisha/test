@@ -16,7 +16,7 @@
                                 <div class="card-sigin">
                                     <div class="mb-5 d-flex"> 
                                         <a href="javascript:void(0);">
-                                            <img src="{{ $settings['site_icon']->getProcessedValue()??'' }}" class="sign-favicon logo-auth" alt="logo">
+                                            <img src="{{ url('seed_images/icon.png')}}" class="sign-favicon logo-auth" alt="logo">
                                         </a>
                                         <h1 class="main-logo1 ml-1 mr-0 my-auto tx-28">{{$settings['site_name']->value??config('app.name')}}</h1>
                                     </div>

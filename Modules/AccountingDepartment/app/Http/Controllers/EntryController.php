@@ -44,6 +44,18 @@ class EntryController extends Controller
             return $entry;
         });
 
+        // Calculate total credit and debit for approved entries
+        $totalCredit = Entry::where('approved', true)->sum('credit');
+        $totalDebit = Entry::where('approved', true)->sum('debit');
+
+        // Calculate total credit and debit for approved entries with description containing 'ايرادات'
+        $totalCreditRevenues = Entry::where('approved', true)
+            ->where('description', 'like', '%ايرادات%')
+            ->sum('credit');
+        $totalDebitRevenues = Entry::where('approved', true)
+            ->where('description', 'like', '%ايرادات%')
+            ->sum('debit');
+
         // Re-key entries by entry_number to ensure one entry per number
         $uniqueEntries = $entries->unique('entry_number')->values();
 
@@ -56,7 +68,13 @@ class EntryController extends Controller
             ['path' => request()->url(), 'query' => request()->query()]
         );
 
-        return view('accountingdepartment::entries.index', ['entries' => $paginatedEntries]);
+        return view('accountingdepartment::entries.index', [
+            'entries' => $paginatedEntries,
+            'totalCredit' => $totalCredit,
+            'totalDebit' => $totalDebit,
+            'totalCreditRevenues' => $totalCreditRevenues,
+            'totalDebitRevenues' => $totalDebitRevenues,
+        ]);
     }
 
     public function import(Request $request)

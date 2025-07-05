@@ -10,7 +10,7 @@
                         <th class="border border-gray-300 px-4 py-2 text-left">الحساب (Account)</th>
                         <th class="border border-gray-300 px-4 py-2 text-right">مدين (Debit)</th>
                         <th class="border border-gray-300 px-4 py-2 text-right">دائن (Credit)</th>
-                        <th class="border border-gray-300 px-4 py-2 text-right">الرصيد السابق (Previous Balance)</th>
+                        <!--<th class="border border-gray-300 px-4 py-2 text-right">الرصيد السابق (Previous Balance)</th>-->
                     </tr>
                 </thead>
                 <tbody>
@@ -21,8 +21,8 @@
                                 {{ number_format($account->total_debit, 2) }}</td>
                             <td class="border border-gray-300 px-4 py-2 text-right">
                                 {{ number_format($account->total_credit, 2) }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-right">
-                                {{ number_format($account->previous_balance ?? 0, 2) }}</td>
+                            <!--<td class="border border-gray-300 px-4 py-2 text-right">-->
+                            <!--    {{ number_format($account->previous_balance ?? 0, 2) }}</td>-->
                         </tr>
                     @endforeach
                 </tbody>
@@ -33,8 +33,8 @@
                             {{ number_format($accounts->sum('total_debit'), 2) }}</td>
                         <td class="border border-gray-300 px-4 py-2 text-right">
                             {{ number_format($accounts->sum('total_credit'), 2) }}</td>
-                        <td class="border border-gray-300 px-4 py-2 text-right">
-                            {{ number_format($accounts->sum('previous_balance'), 2) }}</td>
+                        <!--<td class="border border-gray-300 px-4 py-2 text-right">-->
+                        <!--    {{ number_format($accounts->sum('previous_balance'), 2) }}</td>-->
                     </tr>
                 </tfoot>
             </table>

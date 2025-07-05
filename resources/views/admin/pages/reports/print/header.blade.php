@@ -60,7 +60,7 @@
 <body>
     <div class="header">
         <div>
-            <img width="100px" src="{{ $settings['site_logo']->getProcessedValue()??'' }}" alt="{{$settings['site_name']->value??config('app.name')}}">
+            <img width="100px" src="{{ url('seed_images/logo.png')}}" alt="{{$settings['site_name']->value??config('app.name')}}">
         </div>
         <div class="company-info">
             <h2>{{$settings['site_name']->value??config('app.name')}}</h2>

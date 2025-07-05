@@ -60,13 +60,13 @@ class BookingGroupController extends Controller implements HasMiddleware
             $bookingGroup = $this->dataRepository->create($request->validated());
             toastr()->success(__('Record successfully created.'));
             $this->processBookingRevenueEntry();
+            // $this->processExtraServicesRevenueEntry();
 
             if ($request->save == 'close') {
                 return redirect()->route('admin.bookings.index')->with('success', 'تمت إضافة إيرادات الحجوزات بنجاح');
             }
         } catch (\Exception $e) {
-            // dd($e->getMessage());
-            toastr()->error(__('Something went wrong.'));
+            toastr()->error($e->getMessage());
         }
 
         $pdfUrl = route('admin.print-invoice', ['id' => $bookingGroup->id]);
@@ -84,19 +84,18 @@ class BookingGroupController extends Controller implements HasMiddleware
         session()->forget('bookingGroupId');
         return redirect()->route('admin.bookings.index');
     }
-
     private function processBookingRevenueEntry()
     {
-        $accountNumber = '41';
+        $accountNumber = '40103';
         $account = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_number', $accountNumber)->first();
 
-        $accountNumber2 = '31';
+        $accountNumber2 = '1010103';
         $account2 = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_number', $accountNumber2)->first();
 
-        $accountNumber3 = '32';
+        $accountNumber3 = '1010504';
         $account3 = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_number', $accountNumber3)->first();
 
-        $accountNumber4 = '33';
+        $accountNumber4 = '1010503';
         $account4 = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_number', $accountNumber4)->first();
 
         if (!$account) {
@@ -119,117 +118,93 @@ class BookingGroupController extends Controller implements HasMiddleware
             $newEntryNumber = intval($lastEntryNumber) + 1;
         }
 
+        $createEntry = function ($entryNumber, $account, $debit, $credit, $desc) {
+            $entry = new \Modules\AccountingDepartment\Models\Entry();
+            $entry->entry_number = (string)$entryNumber;
+            $entry->chart_of_account_id = $account->id;
+            $entry->account_number = $account->account_number;
+            $entry->account_name = $account->account_name;
+            $entry->debit = $debit;
+            $entry->credit = $credit;
+            $entry->date = now();
+            $entry->description = $desc;
+            $entry->created_by = \Illuminate\Support\Facades\Auth::id();
+            $entry->approved = 1;
+            $entry->save();
+        };
+
         foreach ($bookingGroups as $group) {
-
-            $cashAmount = $group->booking_group_payments->where('payment_method_id', 3)->sum('paid');
-            if ($cashAmount > 0) {
-                $desc = 'ايرادات الحجوزات -كاش مدفوعات الحجز رقم ' . $group->id;
-                $exists = \Modules\AccountingDepartment\Models\Entry::where('description', $desc)->exists();
-                if ($exists) {
-                    continue;
-                }
-
-                $entry1 = new \Modules\AccountingDepartment\Models\Entry();
-                $entry1->entry_number = (string)$newEntryNumber++;
-                $entry1->chart_of_account_id = $account2->id;
-                $entry1->account_number = $account2->account_number;
-                $entry1->account_name = $account2->account_name;
-                $entry1->debit = $cashAmount;
-                $entry1->credit = 0;
-                $entry1->date = now();
-                $entry1->description = $desc . ' (مدين)';
-                $entry1->created_by = \Illuminate\Support\Facades\Auth::id();
-                $entry1->approved = 1;
-                $entry1->save();
-
-
-                $entry2 = new \Modules\AccountingDepartment\Models\Entry();
-                $entry2->entry_number = (string)$newEntryNumber++;
-                $entry2->chart_of_account_id = $account->id;
-                $entry2->account_number = $account->account_number;
-                $entry2->account_name = $account->account_name;
-                $entry2->debit = 0;
-                $entry2->credit = $cashAmount;
-                $entry2->date = now();
-                $entry2->description = $desc . ' (دائن)';
-                $entry2->created_by = \Illuminate\Support\Facades\Auth::id();
-                $entry2->approved = 1;
-                $entry2->save();
+            // Determine cash account based on currency id
+            $cashAccountNumber = '1010103'; // default
+            if ($group->currency_id == 3) {
+                $cashAccountNumber = '1010104';
             }
-            // فيزا
-            $visaAmount = $group->booking_group_payments->where('payment_method_id', 2)->sum('paid');
-            if ($visaAmount > 0) {
-                $desc = 'ايرادات الحجوزات -فيزا مدفوعات الحجز رقم ' . $group->id;
-                $exists = \Modules\AccountingDepartment\Models\Entry::where('description', $desc)->exists();
-                if ($exists) {
-                    continue;
+            $cashAccount = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_number', $cashAccountNumber)->first();
+
+            $paymentMethods = [
+                3 => $cashAccount,
+                2 => $account3,
+                1 => $account4,
+            ];
+
+            foreach ($paymentMethods as $paymentMethodId => $accountForMethod) {
+                $amount = $group->booking_group_payments->where('payment_method_id', $paymentMethodId)->sum('paid');
+                if ($amount > 0) {
+                    $desc = 'ايرادات الحجوزات -' . match ($paymentMethodId) {
+                        3 => 'كاش',
+                        2 => 'فيزا',
+                        1 => 'انستا باي',
+                        default => 'مدفوعات الحجز',
+                    } . ' رقم ' . $group->id;
+
+                    // Check if entries exist for this payment method and booking group
+                    $existingDebitEntry = \Modules\AccountingDepartment\Models\Entry::where('description', $desc . ' (مدين)')->first();
+                    $existingCreditEntry = \Modules\AccountingDepartment\Models\Entry::where('description', $desc . ' (دائن)')->first();
+
+                    if ($existingDebitEntry && $existingCreditEntry) {
+                        // Update existing entries
+                        $existingDebitEntry->debit = $amount;
+                        $existingDebitEntry->credit = 0;
+                        $existingDebitEntry->date = now();
+                        $existingDebitEntry->save();
+
+                        $existingCreditEntry->debit = 0;
+                        $existingCreditEntry->credit = $amount;
+                        $existingCreditEntry->date = now();
+                        $existingCreditEntry->save();
+                    } else {
+                        // Create new entries
+                        $createEntry($newEntryNumber++, $accountForMethod, $amount, 0, $desc . ' (مدين)');
+                        $createEntry($newEntryNumber++, $account, 0, $amount, $desc . ' (دائن)');
+                    }
+                } else {
+                    // If amount is 0, optionally update existing entries to zero or delete
+                    $desc = 'ايرادات الحجوزات -' . match ($paymentMethodId) {
+                        3 => 'كاش',
+                        2 => 'فيزا',
+                        1 => 'انستا باي',
+                        default => 'مدفوعات الحجز',
+                    } . ' رقم ' . $group->id;
+
+                    $existingDebitEntry = \Modules\AccountingDepartment\Models\Entry::where('description', $desc . ' (مدين)')->first();
+                    $existingCreditEntry = \Modules\AccountingDepartment\Models\Entry::where('description', $desc . ' (دائن)')->first();
+
+                    if ($existingDebitEntry && $existingCreditEntry) {
+                        $existingDebitEntry->debit = 0;
+                        $existingDebitEntry->credit = 0;
+                        $existingDebitEntry->date = now();
+                        $existingDebitEntry->save();
+
+                        $existingCreditEntry->debit = 0;
+                        $existingCreditEntry->credit = 0;
+                        $existingCreditEntry->date = now();
+                        $existingCreditEntry->save();
+                    }
                 }
-
-                $entry1 = new \Modules\AccountingDepartment\Models\Entry();
-                $entry1->entry_number = (string)$newEntryNumber++;
-                $entry1->chart_of_account_id = $account3->id;
-                $entry1->account_number = $account3->account_number;
-                $entry1->account_name = $account3->account_name;
-                $entry1->debit = $visaAmount;
-                $entry1->credit = 0;
-                $entry1->date = now();
-                $entry1->description = $desc . ' (مدين)';
-                $entry1->created_by = \Illuminate\Support\Facades\Auth::id();
-                $entry1->approved = 1;
-                $entry1->save();
-
-
-                $entry2 = new \Modules\AccountingDepartment\Models\Entry();
-                $entry2->entry_number = (string)$newEntryNumber++;
-                $entry2->chart_of_account_id = $account->id;
-                $entry2->account_number = $account->account_number;
-                $entry2->account_name = $account->account_name;
-                $entry2->debit = 0;
-                $entry2->credit = $visaAmount;
-                $entry2->date = now();
-                $entry2->description = $desc . ' (دائن)';
-                $entry2->created_by = \Illuminate\Support\Facades\Auth::id();
-                $entry2->approved = 1;
-                $entry2->save();
-            }
-            // انستا باي
-            $instaPayAmount = $group->booking_group_payments->where('payment_method_id', 1)->sum('paid');
-            if ($instaPayAmount > 0) {
-                $desc = 'ايرادات الحجوزات -انستا باي مدفوعات الحجز رقم ' . $group->id;
-                $exists = \Modules\AccountingDepartment\Models\Entry::where('description', $desc)->exists();
-                if ($exists) {
-                    continue;
-                }
-
-                $entry1 = new \Modules\AccountingDepartment\Models\Entry();
-                $entry1->entry_number = (string)$newEntryNumber++;
-                $entry1->chart_of_account_id = $account4->id;
-                $entry1->account_number = $account4->account_number;
-                $entry1->account_name = $account4->account_name;
-                $entry1->debit = $instaPayAmount;
-                $entry1->credit = 0;
-                $entry1->date = now();
-                $entry1->description = $desc . ' (مدين)';
-                $entry1->created_by = \Illuminate\Support\Facades\Auth::id();
-                $entry1->approved = 1;
-                $entry1->save();
-
-
-                $entry2 = new \Modules\AccountingDepartment\Models\Entry();
-                $entry2->entry_number = (string)$newEntryNumber++;
-                $entry2->chart_of_account_id = $account->id;
-                $entry2->account_number = $account->account_number;
-                $entry2->account_name = $account->account_name;
-                $entry2->debit = 0;
-                $entry2->credit = $instaPayAmount;
-                $entry2->date = now();
-                $entry2->description = $desc . ' (دائن)';
-                $entry2->created_by = \Illuminate\Support\Facades\Auth::id();
-                $entry2->approved = 1;
-                $entry2->save();
             }
         }
     }
+
 
     public function edit($id): View
     {
@@ -243,11 +218,16 @@ class BookingGroupController extends Controller implements HasMiddleware
     {
         try {
             $this->dataRepository->update($booking_group, $request->validated());
-            $this->processBookingRevenueEntry();
+            if (method_exists($this, 'processBookingRevenueEntry')) {
+                $this->processBookingRevenueEntry();
+            }
+            if (method_exists($this, 'processExtraServicesRevenueEntry')) {
+                $this->processExtraServicesRevenueEntry();
+            }
             session()->forget('bookingId');
             toastr()->success(__('Record successfully updated.'));
         } catch (\Exception $e) {
-            toastr()->error(__('Something went wrong.'));
+            toastr()->error($e->getMessage());
         }
 
         $pdfUrl = route(auth()->getDefaultDriver() . '.print-invoice', ['id' => $booking_group]);
@@ -272,11 +252,16 @@ class BookingGroupController extends Controller implements HasMiddleware
     public function destroy($id): RedirectResponse
     {
         try {
+            // Delete related accounting entries for this booking group
+            $entries = \Modules\AccountingDepartment\Models\Entry::where('description', 'like', '%رقم ' . $id . '%')->get();
+            foreach ($entries as $entry) {
+                $entry->delete();
+            }
+
             $this->dataRepository->delete($id);
             toastr()->success(__('Record successfully deleted.'));
         } catch (\Exception $e) {
-            // dd($e->getMessage());
-            toastr()->error(__('Something went wrong.'));
+            toastr()->error($e->getMessage());
         }
         return redirect()->back();
     }
@@ -286,7 +271,7 @@ class BookingGroupController extends Controller implements HasMiddleware
         try {
             return $this->dataRepository->active($request->id, $request->value);
         } catch (\Exception $e) {
-            return response()->json(array('type' => 'error', 'text' => __('Something went wrong.')));
+            return response()->json(array('type' => 'error', 'text' => $e->getMessage()));
         }
     }
 

@@ -12,15 +12,19 @@ class Booking extends Model
 {
     protected $table = 'bookings';
 
+    protected $primaryKey = 'id';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
     public $fillable = [
         'booking_type',
-        'branch_id', 
-        'sailing_boat_id', 
-        'type_id', 
-        'booking_date', 
-        'start_time', 
-        'end_time', 
-        'total_hours', 
+        'branch_id',
+        'sailing_boat_id',
+        'type_id',
+        'booking_date',
+        'start_time',
+        'end_time',
+        'total_hours',
     ];
 
     public static $bookingTypes = [
@@ -37,7 +41,8 @@ class Booking extends Model
 
     protected $appends = ['total_members'];
 
-    protected static function boot() {
+    protected static function boot()
+    {
         parent::boot();
         static::addGlobalScope(new RecordOrderScope('bookings.id', 'DESC'));
     }
@@ -81,5 +86,4 @@ class Booking extends Model
     {
         return $this->hasMany(BookingGroupService::class);
     }
-
 }

@@ -86,7 +86,7 @@
 
     <div class="container">
         <div class="header">
-            <img width="100px" src="{{ $settings['site_logo']->getProcessedValue()??'' }}" alt="{{$settings['site_name']->value??config('app.name')}}">
+            <img width="100px" src="{{ url('seed_images/logo.png')}}" alt="{{$settings['site_name']->value??config('app.name')}}">
             <h2>{{$settings['site_name']->value??config('app.name')}}</h2>
             <p style="font-size: 18px;">{{$title}}</p>
         </div>

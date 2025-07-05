@@ -52,7 +52,7 @@ class BookingGroupServiceController extends Controller implements HasMiddleware
                     'client_name' => $firstRecord->booking_group->client->name,
                     'branch' => $firstRecord->branch->name,
                     'sailing_boat' => $firstRecord->booking->sailing_boat->name,
-                    'booking_date_time' => $firstRecord->booking->booking_date->format('Y-m-d').' '.$firstRecord->booking->start_time->format('H:i'),
+                    'booking_date_time' => $firstRecord->booking->booking_date->format('Y-m-d') . ' ' . $firstRecord->booking->start_time->format('H:i'),
                     'total_services' => $group->sum('services_count'),
                     'booking_type' => __(BOOKING_TYPES[$firstRecord->booking->booking_type]),
                 ];
@@ -91,19 +91,20 @@ class BookingGroupServiceController extends Controller implements HasMiddleware
             $bookingGroupId = $this->dataRepository->create($request->validated());
             session()->forget('bookingGroupId');
             toastr()->success(__('Record successfully created.'));
+            $this->processExtraServicesRevenueEntry($bookingGroupId);
         } catch (\Exception $e) {
-            toastr()->error(__('Something went wrong.'));  
+            toastr()->error(__('Something went wrong.'));
         }
 
-        $pdfUrl = route(auth()->getDefaultDriver().'.print-service-invoices', ['id' => $bookingGroupId]);
+        $pdfUrl = route(auth()->getDefaultDriver() . '.print-service-invoices', ['id' => $bookingGroupId]);
         session()->flash('generatePdf', $pdfUrl);
 
         if ($request->save == 'new') {
-            return redirect()->route(auth()->getDefaultDriver().'.booking-extra-services.create');
+            return redirect()->route(auth()->getDefaultDriver() . '.booking-extra-services.create');
         } elseif ($request->save == 'close') {
             return redirect()->route(auth()->getDefaultDriver() . '.booking-extra-services.index');
         }
-        return redirect()->route(auth()->getDefaultDriver().'.booking-extra-services.edit', $bookingGroupId);
+        return redirect()->route(auth()->getDefaultDriver() . '.booking-extra-services.edit', $bookingGroupId);
     }
 
     public function edit($booking_group_id)
@@ -115,7 +116,7 @@ class BookingGroupServiceController extends Controller implements HasMiddleware
                 'booking_group_id' => $booking_group_id
             ]);
         else
-            toastr()->error(__('No such booking.'));  
+            toastr()->error(__('No such booking.'));
         return redirect()->route(auth()->getDefaultDriver() . '.booking-extra-services.index');
     }
 
@@ -128,10 +129,10 @@ class BookingGroupServiceController extends Controller implements HasMiddleware
             $this->dataRepository->update($request->validated());
             toastr()->success(__('Record successfully updated.'));
         } catch (\Exception $e) {
-            toastr()->error(__('Something went wrong.'));  
+            toastr()->error(__('Something went wrong.'));
         }
 
-        $pdfUrl = route(auth()->getDefaultDriver().'.print-service-invoices', ['id' => $booking_group_id]);
+        $pdfUrl = route(auth()->getDefaultDriver() . '.print-service-invoices', ['id' => $booking_group_id]);
         session()->flash('generatePdf', $pdfUrl);
 
         if ($request->save == 'new') {
@@ -152,7 +153,7 @@ class BookingGroupServiceController extends Controller implements HasMiddleware
             toastr()->success(__('Record successfully deleted.'));
         } catch (\Exception $e) {
             // dd($e->getMessage());
-            toastr()->error(__('Something went wrong.'));  
+            toastr()->error(__('Something went wrong.'));
         }
         return redirect()->back();
     }
@@ -164,7 +165,7 @@ class BookingGroupServiceController extends Controller implements HasMiddleware
             toastr()->success(__('Record successfully deleted.'));
         } catch (\Exception $e) {
             // dd($e->getMessage());
-            toastr()->error(__('Something went wrong.'));  
+            toastr()->error(__('Something went wrong.'));
         }
         return redirect()->back();
     }
@@ -176,11 +177,161 @@ class BookingGroupServiceController extends Controller implements HasMiddleware
         $pdfService->generateMultiPdf('admin.pages.extra-services-management.booking-group-services.invoice', $bookingServices, __('Booking Extra Services Receipt'));
     }
 
+    private function processExtraServicesRevenueEntry($bookingGroupId)
+    {
+        try {
+            $accountNumber = '40103';
+            $account = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_number', $accountNumber)->first();
+
+            $accountNumber2 = '1010103';
+            $account2 = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_number', $accountNumber2)->first();
+
+            $accountNumber3 = '1010504';
+            $account3 = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_number', $accountNumber3)->first();
+
+            $accountNumber4 = '1010503';
+            $account4 = \Modules\AccountingDepartment\Models\ChartOfAccount::where('account_number', $accountNumber4)->first();
+
+            if (!$account) {
+                toastr()->error('حساب إيرادات الخدمات الإضافية غير موجود');
+                return;
+            }
+
+            $extraServices = \App\Models\BookingGroupService::where('booking_group_id', $bookingGroupId)
+                ->get()
+                ->filter(function ($service) {
+                    return $service->paid > 0;
+                });
+
+            if ($extraServices->isEmpty()) {
+                toastr()->error('لا يوجد مبالغ مدفوعة للخدمات الإضافية لإضافتها');
+                return;
+            }
+
+            $lastEntryNumber = \Modules\AccountingDepartment\Models\Entry::orderBy('id', 'desc')->value('entry_number');
+            $newEntryNumber = 1;
+            if ($lastEntryNumber !== null && is_numeric($lastEntryNumber)) {
+                $newEntryNumber = intval($lastEntryNumber) + 1;
+            }
+
+            foreach ($extraServices as $service) {
+
+                $cashAmount = $service->payments->where('payment_method_id', 3)->sum('paid');
+                if ($cashAmount > 0) {
+                    $desc = 'ايرادات الخدمات الإضافية -كاش مدفوعات الخدمة رقم ' . $service->id;
+                    $exists = \Modules\AccountingDepartment\Models\Entry::where('description', $desc)->exists();
+                    if ($exists) {
+                        continue;
+                    }
+
+                    $entry1 = new \Modules\AccountingDepartment\Models\Entry();
+                    $entry1->entry_number = (string)$newEntryNumber++;
+                    $entry1->chart_of_account_id = $account2->id;
+                    $entry1->account_number = $account2->account_number;
+                    $entry1->account_name = $account2->account_name;
+                    $entry1->debit = $cashAmount;
+                    $entry1->credit = 0;
+                    $entry1->date = now();
+                    $entry1->description = $desc . ' (مدين)';
+                    $entry1->created_by = \Illuminate\Support\Facades\Auth::id();
+                    $entry1->approved = 1;
+                    $entry1->save();
+
+                    $entry2 = new \Modules\AccountingDepartment\Models\Entry();
+                    $entry2->entry_number = (string)$newEntryNumber++;
+                    $entry2->chart_of_account_id = $account->id;
+                    $entry2->account_number = $account->account_number;
+                    $entry2->account_name = $account->account_name;
+                    $entry2->debit = 0;
+                    $entry2->credit = $cashAmount;
+                    $entry2->date = now();
+                    $entry2->description = $desc . ' (دائن)';
+                    $entry2->created_by = \Illuminate\Support\Facades\Auth::id();
+                    $entry2->approved = 1;
+                    $entry2->save();
+                }
+
+                $visaAmount = $service->payments->where('payment_method_id', 2)->sum('paid');
+                if ($visaAmount > 0) {
+                    $desc = 'ايرادات الخدمات الإضافية -فيزا مدفوعات الخدمة رقم ' . $service->id;
+                    $exists = \Modules\AccountingDepartment\Models\Entry::where('description', $desc)->exists();
+                    if ($exists) {
+                        continue;
+                    }
+
+                    $entry1 = new \Modules\AccountingDepartment\Models\Entry();
+                    $entry1->entry_number = (string)$newEntryNumber++;
+                    $entry1->chart_of_account_id = $account3->id;
+                    $entry1->account_number = $account3->account_number;
+                    $entry1->account_name = $account3->account_name;
+                    $entry1->debit = $visaAmount;
+                    $entry1->credit = 0;
+                    $entry1->date = now();
+                    $entry1->description = $desc . ' (مدين)';
+                    $entry1->created_by = \Illuminate\Support\Facades\Auth::id();
+                    $entry1->approved = 1;
+                    $entry1->save();
+
+                    $entry2 = new \Modules\AccountingDepartment\Models\Entry();
+                    $entry2->entry_number = (string)$newEntryNumber++;
+                    $entry2->chart_of_account_id = $account->id;
+                    $entry2->account_number = $account->account_number;
+                    $entry2->account_name = $account->account_name;
+                    $entry2->debit = 0;
+                    $entry2->credit = $visaAmount;
+                    $entry2->date = now();
+                    $entry2->description = $desc . ' (دائن)';
+                    $entry2->created_by = \Illuminate\Support\Facades\Auth::id();
+                    $entry2->approved = 1;
+                    $entry2->save();
+                }
+
+                $instaPayAmount = $service->payments->where('payment_method_id', 1)->sum('paid');
+                if ($instaPayAmount > 0) {
+                    $desc = 'ايرادات الخدمات الإضافية -انستا باي مدفوعات الخدمة رقم ' . $service->id;
+                    $exists = \Modules\AccountingDepartment\Models\Entry::where('description', $desc)->exists();
+                    if ($exists) {
+                        continue;
+                    }
+
+                    $entry1 = new \Modules\AccountingDepartment\Models\Entry();
+                    $entry1->entry_number = (string)$newEntryNumber++;
+                    $entry1->chart_of_account_id = $account4->id;
+                    $entry1->account_number = $account4->account_number;
+                    $entry1->account_name = $account4->account_name;
+                    $entry1->debit = $instaPayAmount;
+                    $entry1->credit = 0;
+                    $entry1->date = now();
+                    $entry1->description = $desc . ' (مدين)';
+                    $entry1->created_by = \Illuminate\Support\Facades\Auth::id();
+                    $entry1->approved = 1;
+                    $entry1->save();
+
+                    $entry2 = new \Modules\AccountingDepartment\Models\Entry();
+                    $entry2->entry_number = (string)$newEntryNumber++;
+                    $entry2->chart_of_account_id = $account->id;
+                    $entry2->account_number = $account->account_number;
+                    $entry2->account_name = $account->account_name;
+                    $entry2->debit = 0;
+                    $entry2->credit = $instaPayAmount;
+                    $entry2->date = now();
+                    $entry2->description = $desc . ' (دائن)';
+                    $entry2->created_by = \Illuminate\Support\Facades\Auth::id();
+                    $entry2->approved = 1;
+                    $entry2->save();
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error in processExtraServicesRevenueEntry: ' . $e->getMessage());
+            toastr()->error(__('حدث خطأ أثناء معالجة قيود الإيرادات للخدمات الإضافية.'));
+        }
+    }
+
+
     public function printPdf($id)
     {
         $bookingService = $this->dataRepository->findOneService($id);
         $pdfService = new PdfService();
         $pdfService->generatePdf('admin.pages.extra-services-management.booking-group-services.invoice', $bookingService, __('Booking Extra Services Receipt'));
     }
-
 }

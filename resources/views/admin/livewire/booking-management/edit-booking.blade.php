@@ -150,7 +150,7 @@
             var now = new Date();
             var currentHour = now.getHours();
             var currentMinute = now.getMinutes();
-            var step = 5;
+            var step = 15;
 
             if (selectedDate === now.toDateString()) {
                 currentMinute = Math.ceil(currentMinute / step) * step;

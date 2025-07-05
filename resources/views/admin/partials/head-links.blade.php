@@ -1,7 +1,7 @@
 <!-- Title -->
 <title>@yield('page_title') | {{$settings['site_name']->value??config('app.name')}}</title>
 <!-- Favicon -->
-<link rel="shortcut icon" href="{{ $settings['site_icon']->getProcessedValue()??'' }}" type="image/x-icon"/>
+<link rel="shortcut icon" href="{{ url('seed_images/logo.png')}}" type="image/x-icon"/>
 <!-- Icons css -->
 <link href="{{asset('assets/admin')}}/css/icons.css" rel="stylesheet">
 <!--  Custom Scroll bar-->

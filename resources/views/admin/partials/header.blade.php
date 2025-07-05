@@ -3,8 +3,8 @@
     <div class="container-fluid">
         <div class="main-header-left ">
             <div class="responsive-logo">
-                <a href="javascript:void(0);"><img src="{{ $settings['site_logo']->getProcessedValue()??'' }}" class="logo-1" alt="logo"></a>
-                <a href="javascript:void(0);"><img src="{{ $settings['site_icon']->getProcessedValue()??'' }}" class="logo-2" alt="logo"></a>
+                <a href="javascript:void(0);"><img src="{{ url('seed_images/logo.png')}}" class="logo-1" alt="logo"></a>
+                <a href="javascript:void(0);"><img src="{{ url('seed_images/icon.png')}}" class="logo-2" alt="logo"></a>
             </div>
             <div class="app-sidebar__toggle" data-toggle="sidebar">
                 <a class="open-toggle" href="#"><i class="header-icon fe fe-align-left"></i></a>
