@@ -32,9 +32,9 @@
                 </div>
             </div>
             <div class="card-body">
-                <div class="mb-3">
+                {{-- <div class="mb-3">
                     <h5>إجمالي المدفوع: <strong>{{ number_format($totalPaid, 2) }}</strong></h5>
-                </div>
+                </div> --}}
                 <div class="table-responsive">
                     <a href="javascript:void(0);" data-toggle="modal" data-target="#modal-add"
                         class="btn btn-success mg-b-20">{{ __('Add Booking') }} <i class="typcn typcn-plus"></i></a>
